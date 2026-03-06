@@ -25,6 +25,10 @@ Eine einfache Desktop-Anwendung zur Verwaltung und Organisation von Dokumenten n
 - JSON-basierte Persistenz im Home-Verzeichnis
 - Nur Verweise: Originaldateien bleiben unberührt
 
+## Screenshots
+
+![Hauptfenster](screenshots/main.png)
+
 ## Installation
 
 ### Benötigte Dependencies
@@ -74,3 +78,29 @@ State wird gespeichert in: `~/.dokubibliothek_state.json`
 ## Lizenz
 
 GPL v3 - Siehe [LICENSE](LICENSE)
+
+---
+
+## English
+
+A desktop application for topic-based document management with preview and PDF export.
+
+### Features
+
+- Topic-based organization
+- Document preview
+- PDF export
+- Full-text search
+
+### Installation
+
+```bash
+git clone https://github.com/lukisch/REL-PUB_DokuReader.git
+cd REL-PUB_DokuReader
+pip install -r requirements.txt
+python "DokuReader.py"
+```
+
+### License
+
+See [LICENSE](LICENSE) for details.
