@@ -1,106 +1,84 @@
-# DokuReader - Dokumentenbibliothek
+# DokuReader - Document Library
 
-Eine einfache Desktop-Anwendung zur Verwaltung und Organisation von Dokumenten nach Themen mit Vorschau-Funktion und PDF-Export.
+A simple desktop application for managing and organizing documents by topic with preview functionality and PDF export.
 
 ## Features
 
-- **Themen-Organisation**: Erstellen, umbenennen und löschen Sie Themen für Ihre Dokumente
-- **Gelesen/Ungelesen**: Markieren Sie Dokumente als gelesen (grün mit ✓)
-- **Vorschau-Funktion**:
-  - Bilder (JPG, PNG, GIF)
-  - PDF-Dokumente (erste Seite)
-  - Textdateien (TXT)
-  - Office-Dokumente (DOCX, ODT)
-- **Drag & Drop**: Dateien einfach per Drag & Drop hinzufügen (optional)
-- **Doppelklick-Öffnen**: Dokumente im Standard-Programm öffnen
-- **Sammel-PDF-Export**: Exportieren Sie alle, gelesene oder ungelesene Dokumente als ein PDF
-  - Unterstützt: PDF, TXT, Bilder, DOC, DOCX, ODT, RTF
-  - Automatische Konvertierung zu PDF (LibreOffice oder MS Word)
-- **Plattform-übergreifend**: Windows, macOS, Linux
+- **Topic Organization**: Create, rename, and delete topics for your documents
+- **Read/Unread**: Mark documents as read (green with ✓)
+- **Preview**:
+  - Images (JPG, PNG, GIF)
+  - PDF documents (first page)
+  - Text files (TXT)
+  - Office documents (DOCX, ODT)
+- **Drag & Drop**: Easily add files via drag and drop (optional)
+- **Double-Click Open**: Open documents in the default application
+- **Batch PDF Export**: Export all, read, or unread documents as a single PDF
+  - Supports: PDF, TXT, images, DOC, DOCX, ODT, RTF
+  - Automatic conversion to PDF (LibreOffice or MS Word)
+- **Cross-Platform**: Windows, macOS, Linux
 
-## Technische Details
+## Technical Details
 
-- Python 3.10+ mit Tkinter
-- Single-File-Anwendung (756 Zeilen)
-- JSON-basierte Persistenz im Home-Verzeichnis
-- Nur Verweise: Originaldateien bleiben unberührt
+- Python 3.10+ with Tkinter
+- Single-file application (756 lines)
+- JSON-based persistence in the home directory
+- Reference-only: Original files remain untouched
 
 ## Screenshots
 
-![Hauptfenster](screenshots/main.png)
+![Main Window](screenshots/main.png)
 
 ## Installation
 
-### Benötigte Dependencies
+### Required Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### Optionale Dependencies
+### Optional Dependencies
 
-Für volle Funktionalität:
-- `pdf2image` oder `PyMuPDF` - PDF-Vorschau
+For full functionality:
+- `pdf2image` or `PyMuPDF` - PDF preview
 - `tkinterdnd2` - Drag & Drop
-- `python-docx` - DOCX-Vorschau
-- `odfpy` - ODT-Vorschau
-- `reportlab` - TXT/Bild zu PDF Konvertierung
-- `pypdf` oder `PyPDF2` - PDF-Merge
-- `pywin32` (Windows) - Word COM für Office-Konvertierung
+- `python-docx` - DOCX preview
+- `odfpy` - ODT preview
+- `reportlab` - TXT/image to PDF conversion
+- `pypdf` or `PyPDF2` - PDF merge
+- `pywin32` (Windows) - Word COM for Office conversion
 
-### LibreOffice (für Office → PDF Konvertierung)
+### LibreOffice (for Office → PDF conversion)
 
-Für beste Unterstützung von DOC/DOCX/ODT/RTF → PDF:
+For best support of DOC/DOCX/ODT/RTF → PDF:
 - **Linux**: `sudo apt-get install libreoffice`
 - **macOS**: `brew install --cask libreoffice`
-- **Windows**: Download von https://www.libreoffice.org/
+- **Windows**: Download from https://www.libreoffice.org/
 
-## Verwendung
+## Usage
 
 ```bash
 python DokuReader.py
 ```
 
-Oder per START.bat (Windows):
+Or via START.bat (Windows):
 ```bash
 START.bat
 ```
 
-## Dateiformat
+## Data Storage
 
-State wird gespeichert in: `~/.dokubibliothek_state.json`
+State is saved in: `~/.dokubibliothek_state.json`
 
-## Unterstützte Dateiformate
+## Supported File Formats
 
-- Dokumente: `.txt`, `.doc`, `.docx`, `.pdf`, `.odt`, `.rtf`
-- Bilder: `.jpg`, `.jpeg`, `.gif`, `.png`
+- Documents: `.txt`, `.doc`, `.docx`, `.pdf`, `.odt`, `.rtf`
+- Images: `.jpg`, `.jpeg`, `.gif`, `.png`
 
-## Lizenz
+## License
 
-GPL v3 - Siehe [LICENSE](LICENSE)
+GPL v3 - See [LICENSE](LICENSE)
 
 ---
 
-## English
-
-A desktop application for topic-based document management with preview and PDF export.
-
-### Features
-
-- Topic-based organization
-- Document preview
-- PDF export
-- Full-text search
-
-### Installation
-
-```bash
-git clone https://github.com/lukisch/REL-PUB_DokuReader.git
-cd REL-PUB_DokuReader
-pip install -r requirements.txt
-python "DokuReader.py"
-```
-
-### License
-
-See [LICENSE](LICENSE) for details.
+Deutsche Version: [README.de.md](README.de.md)
