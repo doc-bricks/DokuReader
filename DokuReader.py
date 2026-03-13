@@ -152,6 +152,7 @@ class State:
     def __init__(self):
         self.topics: dict[str, list[dict]] = {}
         self.current_topic: str | None = None
+        self._lock = threading.Lock()
 
     def load(self):
         """Lädt den Zustand aus der JSON-Datei (~/.dokubibliothek_state.json)."""
@@ -181,8 +182,9 @@ class State:
         Args:
             topic: Name des Themas
         """
-        if topic not in self.topics:
-            self.topics[topic] = []
+        with self._lock:
+            if topic not in self.topics:
+                self.topics[topic] = []
 
     def add_docs(self, topic: str, paths) -> int:
         """
@@ -195,14 +197,16 @@ class State:
         Returns:
             Anzahl der tatsächlich hinzugefügten Dokumente
         """
-        self.ensure_topic(topic)
-        known = {d["path"] for d in self.topics[topic]}
-        added = 0
-        for p in paths:
-            if os.path.isfile(p) and Path(p).suffix.lower() in SUPPORTED_EXTS and p not in known:
-                self.topics[topic].append({"path": p, "read": False})
-                added += 1
-        return added
+        with self._lock:
+            if topic not in self.topics:
+                self.topics[topic] = []
+            known = {d["path"] for d in self.topics[topic]}
+            added = 0
+            for p in paths:
+                if os.path.isfile(p) and Path(p).suffix.lower() in SUPPORTED_EXTS and p not in known:
+                    self.topics[topic].append({"path": p, "read": False})
+                    added += 1
+            return added
 
     def remove_doc(self, topic: str, path: str):
         """
@@ -212,7 +216,8 @@ class State:
             topic: Name des Themas
             path: Pfad des zu entfernenden Dokuments
         """
-        self.topics[topic] = [d for d in self.topics.get(topic, []) if d["path"] != path]
+        with self._lock:
+            self.topics[topic] = [d for d in self.topics.get(topic, []) if d["path"] != path]
 
     def set_read(self, topic: str, path: str, is_read: bool):
         """
@@ -223,13 +228,14 @@ class State:
             path: Pfad des Dokuments
             is_read: True = gelesen, False = ungelesen
         """
-        for d in self.topics.get(topic, []):
-            if d["path"] == path:
-                d["read"] = is_read
+        with self._lock:
+            for d in self.topics.get(topic, []):
+                if d["path"] == path:
+                    d["read"] = is_read
 
     def list_docs(self, topic: str):
         """
-        Gibt alle Dokumente eines Themas zurück.
+        Gibt eine Kopie aller Dokumente eines Themas zurück (thread-sicher).
 
         Args:
             topic: Name des Themas
@@ -237,7 +243,8 @@ class State:
         Returns:
             Liste von Dokumenten (dicts mit 'path' und 'read')
         """
-        return self.topics.get(topic, [])
+        with self._lock:
+            return list(self.topics.get(topic, []))
 
 
 class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
@@ -647,10 +654,13 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
                 if img is None and PYMUPDF_AVAILABLE:
                     try:
                         doc = fitz.open(path)
-                        if len(doc) > 0:
-                            page = doc[0]
-                            pix = page.get_pixmap()
-                            img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
+                        try:
+                            if len(doc) > 0:
+                                page = doc[0]
+                                pix = page.get_pixmap()
+                                img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
+                        finally:
+                            doc.close()
                     except (OSError, ValueError, RuntimeError):
                         img = None
                 if img is not None:
@@ -902,6 +912,8 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
                     pass
         # 2) Microsoft Word COM (nur Windows; öffnet DOC/DOCX/RTF; ODT oft nicht)
         if platform.system() == "Windows":
+            word = None
+            doc = None
             try:
                 import win32com.client  # pywin32
                 word = win32com.client.Dispatch("Word.Application")
@@ -911,11 +923,25 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
                 wdFormatPDF = 17
                 doc.SaveAs(out_path, FileFormat=wdFormatPDF)
                 doc.Close(False)
+                doc = None
                 word.Quit()
+                word = None
                 if os.path.exists(out_path):
                     return out_path
             except (OSError, ImportError, AttributeError):
                 pass
+            finally:
+                # COM-Objekte freigeben, falls durch Exception nicht geschlossen
+                try:
+                    if doc is not None:
+                        doc.Close(False)
+                except Exception:
+                    pass
+                try:
+                    if word is not None:
+                        word.Quit()
+                except Exception:
+                    pass
         return None
 
     def _merge_pdfs(self, pdf_paths: list[str], out_path: Path) -> bool:
