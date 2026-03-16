@@ -77,7 +77,9 @@ Status wird gespeichert in: `~/.dokubibliothek_state.json`
 
 ## Lizenz
 
-GPL v3 - Siehe [LICENSE](LICENSE)
+AGPL v3 - Siehe [LICENSE](LICENSE)
+
+Dieses Projekt verwendet PyMuPDF (AGPL-3.0), daher gilt die AGPL-Lizenz.
 
 ---
 
@@ -162,4 +164,6 @@ State is saved in: `~/.dokubibliothek_state.json`
 
 ### License
 
-GPL v3 - See [LICENSE](LICENSE)
+AGPL v3 - See [LICENSE](LICENSE)
+
+This project uses PyMuPDF (AGPL-3.0), therefore the AGPL license applies.
