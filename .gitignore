@@ -1,6 +1,7 @@
 # Python
 __pycache__/
 *.py[cod]
+*.pyo
 *$py.class
 *.so
 .Python
@@ -56,6 +57,9 @@ releases/
 # Secrets
 .env
 .env.*
+*.db
+*.sqlite
+*.sqlite3
 credentials.json
 client_secret*.json
 token.json
@@ -80,3 +84,10 @@ _private/
 # Project-specific
 AUFGABEN.txt
 DokuReader_konvert.txt
+
+# Test / coverage caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/

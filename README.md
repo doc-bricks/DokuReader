@@ -1,30 +1,25 @@
 # DokuReader - Dokumentenbibliothek
 
-Eine einfache Desktop-Anwendung zur Verwaltung und Organisation von Dokumenten nach Themen mit Vorschau-Funktion und PDF-Export.
+DokuReader ist eine lokale Desktop-Anwendung zum Verwalten, Vorschauen und Bündeln von Dokumenten nach Themen.
+Originaldateien bleiben an ihrem Speicherort; die Anwendung speichert nur Verweise und Lesestatus in einer lokalen JSON-Datei.
 
-## Features
+## Funktionen
 
-- **Themen-Organisation**: Themen fuer Dokumente erstellen, umbenennen und loeschen
-- **Gelesen/Ungelesen**: Dokumente als gelesen markieren (gruen mit Haekchen)
-- **Vorschau**:
-  - Bilder (JPG, PNG, GIF)
-  - PDF-Dokumente (erste Seite)
-  - Textdateien (TXT)
-  - Office-Dokumente (DOCX, ODT)
-- **Drag & Drop**: Dateien einfach per Drag & Drop hinzufuegen (optional)
-- **Doppelklick-Oeffnen**: Dokumente in der Standardanwendung oeffnen
-- **Batch-PDF-Export**: Alle, gelesene oder ungelesene Dokumente als einzelnes PDF exportieren
-  - Unterstuetzt: PDF, TXT, Bilder, DOC, DOCX, ODT, RTF
-  - Automatische Konvertierung zu PDF (LibreOffice oder MS Word)
-- **Windows-Icon**: Projekt-Icon fuer Fenster und PyInstaller-Builds
-- **Plattformuebergreifend**: Windows, macOS, Linux
+- Themen für Dokumente erstellen, umbenennen und löschen
+- Dokumente als gelesen oder ungelesen markieren
+- Vorschau für Bilder, PDFs, Textdateien sowie DOCX/ODT-Dokumente
+- Dateien per Drag & Drop hinzufügen, wenn `tkinterdnd2` installiert ist
+- Dokumente per Doppelklick in der Standardanwendung öffnen
+- Batch-PDF-Export für alle, gelesene oder ungelesene Dokumente
+- Office-zu-PDF-Konvertierung über LibreOffice oder Microsoft Word
+- Windows-Icon und PyInstaller-Spec für lokale Windows-Builds
 
-## Technische Details
+## Datenschutz und lokale Daten
 
-- Python 3.10+ mit Tkinter
-- Einzeldatei-Anwendung mit Tkinter-GUI
-- JSON-basierte Speicherung im Home-Verzeichnis
-- Nur Referenzen: Originaldateien bleiben unberuehrt
+- DokuReader arbeitet lokal und lädt keine Dokumente in externe Dienste hoch.
+- Originaldateien werden nicht kopiert oder verändert.
+- Der Status wird in `~/.dokubibliothek_state.json` gespeichert.
+- Lokale Build-Artefakte, Release-Dateien, interne Aufgabenlisten und Konvertierungsnotizen sind per `.gitignore` ausgeschlossen.
 
 ## Screenshots
 
@@ -32,29 +27,26 @@ Eine einfache Desktop-Anwendung zur Verwaltung und Organisation von Dokumenten n
 
 ## Installation
 
-### Erforderliche Abhaengigkeiten
+### Voraussetzungen
+
+- Python 3.10+
+- Tkinter, normalerweise in Standard-Python-Installationen enthalten
+
+### Python-Abhängigkeiten
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### Optionale Abhaengigkeiten
+`requirements.txt` enthält die unterstützten Python-Integrationen für Vorschau, Drag & Drop und PDF-Export. Fehlende optionale Pakete deaktivieren nur die jeweilige Zusatzfunktion.
 
-Fuer volle Funktionalitaet:
-- `pdf2image` oder `PyMuPDF` - PDF-Vorschau
-- `tkinterdnd2` - Drag & Drop
-- `python-docx` - DOCX-Vorschau
-- `odfpy` - ODT-Vorschau
-- `reportlab` - TXT/Bild zu PDF-Konvertierung
-- `pypdf` oder `PyPDF2` - PDF-Zusammenfuehrung
-- `pywin32` (Windows) - Word COM fuer Office-Konvertierung
+### Optionale Systemabhängigkeiten
 
-### LibreOffice (fuer Office → PDF Konvertierung)
+Für volle Vorschau- und Exportfunktionalität:
 
-Fuer beste Unterstuetzung von DOC/DOCX/ODT/RTF → PDF:
-- **Linux**: `sudo apt-get install libreoffice`
-- **macOS**: `brew install --cask libreoffice`
-- **Windows**: Download von https://www.libreoffice.org/
+- LibreOffice für DOC/DOCX/ODT/RTF zu PDF
+- Poppler für `pdf2image`, falls diese Vorschau-Variante genutzt wird
+- Microsoft Word unter Windows für die optionale Word-COM-Konvertierung
 
 ## Verwendung
 
@@ -62,31 +54,43 @@ Fuer beste Unterstuetzung von DOC/DOCX/ODT/RTF → PDF:
 python DokuReader.py
 ```
 
-Oder via START.bat (Windows):
+Unter Windows kann alternativ die Startdatei verwendet werden:
+
 ```bash
 START.bat
 ```
 
-### Optionaler Windows-Build
+## Optionaler Windows-Build
 
 ```bash
 pyinstaller DokuReader.spec
 ```
 
-## Datenspeicherung
+Build-Ausgaben unter `build/`, `dist/` und `releases/` bleiben lokal und gehören nicht in das Git-Repository.
 
-Status wird gespeichert in: `~/.dokubibliothek_state.json`
-
-## Unterstuetzte Dateiformate
+## Unterstützte Dateiformate
 
 - Dokumente: `.txt`, `.doc`, `.docx`, `.pdf`, `.odt`, `.rtf`
 - Bilder: `.jpg`, `.jpeg`, `.gif`, `.png`
 
+## Projektdateien
+
+- `DokuReader.py` - Hauptanwendung
+- `requirements.txt` - Python-Abhängigkeiten
+- `DokuReader.spec` - PyInstaller-Konfiguration
+- `locales/translations.json` - Übersetzungsdaten
+- `SECURITY.md` - Hinweise zum Melden von Sicherheitslücken
+- `CONTRIBUTING.md` - Beitragsrichtlinien
+
 ## Lizenz
 
-AGPL v3 - Siehe [LICENSE](LICENSE)
+Dieses Projekt steht unter der [GNU Affero General Public License v3.0](LICENSE).
+Die AGPL-3.0 ist passend, weil DokuReader optional PyMuPDF nutzt, das ebenfalls AGPL-3.0-lizenziert ist.
 
-Dieses Projekt verwendet PyMuPDF (AGPL-3.0), daher gilt die AGPL-Lizenz.
+## Haftung
+
+Dieses Projekt wird ohne Gewährleistung bereitgestellt. Nutzung, Tests und Verarbeitung eigener Dokumente erfolgen auf eigenes Risiko.
+Es gilt die Haftungs- und Gewährleistungsausschlussregelung der AGPL-3.0.
 
 ---
 
@@ -94,101 +98,94 @@ Dieses Projekt verwendet PyMuPDF (AGPL-3.0), daher gilt die AGPL-Lizenz.
 
 # DokuReader - Document Library
 
-A simple desktop application for managing and organizing documents by topic with preview functionality and PDF export.
+DokuReader is a local desktop application for organizing, previewing, and bundling documents by topic.
+Original files remain where they are; the application stores only references and read status in a local JSON file.
 
-### Features
+## Features
 
-- **Topic Organization**: Create, rename, and delete topics for your documents
-- **Read/Unread**: Mark documents as read (green with checkmark)
-- **Preview**:
-  - Images (JPG, PNG, GIF)
-  - PDF documents (first page)
-  - Text files (TXT)
-  - Office documents (DOCX, ODT)
-- **Drag & Drop**: Easily add files via drag and drop (optional)
-- **Double-Click Open**: Open documents in the default application
-- **Batch PDF Export**: Export all, read, or unread documents as a single PDF
-  - Supports: PDF, TXT, images, DOC, DOCX, ODT, RTF
-  - Automatic conversion to PDF (LibreOffice or MS Word)
-- **Windows icon**: Project icon for the app window and PyInstaller builds
-- **Cross-Platform**: Windows, macOS, Linux
+- Create, rename, and delete document topics
+- Mark documents as read or unread
+- Preview images, PDFs, text files, and DOCX/ODT documents
+- Add files via drag and drop when `tkinterdnd2` is installed
+- Open documents in the default application by double-clicking
+- Export all, read, or unread documents as a combined PDF
+- Convert Office documents to PDF through LibreOffice or Microsoft Word
+- Windows icon and PyInstaller spec for local Windows builds
 
-### Technical Details
+## Privacy and Local Data
 
-- Python 3.10+ with Tkinter
-- Single-file Tkinter application
-- JSON-based persistence in the home directory
-- Reference-only: Original files remain untouched
+- DokuReader runs locally and does not upload documents to external services.
+- Original files are not copied or modified.
+- State is stored in `~/.dokubibliothek_state.json`.
+- Local build artifacts, release files, internal task notes, and conversion scratch files are excluded via `.gitignore`.
 
-### Screenshots
+## Screenshots
 
-![Main Window](README/screenshots/main.png)
+![Main window](README/screenshots/main.png)
 
-### Installation
+## Installation
 
-#### Required Dependencies
+### Requirements
+
+- Python 3.10+
+- Tkinter, usually included with standard Python installations
+
+### Python Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-#### Optional Dependencies
+`requirements.txt` includes the supported Python integrations for preview, drag and drop, and PDF export. Missing optional packages only disable the related extra feature.
 
-For full functionality:
-- `pdf2image` or `PyMuPDF` - PDF preview
-- `tkinterdnd2` - Drag & Drop
-- `python-docx` - DOCX preview
-- `odfpy` - ODT preview
-- `reportlab` - TXT/image to PDF conversion
-- `pypdf` or `PyPDF2` - PDF merge
-- `pywin32` (Windows) - Word COM for Office conversion
+### Optional System Dependencies
 
-#### LibreOffice (for Office → PDF conversion)
+For full preview and export functionality:
 
-For best support of DOC/DOCX/ODT/RTF → PDF:
-- **Linux**: `sudo apt-get install libreoffice`
-- **macOS**: `brew install --cask libreoffice`
-- **Windows**: Download from https://www.libreoffice.org/
+- LibreOffice for DOC/DOCX/ODT/RTF to PDF conversion
+- Poppler for `pdf2image`, if that preview backend is used
+- Microsoft Word on Windows for optional Word COM conversion
 
-### Usage
+## Usage
 
 ```bash
 python DokuReader.py
 ```
 
-Or via START.bat (Windows):
+On Windows, the start file can be used instead:
+
 ```bash
 START.bat
 ```
 
-#### Optional Windows build
+## Optional Windows Build
 
 ```bash
 pyinstaller DokuReader.spec
 ```
 
-### Data Storage
+Build output under `build/`, `dist/`, and `releases/` stays local and does not belong in the Git repository.
 
-State is saved in: `~/.dokubibliothek_state.json`
-
-### Supported File Formats
+## Supported File Formats
 
 - Documents: `.txt`, `.doc`, `.docx`, `.pdf`, `.odt`, `.rtf`
 - Images: `.jpg`, `.jpeg`, `.gif`, `.png`
 
-### License
+## Project Files
 
-AGPL v3 - See [LICENSE](LICENSE)
+- `DokuReader.py` - main application
+- `requirements.txt` - Python dependencies
+- `DokuReader.spec` - PyInstaller configuration
+- `locales/translations.json` - translation data
+- `SECURITY.md` - vulnerability reporting guidance
+- `CONTRIBUTING.md` - contribution guidelines
 
-This project uses PyMuPDF (AGPL-3.0), therefore the AGPL license applies.
+## License
 
----
+This project is licensed under the [GNU Affero General Public License v3.0](LICENSE).
+AGPL-3.0 is appropriate because DokuReader can optionally use PyMuPDF, which is also licensed under AGPL-3.0.
 
-## Haftung / Liability
+## Liability
 
-Dieses Projekt ist eine **unentgeltliche Open-Source-Schenkung** im Sinne der §§ 516 ff. BGB. Die Haftung des Urhebers ist gemäß **§ 521 BGB** auf **Vorsatz und grobe Fahrlässigkeit** beschränkt. Ergänzend gelten die Haftungsausschlüsse aus GPL-3.0 / MIT / Apache-2.0 §§ 15–16 (je nach gewählter Lizenz).
-
-Nutzung auf eigenes Risiko. Keine Wartungszusage, keine Verfügbarkeitsgarantie, keine Gewähr für Fehlerfreiheit oder Eignung für einen bestimmten Zweck.
-
-This project is an unpaid open-source donation. Liability is limited to intent and gross negligence (§ 521 German Civil Code). Use at your own risk. No warranty, no maintenance guarantee, no fitness-for-purpose assumed.
-
+This project is provided without warranty. Use, testing, and processing of your own documents are at your own risk.
+The warranty and liability disclaimers of AGPL-3.0 apply.

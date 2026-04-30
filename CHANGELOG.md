@@ -1,21 +1,24 @@
-# Changelog / Aenderungsprotokoll
+# Changelog / Änderungsprotokoll
 
-Alle wesentlichen Aenderungen an diesem Projekt werden hier dokumentiert.
+Alle wesentlichen Änderungen an diesem Projekt werden hier dokumentiert.
 Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
-### Hinzugefuegt / Added
-- Windows-App-Icon und PyInstaller-Spec fuer lokale Windows-Builds.
+### Hinzugefügt / Added
+- Windows-App-Icon und PyInstaller-Spec für lokale Windows-Builds.
 
-### Geaendert / Changed
+### Geändert / Changed
 - README-Screenshotpfad auf `README/screenshots/main.png` vereinheitlicht.
 - `.gitignore` um lokale Build-Artefakte, Secrets und interne Steuerungsdateien erweitert.
+- README, Security Policy und Beitragsrichtlinie auf aktuellen Repository-Hygiene-Stand gebracht.
+- Welcome-Workflow um Hinweis auf nicht öffentliche Sicherheits- und Privatdaten ergänzt.
 
 ### Behoben / Fixed
 - Veraltete Beitrags- und Startanweisungen in `CONTRIBUTING.md` korrigiert.
+- Direkte Kontakt-E-Mail aus dem Code of Conduct entfernt; GitHub-Kanäle werden genutzt.
 
-## [1.0.0] - YYYY-MM-DD
+## [1.0.0] - 2026-02-24
 
-### Hinzugefuegt / Added
-- Erstveroeffentlichung / Initial release
+### Hinzugefügt / Added
+- Erstveröffentlichung / Initial release

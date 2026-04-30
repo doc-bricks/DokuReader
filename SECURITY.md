@@ -1,24 +1,61 @@
-# Security Policy
+# Sicherheitsrichtlinie / Security Policy
 
-## Supported Versions
+## Deutsch
 
-| Version | Supported          |
-| ------- | ------------------ |
-| latest  | :white_check_mark: |
+### Unterstützte Versionen
 
-## Reporting a Vulnerability
+| Version | Status |
+| --- | --- |
+| Aktueller `master` | unterstützt |
 
-If you discover a security vulnerability, please report it via GitHub's private vulnerability reporting feature:
+### Sicherheitslücken melden
 
-1. Go to the **Security** tab of this repository
-2. Click **Report a vulnerability**
-3. Provide details about the vulnerability
+Wenn Sie eine Sicherheitslücke finden, melden Sie diese bitte verantwortungsvoll:
 
-**Please do not open public issues for security vulnerabilities.**
+1. Öffnen Sie kein öffentliches Issue mit technischen Details.
+2. Verwenden Sie GitHub Private Vulnerability Reporting: `Security` -> `Advisories` -> `New`.
+3. Beschreiben Sie Reproduktionsschritte, betroffene Versionen und mögliche Auswirkungen.
 
-We will respond within 48 hours and work with you to understand and address the issue.
+Falls Private Vulnerability Reporting für das Repository nicht verfügbar ist, kontaktieren Sie die Maintainer über GitHub und veröffentlichen Sie keine sensiblen Details in öffentlichen Issues.
 
-## Security Updates
+### Projektbezogener Sicherheitsumfang
 
-Security updates will be released as soon as possible after a vulnerability is confirmed. Updates will be documented in the release notes.
+- Lokale Dateipfade und Dokumentreferenzen
+- Lokale JSON-Statusdatei
+- Vorschau und Konvertierung von PDF-, Office-, Text- und Bilddateien
+- Lokale Build- und Release-Artefakte
 
+### Updates
+
+Bestätigte Sicherheitskorrekturen werden im Changelog oder in Release Notes dokumentiert.
+
+---
+
+## English
+
+### Supported Versions
+
+| Version | Status |
+| --- | --- |
+| Current `master` | supported |
+
+### Reporting a Vulnerability
+
+If you find a security vulnerability, please report it responsibly:
+
+1. Do not open a public issue with technical details.
+2. Use GitHub Private Vulnerability Reporting: `Security` -> `Advisories` -> `New`.
+3. Include reproduction steps, affected versions, and potential impact.
+
+If private vulnerability reporting is not available for the repository, contact the maintainers through GitHub and do not publish sensitive details in public issues.
+
+### Project Security Scope
+
+- Local file paths and document references
+- Local JSON state file
+- Preview and conversion of PDF, Office, text, and image files
+- Local build and release artifacts
+
+### Updates
+
+Confirmed security fixes are documented in the changelog or release notes.
