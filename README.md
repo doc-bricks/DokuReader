@@ -16,18 +16,19 @@ Eine einfache Desktop-Anwendung zur Verwaltung und Organisation von Dokumenten n
 - **Batch-PDF-Export**: Alle, gelesene oder ungelesene Dokumente als einzelnes PDF exportieren
   - Unterstuetzt: PDF, TXT, Bilder, DOC, DOCX, ODT, RTF
   - Automatische Konvertierung zu PDF (LibreOffice oder MS Word)
+- **Windows-Icon**: Projekt-Icon fuer Fenster und PyInstaller-Builds
 - **Plattformuebergreifend**: Windows, macOS, Linux
 
 ## Technische Details
 
 - Python 3.10+ mit Tkinter
-- Einzeldatei-Anwendung (756 Zeilen)
+- Einzeldatei-Anwendung mit Tkinter-GUI
 - JSON-basierte Speicherung im Home-Verzeichnis
 - Nur Referenzen: Originaldateien bleiben unberuehrt
 
 ## Screenshots
 
-![Hauptfenster](screenshots/main.png)
+![Hauptfenster](README/screenshots/main.png)
 
 ## Installation
 
@@ -64,6 +65,12 @@ python DokuReader.py
 Oder via START.bat (Windows):
 ```bash
 START.bat
+```
+
+### Optionaler Windows-Build
+
+```bash
+pyinstaller DokuReader.spec
 ```
 
 ## Datenspeicherung
@@ -103,18 +110,19 @@ A simple desktop application for managing and organizing documents by topic with
 - **Batch PDF Export**: Export all, read, or unread documents as a single PDF
   - Supports: PDF, TXT, images, DOC, DOCX, ODT, RTF
   - Automatic conversion to PDF (LibreOffice or MS Word)
+- **Windows icon**: Project icon for the app window and PyInstaller builds
 - **Cross-Platform**: Windows, macOS, Linux
 
 ### Technical Details
 
 - Python 3.10+ with Tkinter
-- Single-file application (756 lines)
+- Single-file Tkinter application
 - JSON-based persistence in the home directory
 - Reference-only: Original files remain untouched
 
 ### Screenshots
 
-![Main Window](screenshots/main.png)
+![Main Window](README/screenshots/main.png)
 
 ### Installation
 
@@ -151,6 +159,12 @@ python DokuReader.py
 Or via START.bat (Windows):
 ```bash
 START.bat
+```
+
+#### Optional Windows build
+
+```bash
+pyinstaller DokuReader.spec
 ```
 
 ### Data Storage

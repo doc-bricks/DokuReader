@@ -19,6 +19,9 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+*.msi
+*.msix
+*.appx
 
 # Virtual Environment
 venv/
@@ -29,6 +32,7 @@ env/
 # IDE
 .vscode/
 .idea/
+.claude/
 *.swp
 *.swo
 *~
@@ -45,11 +49,26 @@ desktop.ini
 *.log
 
 # Releases
-releases/*.exe
-releases/*.zip
+releases/
+*.exe
+*.zip
 
 # Secrets
 .env
+.env.*
+credentials.json
+client_secret*.json
+token.json
+*.pem
+*.key
+keyring/
+
+# BACH Interne Steuerungsdateien (NIEMALS in Git!)
+TEST.txt
+TESTS.txt
+TESTERGEBNISSE.txt
+BUGREPORT.md
+DIAGNOSE_REPORT.md
 
 # Planung & Interne Doku
 PLAN.txt

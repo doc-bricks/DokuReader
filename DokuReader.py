@@ -263,6 +263,7 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         self.title(APP_NAME)
         self.geometry("1200x700")
         self.minsize(1000, 600)
+        self._apply_window_icon()
 
         self.state_model = State()
         self.state_model.load()
@@ -273,6 +274,16 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
             self._select_topic(self.state_model.current_topic)
 
         self.protocol("WM_DELETE_WINDOW", self.on_close)
+
+    def _apply_window_icon(self):
+        """Setzt nach Möglichkeit das Windows-App-Icon aus dem Projektordner."""
+        icon_path = Path(__file__).with_name("DokuReader.ico")
+        if not icon_path.exists():
+            return
+        try:
+            self.iconbitmap(default=str(icon_path))
+        except tk.TclError:
+            pass
 
     def _build_ui(self):
         """Erstellt alle GUI-Widgets (PanedWindow, Themenliste, Dokumententree, Vorschau, Export)."""
