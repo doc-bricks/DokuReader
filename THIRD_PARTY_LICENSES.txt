@@ -1,0 +1,32 @@
+DokuReader - Third-Party Dependency License Summary
+===================================================
+
+This file summarizes the Python packages declared or supported by DokuReader.
+The project itself is licensed under AGPL-3.0; optional PyMuPDF support also
+requires AGPL-3.0 compliance unless a commercial Artifex license is used.
+
+Generated/checked on: 2026-05-19
+Source: installed package metadata via pip-licenses, plus PyPI classifier check
+for odfpy.
+
+| Package | Version checked | License metadata | Use in DokuReader |
+| --- | --- | --- | --- |
+| Pillow | 12.2.0 | MIT-CMU | Image preview and image-to-PDF conversion |
+| pypdf | 6.4.0 | BSD-3-Clause | PDF merge backend |
+| PyPDF2 | 3.0.1 | BSD License | Legacy fallback PDF merge backend |
+| pdf2image | 1.17.0 | MIT License | Optional PDF preview backend |
+| PyMuPDF | 1.26.4 | Dual Licensed - GNU AFFERO GPL 3.0 or Artifex Commercial License | Optional PDF preview backend |
+| python-docx | 1.2.0 | MIT License | Optional DOCX preview |
+| odfpy | 1.4.1 | Apache Software License / GPL / LGPL classifiers | Optional ODT preview |
+| reportlab | 4.4.5 | BSD License | Text-to-PDF export |
+| tkinterdnd2 | 0.4.3 | MIT License | Optional drag and drop support |
+| pywin32 | 311 | Python Software Foundation License | Optional Microsoft Word COM conversion on Windows |
+
+External system tools are not bundled with this repository:
+
+- LibreOffice: optional Office-to-PDF conversion.
+- Poppler: optional pdf2image backend dependency.
+- Microsoft Word: optional local COM conversion on Windows.
+
+For binary releases, include full license texts from the exact packaged
+dependency versions and verify system-tool redistribution terms separately.

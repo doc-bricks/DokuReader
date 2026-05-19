@@ -8,6 +8,7 @@ Originaldateien bleiben an ihrem Speicherort; die Anwendung speichert nur Verwei
 - Themen für Dokumente erstellen, umbenennen und löschen
 - Dokumente als gelesen oder ungelesen markieren
 - Vorschau für Bilder, PDFs, Textdateien sowie DOCX/ODT-Dokumente
+- Textvorschau und TXT-zu-PDF-Export mit UTF-8- und Latin-1-Fallback
 - Dateien per Drag & Drop hinzufügen, wenn `tkinterdnd2` installiert ist
 - Dokumente per Doppelklick in der Standardanwendung öffnen
 - Batch-PDF-Export für alle, gelesene oder ungelesene Dokumente
@@ -79,6 +80,7 @@ Build-Ausgaben unter `build/`, `dist/` und `releases/` bleiben lokal und gehöre
 - `requirements.txt` - Python-Abhängigkeiten
 - `DokuReader.spec` - PyInstaller-Konfiguration
 - `locales/translations.json` - Übersetzungsdaten
+- `THIRD_PARTY_LICENSES.txt` - Drittanbieter-Lizenzübersicht
 - `SECURITY.md` - Hinweise zum Melden von Sicherheitslücken
 - `CONTRIBUTING.md` - Beitragsrichtlinien
 
@@ -106,6 +108,7 @@ Original files remain where they are; the application stores only references and
 - Create, rename, and delete document topics
 - Mark documents as read or unread
 - Preview images, PDFs, text files, and DOCX/ODT documents
+- Text preview and TXT-to-PDF export with UTF-8 and Latin-1 fallback
 - Add files via drag and drop when `tkinterdnd2` is installed
 - Open documents in the default application by double-clicking
 - Export all, read, or unread documents as a combined PDF
@@ -177,6 +180,7 @@ Build output under `build/`, `dist/`, and `releases/` stays local and does not b
 - `requirements.txt` - Python dependencies
 - `DokuReader.spec` - PyInstaller configuration
 - `locales/translations.json` - translation data
+- `THIRD_PARTY_LICENSES.txt` - third-party license summary
 - `SECURITY.md` - vulnerability reporting guidance
 - `CONTRIBUTING.md` - contribution guidelines
 

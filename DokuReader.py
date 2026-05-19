@@ -100,8 +100,8 @@ def read_text_with_fallback(path, max_chars=None):
     """Liest eine Textdatei mit Encoding-Fallback: UTF-8 -> Latin-1 -> Hexdump."""
     for enc in ["utf-8", "latin-1"]:
         try:
-            with open(path, "r", encoding=enc, errors="replace") as f:
-                return f.read(max_chars) if max_chars else f.read()
+            with open(path, "r", encoding=enc) as f:
+                return f.read(max_chars) if max_chars is not None else f.read()
         except (OSError, UnicodeDecodeError):
             continue
     try:
@@ -833,19 +833,20 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
             y = height - margin
             line_height = 12
             c.setFont("Helvetica", 11)
-            with open(path, "r", encoding="utf-8", errors="replace") as f:
-                for line in f:
-                    line = line.rstrip("\n")
-                    while line:
-                        max_chars = int((width - 2 * margin) / 6)  # Näherung
-                        part = line[:max_chars]
-                        c.drawString(margin, y, part)
-                        y -= line_height
-                        line = line[len(part):]
-                        if y < margin:
-                            c.showPage()
-                            c.setFont("Helvetica", 11)
-                            y = height - margin
+            content = read_text_with_fallback(path)
+            if content is None:
+                return None
+            for line in content.splitlines() or [""]:
+                while line:
+                    max_chars = int((width - 2 * margin) / 6)  # Näherung
+                    part = line[:max_chars]
+                    c.drawString(margin, y, part)
+                    y -= line_height
+                    line = line[len(part):]
+                    if y < margin:
+                        c.showPage()
+                        c.setFont("Helvetica", 11)
+                        y = height - margin
             c.showPage()
             c.save()
             return str(out)
