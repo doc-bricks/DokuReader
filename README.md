@@ -2,6 +2,8 @@
 
 DokuReader ist eine lokale Desktop-Anwendung zum Verwalten, Vorschauen und Bündeln von Dokumenten nach Themen.
 Originaldateien bleiben an ihrem Speicherort; die Anwendung speichert nur Verweise und Lesestatus in einer lokalen JSON-Datei.
+DokuReader eignet sich für private Dokumentenbibliotheken, Forschungsordner,
+PDF-Sammlungen und thematische Leseablagen, die bewusst lokal bleiben sollen.
 
 ## Funktionen
 
@@ -64,10 +66,11 @@ START.bat
 ## Optionaler Windows-Build
 
 ```bash
-pyinstaller DokuReader.spec
+build_exe.bat
 ```
 
 Build-Ausgaben unter `build/`, `dist/` und `releases/` bleiben lokal und gehören nicht in das Git-Repository.
+Der Build nutzt einen lokalen Arbeitsordner unter `C:\_Local_DEV\codex_build\dokureader` und aktualisiert `dist\DokuReader.exe`.
 
 ## Unterstützte Dateiformate
 
@@ -102,6 +105,8 @@ Es gilt die Haftungs- und Gewährleistungsausschlussregelung der AGPL-3.0.
 
 DokuReader is a local desktop application for organizing, previewing, and bundling documents by topic.
 Original files remain where they are; the application stores only references and read status in a local JSON file.
+DokuReader is designed for private document libraries, research folders, PDF
+collections, and topic-based reading queues that should stay local.
 
 ## Features
 
@@ -164,10 +169,11 @@ START.bat
 ## Optional Windows Build
 
 ```bash
-pyinstaller DokuReader.spec
+build_exe.bat
 ```
 
 Build output under `build/`, `dist/`, and `releases/` stays local and does not belong in the Git repository.
+The build uses a local work directory under `C:\_Local_DEV\codex_build\dokureader` and updates `dist\DokuReader.exe`.
 
 ## Supported File Formats
 

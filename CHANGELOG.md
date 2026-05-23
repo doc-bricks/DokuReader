@@ -9,6 +9,7 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 - Windows-App-Icon und PyInstaller-Spec für lokale Windows-Builds.
 
 ### Geändert / Changed
+- Windows-Build über `build_exe.bat` auf lokalen Arbeitsordner außerhalb von OneDrive umgestellt; `START.bat` startet bevorzugt die gebaute EXE mit Python-Fallback.
 - README-Screenshotpfad auf `README/screenshots/main.png` vereinheitlicht.
 - README um Encoding-Fallback und Drittanbieter-Lizenzübersicht ergänzt.
 - `.gitignore` um lokale Build-Artefakte, Secrets und interne Steuerungsdateien erweitert.

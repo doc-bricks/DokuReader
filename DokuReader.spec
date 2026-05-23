@@ -1,15 +1,16 @@
 # -*- mode: python ; coding: utf-8 -*-
-from PyInstaller.utils.hooks import collect_all
 
-datas = []
+datas = [
+    ('locales', 'locales'),
+    ('DokuReader.ico', '.'),
+]
 binaries = []
-hiddenimports = ['_tkinter']
-
-for package in ('tkinter', 'PIL'):
-    pkg_datas, pkg_binaries, pkg_hiddenimports = collect_all(package)
-    datas += pkg_datas
-    binaries += pkg_binaries
-    hiddenimports += pkg_hiddenimports
+hiddenimports = [
+    '_tkinter',
+    'PIL._tkinter_finder',
+    'PIL.Image',
+    'PIL.ImageTk',
+]
 
 
 a = Analysis(
@@ -21,7 +22,20 @@ a = Analysis(
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=[],
+    excludes=[
+        'IPython',
+        'PyQt5',
+        'PyQt6',
+        'PySide2',
+        'PySide6',
+        'cv2',
+        'matplotlib',
+        'numpy',
+        'pandas',
+        'pytest',
+        'scipy',
+        'torch',
+    ],
     noarchive=False,
     optimize=0,
 )
@@ -37,7 +51,7 @@ exe = EXE(
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
-    upx=True,
+    upx=False,
     upx_exclude=[],
     runtime_tmpdir=None,
     console=False,
