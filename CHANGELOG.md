@@ -7,8 +7,10 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ### Hinzugefügt / Added
 - Windows-App-Icon und PyInstaller-Spec für lokale Windows-Builds.
+- `PORTIERUNGSPLAN.md` mit Plattformentscheidung für Windows Store, macOS/Linux-Smokes und Web/PWA-Companion auf Basis von `dokureader-library-v1.json`.
 
 ### Geändert / Changed
+- README um die Plattformstrategie und den Verweis auf den Portierungsplan ergänzt.
 - Windows-Build über `build_exe.bat` auf lokalen Arbeitsordner außerhalb von OneDrive umgestellt; `START.bat` startet bevorzugt die gebaute EXE mit Python-Fallback.
 - README-Screenshotpfad auf `README/screenshots/main.png` vereinheitlicht.
 - README um Encoding-Fallback und Drittanbieter-Lizenzübersicht ergänzt.

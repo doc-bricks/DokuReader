@@ -72,6 +72,10 @@ build_exe.bat
 Build-Ausgaben unter `build/`, `dist/` und `releases/` bleiben lokal und gehören nicht in das Git-Repository.
 Der Build nutzt einen lokalen Arbeitsordner unter `C:\_Local_DEV\codex_build\dokureader` und aktualisiert `dist\DokuReader.exe`.
 
+## Plattformstrategie
+
+Die Desktop-App bleibt die autoritative lokale Bibliothek. Windows Store ist der erste Distributionskanal; macOS und Linux werden als Source-/Smoke-Ziele aus derselben Tkinter-Codebasis geführt. Für Android, iOS und Browser ist ein späterer Web/PWA-Companion auf Basis von `dokureader-library-v1.json` sinnvoller als ein nativer Voll-Clone, weil mobile Sandboxes keinen freien Zugriff auf die lokalen Desktop-Dokumentpfade haben. Details stehen in `PORTIERUNGSPLAN.md`.
+
 ## Unterstützte Dateiformate
 
 - Dokumente: `.txt`, `.doc`, `.docx`, `.pdf`, `.odt`, `.rtf`
@@ -82,6 +86,7 @@ Der Build nutzt einen lokalen Arbeitsordner unter `C:\_Local_DEV\codex_build\dok
 - `DokuReader.py` - Hauptanwendung
 - `requirements.txt` - Python-Abhängigkeiten
 - `DokuReader.spec` - PyInstaller-Konfiguration
+- `PORTIERUNGSPLAN.md` - Plattformstrategie und Austauschformat-Planung
 - `locales/translations.json` - Übersetzungsdaten
 - `THIRD_PARTY_LICENSES.txt` - Drittanbieter-Lizenzübersicht
 - `SECURITY.md` - Hinweise zum Melden von Sicherheitslücken
@@ -175,6 +180,10 @@ build_exe.bat
 Build output under `build/`, `dist/`, and `releases/` stays local and does not belong in the Git repository.
 The build uses a local work directory under `C:\_Local_DEV\codex_build\dokureader` and updates `dist\DokuReader.exe`.
 
+## Platform Strategy
+
+The desktop app remains the authoritative local library. Windows Store is the first distribution target; macOS and Linux are tracked as source/smoke-test targets from the same Tkinter codebase. For Android, iOS, and browser use, a later Web/PWA companion based on `dokureader-library-v1.json` is more appropriate than a full native clone because mobile sandboxes cannot freely access local desktop document paths. See `PORTIERUNGSPLAN.md` for details.
+
 ## Supported File Formats
 
 - Documents: `.txt`, `.doc`, `.docx`, `.pdf`, `.odt`, `.rtf`
@@ -185,6 +194,7 @@ The build uses a local work directory under `C:\_Local_DEV\codex_build\dokureade
 - `DokuReader.py` - main application
 - `requirements.txt` - Python dependencies
 - `DokuReader.spec` - PyInstaller configuration
+- `PORTIERUNGSPLAN.md` - platform strategy and exchange-format plan
 - `locales/translations.json` - translation data
 - `THIRD_PARTY_LICENSES.txt` - third-party license summary
 - `SECURITY.md` - vulnerability reporting guidance
