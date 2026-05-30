@@ -1,0 +1,14 @@
+{
+  "app_name": "DokuReader",
+  "publisher": "CN=52596601-BAB4-4F3F-B182-E8F3F273B202",
+  "publisher_display": "Geiger",
+  "identity_name": "Geiger.DokuReader",
+  "version": "1.0.1.0",
+  "description": "Lokale Dokumentenbibliothek mit Vorschau, Lesestatus, Sammel-PDF und Companion-JSON-Export.",
+  "executable": "DokuReader.exe",
+  "capabilities": "runFullTrust",
+  "category": "Productivity",
+  "age_rating": "3+",
+  "privacy_url": "https://github.com/doc-bricks/DokuReader/blob/master/README.md#privacy-and-local-data",
+  "support_url": "https://github.com/doc-bricks/DokuReader/issues"
+}

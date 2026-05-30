@@ -1,117 +1,10 @@
-# DokuReader - Dokumentenbibliothek
+# DokuReader - Local Document Library
 
-DokuReader ist eine lokale Desktop-Anwendung zum Verwalten, Vorschauen und Bündeln von Dokumenten nach Themen.
-Originaldateien bleiben an ihrem Speicherort; die Anwendung speichert nur Verweise und Lesestatus in einer lokalen JSON-Datei.
-DokuReader eignet sich für private Dokumentenbibliotheken, Forschungsordner,
-PDF-Sammlungen und thematische Leseablagen, die bewusst lokal bleiben sollen.
+[Deutsch](README_de.md)
 
-## Funktionen
+DokuReader is a local desktop application for organizing, previewing, and bundling documents by topic. Original files stay where they are; the application stores only file references and read status in a local JSON state file.
 
-- Themen für Dokumente erstellen, umbenennen und löschen
-- Dokumente als gelesen oder ungelesen markieren
-- Vorschau für Bilder, PDFs, Textdateien sowie DOCX/ODT-Dokumente
-- Textvorschau und TXT-zu-PDF-Export mit UTF-8- und Latin-1-Fallback
-- Dateien per Drag & Drop hinzufügen, wenn `tkinterdnd2` installiert ist
-- Dokumente per Doppelklick in der Standardanwendung öffnen
-- Batch-PDF-Export für alle, gelesene oder ungelesene Dokumente
-- Office-zu-PDF-Konvertierung über LibreOffice oder Microsoft Word
-- Windows-Icon und PyInstaller-Spec für lokale Windows-Builds
-
-## Datenschutz und lokale Daten
-
-- DokuReader arbeitet lokal und lädt keine Dokumente in externe Dienste hoch.
-- Originaldateien werden nicht kopiert oder verändert.
-- Der Status wird in `~/.dokubibliothek_state.json` gespeichert.
-- Lokale Build-Artefakte, Release-Dateien, interne Aufgabenlisten und Konvertierungsnotizen sind per `.gitignore` ausgeschlossen.
-
-## Screenshots
-
-![Hauptfenster](README/screenshots/main.png)
-
-## Installation
-
-### Voraussetzungen
-
-- Python 3.10+
-- Tkinter, normalerweise in Standard-Python-Installationen enthalten
-
-### Python-Abhängigkeiten
-
-```bash
-pip install -r requirements.txt
-```
-
-`requirements.txt` enthält die unterstützten Python-Integrationen für Vorschau, Drag & Drop und PDF-Export. Fehlende optionale Pakete deaktivieren nur die jeweilige Zusatzfunktion.
-
-### Optionale Systemabhängigkeiten
-
-Für volle Vorschau- und Exportfunktionalität:
-
-- LibreOffice für DOC/DOCX/ODT/RTF zu PDF
-- Poppler für `pdf2image`, falls diese Vorschau-Variante genutzt wird
-- Microsoft Word unter Windows für die optionale Word-COM-Konvertierung
-
-## Verwendung
-
-```bash
-python DokuReader.py
-```
-
-Unter Windows kann alternativ die Startdatei verwendet werden:
-
-```bash
-START.bat
-```
-
-## Optionaler Windows-Build
-
-```bash
-build_exe.bat
-```
-
-Build-Ausgaben unter `build/`, `dist/` und `releases/` bleiben lokal und gehören nicht in das Git-Repository.
-Der Build nutzt einen lokalen Arbeitsordner unter `C:\_Local_DEV\codex_build\dokureader` und aktualisiert `dist\DokuReader.exe`.
-
-## Plattformstrategie
-
-Die Desktop-App bleibt die autoritative lokale Bibliothek. Windows Store ist der erste Distributionskanal; macOS und Linux werden als Source-/Smoke-Ziele aus derselben Tkinter-Codebasis geführt. Für Android, iOS und Browser ist ein späterer Web/PWA-Companion auf Basis von `dokureader-library-v1.json` sinnvoller als ein nativer Voll-Clone, weil mobile Sandboxes keinen freien Zugriff auf die lokalen Desktop-Dokumentpfade haben. Details stehen in `PORTIERUNGSPLAN.md`.
-
-## Unterstützte Dateiformate
-
-- Dokumente: `.txt`, `.doc`, `.docx`, `.pdf`, `.odt`, `.rtf`
-- Bilder: `.jpg`, `.jpeg`, `.gif`, `.png`
-
-## Projektdateien
-
-- `DokuReader.py` - Hauptanwendung
-- `requirements.txt` - Python-Abhängigkeiten
-- `DokuReader.spec` - PyInstaller-Konfiguration
-- `PORTIERUNGSPLAN.md` - Plattformstrategie und Austauschformat-Planung
-- `locales/translations.json` - Übersetzungsdaten
-- `THIRD_PARTY_LICENSES.txt` - Drittanbieter-Lizenzübersicht
-- `SECURITY.md` - Hinweise zum Melden von Sicherheitslücken
-- `CONTRIBUTING.md` - Beitragsrichtlinien
-
-## Lizenz
-
-Dieses Projekt steht unter der [GNU Affero General Public License v3.0](LICENSE).
-Die AGPL-3.0 ist passend, weil DokuReader optional PyMuPDF nutzt, das ebenfalls AGPL-3.0-lizenziert ist.
-
-## Haftung
-
-Dieses Projekt wird ohne Gewährleistung bereitgestellt. Nutzung, Tests und Verarbeitung eigener Dokumente erfolgen auf eigenes Risiko.
-Es gilt die Haftungs- und Gewährleistungsausschlussregelung der AGPL-3.0.
-
----
-
-## English
-
-# DokuReader - Document Library
-
-DokuReader is a local desktop application for organizing, previewing, and bundling documents by topic.
-Original files remain where they are; the application stores only references and read status in a local JSON file.
-DokuReader is designed for private document libraries, research folders, PDF
-collections, and topic-based reading queues that should stay local.
+It is designed for private document libraries, research folders, PDF collections, and topic-based reading queues that should remain local and inspectable.
 
 ## Features
 
@@ -120,21 +13,23 @@ collections, and topic-based reading queues that should stay local.
 - Preview images, PDFs, text files, and DOCX/ODT documents
 - Text preview and TXT-to-PDF export with UTF-8 and Latin-1 fallback
 - Add files via drag and drop when `tkinterdnd2` is installed
-- Open documents in the default application by double-clicking
+- Open original documents in the default application with a double-click
 - Export all, read, or unread documents as a combined PDF
+- Export the full library as `dokureader-library-v1.json`
 - Convert Office documents to PDF through LibreOffice or Microsoft Word
-- Windows icon and PyInstaller spec for local Windows builds
+- Build a local Windows executable through the PyInstaller spec
 
-## Privacy and Local Data
+## Privacy And Local Data
 
 - DokuReader runs locally and does not upload documents to external services.
 - Original files are not copied or modified.
 - State is stored in `~/.dokubibliothek_state.json`.
+- The standard JSON export contains topics, paths, file metadata, and read status, but no document contents.
 - Local build artifacts, release files, internal task notes, and conversion scratch files are excluded via `.gitignore`.
 
-## Screenshots
+## Screenshot
 
-![Main window](README/screenshots/main.png)
+![DokuReader main window](README/screenshots/main.png)
 
 ## Installation
 
@@ -156,8 +51,8 @@ pip install -r requirements.txt
 For full preview and export functionality:
 
 - LibreOffice for DOC/DOCX/ODT/RTF to PDF conversion
-- Poppler for `pdf2image`, if that preview backend is used
-- Microsoft Word on Windows for optional Word COM conversion
+- Poppler for the optional `pdf2image` preview backend
+- Microsoft Word on Windows for optional Word-COM conversion
 
 ## Usage
 
@@ -171,18 +66,21 @@ On Windows, the start file can be used instead:
 START.bat
 ```
 
+For companion export, use the `Bibliothek (JSON)` section on the right side of the app. It writes topics, paths, file metadata, and read status to `dokureader-library-v1.json` without copying document contents. The format is documented in `EXPORTFORMAT.md`.
+
 ## Optional Windows Build
 
 ```bash
 build_exe.bat
 ```
 
-Build output under `build/`, `dist/`, and `releases/` stays local and does not belong in the Git repository.
-The build uses a local work directory under `C:\_Local_DEV\codex_build\dokureader` and updates `dist\DokuReader.exe`.
+Build output under `build/`, `dist/`, and `releases/` stays local and does not belong in the Git repository. The build uses a local work directory under `C:\_Local_DEV\codex_build\dokureader` and updates `dist\DokuReader.exe`.
 
 ## Platform Strategy
 
-The desktop app remains the authoritative local library. Windows Store is the first distribution target; macOS and Linux are tracked as source/smoke-test targets from the same Tkinter codebase. For Android, iOS, and browser use, a later Web/PWA companion based on `dokureader-library-v1.json` is more appropriate than a full native clone because mobile sandboxes cannot freely access local desktop document paths. See `PORTIERUNGSPLAN.md` for details.
+The desktop app remains the authoritative local library. Windows Store is the first distribution target; macOS and Linux are tracked as source and smoke-test targets from the same Tkinter codebase. For Android, iOS, and browser use, a later Web/PWA companion based on `dokureader-library-v1.json` is more appropriate than a full native clone because mobile sandboxes cannot freely access local desktop document paths.
+
+See `PORTIERUNGSPLAN.md` for the current platform plan.
 
 ## Supported File Formats
 
@@ -194,7 +92,12 @@ The desktop app remains the authoritative local library. Windows Store is the fi
 - `DokuReader.py` - main application
 - `requirements.txt` - Python dependencies
 - `DokuReader.spec` - PyInstaller configuration
+- `EXPORTFORMAT.md` - schema for `dokureader-library-v1.json`
 - `PORTIERUNGSPLAN.md` - platform strategy and exchange-format plan
+- `STORE_LISTING.md` - Windows Store copy in German and English
+- `PRIVACY_POLICY.md` - privacy notes for the Store release
+- `SUPPORT.md` - support and contact paths
+- `llms.txt` - machine-readable project context
 - `locales/translations.json` - translation data
 - `THIRD_PARTY_LICENSES.txt` - third-party license summary
 - `SECURITY.md` - vulnerability reporting guidance
@@ -202,10 +105,8 @@ The desktop app remains the authoritative local library. Windows Store is the fi
 
 ## License
 
-This project is licensed under the [GNU Affero General Public License v3.0](LICENSE).
-AGPL-3.0 is appropriate because DokuReader can optionally use PyMuPDF, which is also licensed under AGPL-3.0.
+This project is licensed under the [GNU Affero General Public License v3.0](LICENSE). AGPL-3.0 is appropriate because DokuReader can optionally use PyMuPDF, which is also licensed under AGPL-3.0.
 
 ## Liability
 
-This project is provided without warranty. Use, testing, and processing of your own documents are at your own risk.
-The warranty and liability disclaimers of AGPL-3.0 apply.
+This project is provided without warranty. Use, testing, and processing of your own documents are at your own risk. The warranty and liability disclaimers of AGPL-3.0 apply.

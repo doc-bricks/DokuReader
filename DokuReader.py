@@ -32,6 +32,7 @@ import subprocess
 import tempfile
 import platform
 import threading
+from datetime import datetime, timezone
 from pathlib import Path
 
 import tkinter as tk
@@ -112,7 +113,9 @@ def read_text_with_fallback(path, max_chars=None):
 
 
 APP_NAME = "Dokumentenbibliothek"
+APP_VERSION = "1.0.1-dev"
 STATE_FILE = str(Path.home() / ".dokubibliothek_state.json")
+LIBRARY_EXPORT_SCHEMA = "dokureader-library-v1"
 
 SUPPORTED_EXTS = {
     ".txt", ".doc", ".docx", ".pdf", ".odt", ".rtf",
@@ -139,6 +142,90 @@ def human_size(num_bytes: int) -> str:
 def desktop_path() -> Path:
     p = Path.home() / "Desktop"
     return p if p.exists() else Path.home()
+
+
+def isoformat_utc(timestamp: float) -> str:
+    """Formatiert einen Unix-Timestamp als UTC-ISO-8601-Zeitstempel."""
+    return datetime.fromtimestamp(timestamp, tz=timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+def build_library_document_record(doc: dict) -> dict | None:
+    """Leitet aus einem State-Dokument einen exportierbaren Metadatensatz ab."""
+    path = doc.get("path")
+    if not isinstance(path, str) or not path:
+        return None
+
+    record = {
+        "path": path,
+        "filename": os.path.basename(path),
+        "extension": Path(path).suffix.lower(),
+        "read": bool(doc.get("read", False)),
+        "size_bytes": None,
+        "mtime": None,
+        "missing": True,
+    }
+    try:
+        stat_result = os.stat(path)
+    except OSError:
+        return record
+
+    record["size_bytes"] = stat_result.st_size
+    record["mtime"] = isoformat_utc(stat_result.st_mtime)
+    record["missing"] = False
+    return record
+
+
+def build_library_export_payload(topics: dict[str, list[dict]], current_topic: str | None = None) -> dict:
+    """Erstellt das Austauschformat `dokureader-library-v1` aus dem aktuellen State."""
+    export_topics: list[dict] = []
+    document_total = 0
+    missing_total = 0
+
+    for topic_name in sorted(topics.keys(), key=str.lower):
+        records: list[dict] = []
+        docs = topics.get(topic_name, [])
+        sorted_docs = sorted(
+            docs,
+            key=lambda d: (
+                os.path.basename(str(d.get("path", ""))).lower(),
+                str(d.get("path", "")).lower(),
+            ),
+        )
+        for doc in sorted_docs:
+            record = build_library_document_record(doc)
+            if record is None:
+                continue
+            records.append(record)
+            document_total += 1
+            if record["missing"]:
+                missing_total += 1
+        export_topics.append(
+            {
+                "name": topic_name,
+                "document_count": len(records),
+                "documents": records,
+            }
+        )
+
+    return {
+        "schema_version": LIBRARY_EXPORT_SCHEMA,
+        "exported_at": isoformat_utc(datetime.now(tz=timezone.utc).timestamp()),
+        "app_name": APP_NAME,
+        "app_version": APP_VERSION,
+        "current_topic": current_topic,
+        "topics": export_topics,
+        "totals": {
+            "topic_count": len(export_topics),
+            "document_count": document_total,
+            "missing_documents": missing_total,
+        },
+    }
+
+
+def write_library_export(path: str | os.PathLike[str], payload: dict) -> None:
+    """Schreibt den Bibliotheksexport als UTF-8-JSON-Datei."""
+    out_path = Path(path)
+    out_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
 class State:
@@ -367,6 +454,20 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         ttk.Radiobutton(export_frame, text="Gelesene", variable=self.filter_var, value="gelesene").pack(side=tk.LEFT, padx=6, pady=6)
         ttk.Radiobutton(export_frame, text="Ungelesene", variable=self.filter_var, value="ungelesene").pack(side=tk.LEFT, padx=6, pady=6)
         ttk.Button(export_frame, text="Sammel-PDF erzeugen", command=self.create_collection_pdf).pack(side=tk.RIGHT, padx=6, pady=6)
+
+        library_export_frame = ttk.LabelFrame(right, text="Bibliothek (JSON)")
+        library_export_frame.pack(fill=tk.X, padx=8, pady=(0, 8))
+        ttk.Label(
+            library_export_frame,
+            text="Exportiert Themen, Pfade, Metadaten und Lesestatus ohne Dokumentinhalte.",
+            wraplength=340,
+            justify="left",
+        ).pack(anchor="w", padx=8, pady=(8, 4))
+        ttk.Button(
+            library_export_frame,
+            text="JSON-Export…",
+            command=self.export_library_json,
+        ).pack(anchor="e", padx=8, pady=(0, 8))
 
         # Kontextmenü
         self.doc_menu = tk.Menu(self, tearoff=0)
@@ -811,6 +912,29 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
             msg: Anzuzeigende Nachricht
         """
         self.after(0, lambda: messagebox.showinfo("Info", msg))
+
+    def export_library_json(self):
+        """Exportiert die gesamte Bibliothek als `dokureader-library-v1.json`."""
+        initialfile = f"{LIBRARY_EXPORT_SCHEMA}.json"
+        out_path = filedialog.asksaveasfilename(
+            title="Bibliothek als JSON exportieren",
+            defaultextension=".json",
+            initialdir=str(desktop_path()),
+            initialfile=initialfile,
+            filetypes=[("JSON-Dateien", "*.json"), ("Alle Dateien", "*.*")],
+        )
+        if not out_path:
+            return
+        payload = build_library_export_payload(
+            self.state_model.topics,
+            current_topic=self.state_model.current_topic,
+        )
+        try:
+            write_library_export(out_path, payload)
+        except OSError as exc:
+            messagebox.showerror("Fehler", f"JSON-Export fehlgeschlagen:\n{exc}")
+            return
+        messagebox.showinfo("Erfolg", f"Bibliothek exportiert:\n{out_path}")
 
     # Konvertierungen
     def _txt_to_pdf(self, path: str, tmpdir: Path) -> str | None:

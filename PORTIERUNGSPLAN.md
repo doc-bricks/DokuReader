@@ -1,6 +1,6 @@
 # PORTIERUNGSPLAN - DokuReader
 
-Stand: 2026-05-26
+Stand: 2026-05-30
 
 ## Ausgangslage
 
@@ -23,7 +23,7 @@ Die passende Strategie ist deshalb keine vollständige native Mobile-Neuentwickl
 
 | Plattform | Bewertung | Entscheidung |
 |---|---|---|
-| Windows Store | Sinnvoll, weil DokuReader ein lokales Datenschutz-Tool mit klarer Desktop-Nutzung ist. AGPL ist für kostenlose Veröffentlichung mit öffentlichem Quellcode tragbar; PyMuPDF bleibt als AGPL-Kontext zu beachten. | P1: Store-Vorbereitung fortführen, Screenshots/Listing/WACK ergänzen. |
+| Windows Store | Sinnvoll, weil DokuReader ein lokales Datenschutz-Tool mit klarer Desktop-Nutzung ist. AGPL ist für kostenlose Veröffentlichung mit öffentlichem Quellcode tragbar; PyMuPDF bleibt als AGPL-Kontext zu beachten. | P1: Listing, Privacy/Support, Screenshot-Set, Store-Assets und Pretest vorhanden; als Nächstes MSIX + WACK final ausführen. |
 | Android | Hoher Nutzen für Lesestatus, Themenlisten und schnelle Recherche. Direkter Zugriff auf beliebige Desktop-Pfade ist mobil aber unrealistisch. | P2: über Web/PWA oder Capacitor auf Basis von `dokureader-library-v1.json`; kein nativer Voll-Clone. |
 | Webapp | Sinnvoll als gemeinsamer Companion für Browser, Android und iOS. Datei-Uploads oder exportierte Bundles können sandboxkonform genutzt werden. | P1: PWA-Companion planen, zunächst read-only/Statusansicht. |
 | iOS | Nutzen wie Android, aber Dateisystemzugriff und Store-Aufwand sprechen gegen einen frühen nativen Port. | P2: PWA/Capacitor-Smoke nach Web-Companion. |
@@ -55,16 +55,18 @@ Wichtig: Der Export darf standardmäßig keine Dokumentinhalte einbetten, weil D
 
 - Windows-Desktop-App: vorhanden.
 - Windows-Build: vorhanden (`build_exe.bat`, `DokuReader.spec`).
+- Windows-Store-Dokumentation: vorhanden (`STORE_LISTING.md`, `PRIVACY_POLICY.md`, `SUPPORT.md`, `store_package.json`).
+- Store-Screenshots sind lokal reproduzierbar über `_WARTUNG/generate_store_media.py`; `releases/windowsstore/*` bleibt als Release-Artefakt ungetrackt.
+- Basis-Store-Assets liegen in `store_assets/`.
 - macOS/Linux-Quelllauf: im Code grundsätzlich angelegt, aber nicht als Smoke-Test dokumentiert.
 - Web/PWA: noch nicht vorhanden.
 - Android/iOS: noch nicht vorhanden.
-- Exportformat: noch nicht vorhanden.
+- Exportformat: vorhanden (`EXPORTFORMAT.md`, Desktop-Export in der App).
 
 ## Nächste Schritte
 
-1. `dokureader-library-v1.json` als Desktop-Export definieren und dokumentieren.
-2. Exportfunktion für Themen, Dokumentmetadaten und Lesestatus ergänzen.
-3. Import-/Merge-Strategie für Lesestatus aus Companion-Export festlegen.
-4. Windows-Store-Unterlagen aktualisieren: Listing, Screenshots, WACK/Testprotokoll.
-5. Minimalen Web/PWA-Prototyp für importierte Bibliotheken planen.
-6. macOS/Linux-Smoke-Test dokumentieren: Start, Datei öffnen, PDF/Textvorschau, Sammel-PDF mit LibreOffice.
+1. Lokales MSIX bauen und den echten WACK-Lauf mit XML-Report in `releases/windowsstore/WACK_PROTOCOL.md` dokumentieren.
+2. Import-/Merge-Strategie für Lesestatus aus Companion-Export festlegen.
+3. Minimalen Web/PWA-Prototyp für importierte Bibliotheken planen.
+4. Android/iOS-PWA-Smoke-Test vorbereiten.
+5. macOS/Linux-Smoke-Test dokumentieren: Start, Datei öffnen, PDF/Textvorschau, Sammel-PDF mit LibreOffice.

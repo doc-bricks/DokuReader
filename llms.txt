@@ -1,0 +1,40 @@
+# DokuReader
+
+## Canonical Links
+
+- Repository: https://github.com/doc-bricks/DokuReader
+- Issues: https://github.com/doc-bricks/DokuReader/issues
+- License: AGPL-3.0
+
+## Summary
+
+DokuReader is a local-first Tkinter desktop app for organizing document references by topic, previewing common file formats, tracking read/unread status, and exporting combined PDFs or a metadata-only JSON library.
+
+## Local Data Boundary
+
+- Original documents remain in their existing filesystem locations.
+- App state is stored locally in `~/.dokubibliothek_state.json`.
+- The `dokureader-library-v1.json` export contains topics, paths, file metadata, and read status.
+- The standard JSON export does not embed document contents, PDFs, images, previews, accounts, tokens, or cloud credentials.
+
+## Interfaces
+
+- Desktop entrypoint: `python DokuReader.py`
+- Windows launcher: `START.bat`
+- Windows build launcher: `build_exe.bat`
+- Export schema docs: `EXPORTFORMAT.md`
+- Platform plan: `PORTIERUNGSPLAN.md`
+- Store docs: `STORE_LISTING.md`, `PRIVACY_POLICY.md`, `SUPPORT.md`, `store_package.json`
+
+## Test And Validation
+
+- Python tests live under `tests/`.
+- Current focused validation: `python -m pytest -q`
+- Syntax smoke: `python -m py_compile DokuReader.py manage_translations.py translator.py _WARTUNG/generate_store_media.py`
+- Workflow YAML should parse before push.
+
+## Safety Notes
+
+- Do not commit local document libraries, generated releases, converted PDFs, credentials, or `~/.dokubibliothek_state.json`.
+- `releases/`, build outputs, local state, SQLite files, tokens, and private/archive folders are ignored.
+- Optional PyMuPDF support keeps the project in AGPL-3.0 territory unless a commercial Artifex license is used.

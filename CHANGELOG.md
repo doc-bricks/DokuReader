@@ -8,9 +8,17 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 ### Hinzugefügt / Added
 - Windows-App-Icon und PyInstaller-Spec für lokale Windows-Builds.
 - `PORTIERUNGSPLAN.md` mit Plattformentscheidung für Windows Store, macOS/Linux-Smokes und Web/PWA-Companion auf Basis von `dokureader-library-v1.json`.
+- `EXPORTFORMAT.md` für das stabile Austauschformat `dokureader-library-v1.json`.
+- GUI-Export `Bibliothek (JSON)` für Themen, Dokumentpfade, Dateimetadaten und Lesestatus ohne Dokumentinhalte.
+- Windows-Store-Unterlagen mit `STORE_LISTING.md`, `PRIVACY_POLICY.md`, `SUPPORT.md` und `store_package.json`; Screenshots werden lokal unter dem ungetrackten `releases/windowsstore/` erzeugt.
+- Reproduzierbare Store-Medien via `_WARTUNG/generate_store_media.py` für Screenshots und Basis-Store-Assets.
+- `README_de.md` als deutsche Root-Dokumentation und `llms.txt` als maschinenlesbarer Projektkontext.
 
 ### Geändert / Changed
 - README um die Plattformstrategie und den Verweis auf den Portierungsplan ergänzt.
+- README um den JSON-Export und die Exportformat-Dokumentation ergänzt.
+- README auf English-first GitHub-Dokumentation ausgerichtet; die deutsche Fassung bleibt separat erhalten.
+- `PORTIERUNGSPLAN.md` auf den neuen Store-Readiness-Stand synchronisiert.
 - Windows-Build über `build_exe.bat` auf lokalen Arbeitsordner außerhalb von OneDrive umgestellt; `START.bat` startet bevorzugt die gebaute EXE mit Python-Fallback.
 - README-Screenshotpfad auf `README/screenshots/main.png` vereinheitlicht.
 - README um Encoding-Fallback und Drittanbieter-Lizenzübersicht ergänzt.
@@ -23,6 +31,7 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 - Text-Fallback für Vorschau und TXT->PDF-Export korrigiert, damit Latin-1-Dateien nicht als Ersatzzeichen angezeigt werden.
 - Veraltete Beitrags- und Startanweisungen in `CONTRIBUTING.md` korrigiert.
 - Direkte Kontakt-E-Mail aus dem Code of Conduct entfernt; GitHub-Kanäle werden genutzt.
+- Fehlende Store-Beschreibung, Screenshot-Basis und AGPL-/PyMuPDF-Hinweise für den geplanten kostenlosen Windows-Store-Release ergänzt.
 
 ## [1.0.0] - 2026-02-24
 
