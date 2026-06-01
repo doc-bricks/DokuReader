@@ -1,4 +1,4 @@
-# Python
+﻿# Python
 __pycache__/
 *.py[cod]
 *.pyo
@@ -91,3 +91,7 @@ DokuReader_konvert.txt
 .ruff_cache/
 .coverage
 htmlcov/
+DECISIONS.md
+PORTIERUNGSPLAN.md
+TODO.md
+DONE.md
