@@ -1,0 +1,11 @@
+{
+  "name": "DokuReader Companion",
+  "short_name": "DokuReader",
+  "description": "Lese-only-Ansicht der DokuReader-Bibliothek auf Mobilgeräten und im Browser.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f5f5f5",
+  "theme_color": "#1976d2",
+  "lang": "de",
+  "icons": []
+}

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DokuReader Companion</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>DokuReader Companion</h1>
+    <div class="header-actions">
+      <button id="import-btn">JSON importieren</button>
+      <button id="demo-btn">Demo laden</button>
+      <input type="file" id="file-input" accept=".json" hidden>
+    </div>
+  </header>
+
+  <div id="drop-zone" aria-label="JSON-Datei hierher ziehen">
+    <p>dokureader-library-v1.json hier ablegen oder oben importieren</p>
+  </div>
+
+  <div id="status-bar" class="status-bar"></div>
+
+  <div id="main-layout">
+    <aside id="sidebar">
+      <h2>Themen</h2>
+      <ul id="topic-list" role="list"></ul>
+    </aside>
+
+    <section id="content">
+      <div class="filter-bar">
+        <input id="search" type="search" placeholder="Dokument suchen…" aria-label="Dokument suchen">
+        <label class="checkbox-label">
+          <input type="checkbox" id="show-missing" checked>
+          Fehlende anzeigen
+        </label>
+      </div>
+      <div id="doc-list" aria-live="polite">
+        <p class="empty">Noch keine Bibliothek geladen.</p>
+      </div>
+    </section>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
