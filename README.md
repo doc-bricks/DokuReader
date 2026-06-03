@@ -82,6 +82,8 @@ The desktop app remains the authoritative local library. Windows Store is the fi
 
 See `PORTIERUNGSPLAN.md` for the current platform plan.
 
+The reproducible desktop source smoke lives in `tests/source_platform_smoke.py`. It covers app start, `open`/`xdg-open` dispatch, text and PDF preview, simulated LibreOffice conversion, and merged PDF export without touching real user state.
+
 ## Supported File Formats
 
 - Documents: `.txt`, `.doc`, `.docx`, `.pdf`, `.odt`, `.rtf`

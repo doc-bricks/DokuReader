@@ -5,6 +5,9 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+### Build / Release
+- EXE neu gebaut 2026-06-01 (PyInstaller, `DokuReader.spec` → `C:\_Local_DEV\codex_build\dokureader`); 5/5 Tests grün, Smoke-Test bestanden. Vorherige EXE: 2026-05-22, Anlass: DokuReader.py 2026-05-26.
+
 ### Hinzugefügt / Added
 - Windows-App-Icon und PyInstaller-Spec für lokale Windows-Builds.
 - `PORTIERUNGSPLAN.md` mit Plattformentscheidung für Windows Store, macOS/Linux-Smokes und Web/PWA-Companion auf Basis von `dokureader-library-v1.json`.
@@ -12,6 +15,7 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 - GUI-Export `Bibliothek (JSON)` für Themen, Dokumentpfade, Dateimetadaten und Lesestatus ohne Dokumentinhalte.
 - Windows-Store-Unterlagen mit `STORE_LISTING.md`, `PRIVACY_POLICY.md`, `SUPPORT.md` und `store_package.json`; Screenshots werden lokal unter dem ungetrackten `releases/windowsstore/` erzeugt.
 - Reproduzierbare Store-Medien via `_WARTUNG/generate_store_media.py` für Screenshots und Basis-Store-Assets.
+- `tests/source_platform_smoke.py` als reproduzierbarer macOS/Linux-Desktop-Smoke für Start, Dateiaufruf, Vorschau, LibreOffice-Fallback und Sammel-PDF.
 - `README_de.md` als deutsche Root-Dokumentation und `llms.txt` als maschinenlesbarer Projektkontext.
 
 ### Geändert / Changed
@@ -19,6 +23,7 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 - README um den JSON-Export und die Exportformat-Dokumentation ergänzt.
 - README auf English-first GitHub-Dokumentation ausgerichtet; die deutsche Fassung bleibt separat erhalten.
 - `PORTIERUNGSPLAN.md` auf den neuen Store-Readiness-Stand synchronisiert.
+- README und Aufgaben/Portierungsplan dokumentieren jetzt den neuen Desktop-Source-Smoke für macOS/Linux.
 - Windows-Build über `build_exe.bat` auf lokalen Arbeitsordner außerhalb von OneDrive umgestellt; `START.bat` startet bevorzugt die gebaute EXE mit Python-Fallback.
 - README-Screenshotpfad auf `README/screenshots/main.png` vereinheitlicht.
 - README um Encoding-Fallback und Drittanbieter-Lizenzübersicht ergänzt.
