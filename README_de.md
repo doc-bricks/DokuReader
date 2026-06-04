@@ -80,7 +80,7 @@ Build-Ausgaben unter `build/`, `dist/` und `releases/` bleiben lokal und gehöre
 
 Die Desktop-App bleibt die autoritative lokale Bibliothek. Windows Store ist der erste Distributionskanal; macOS und Linux werden als Source- und Smoke-Test-Ziele aus derselben Tkinter-Codebasis geführt. Für Android, iOS und Browser ist ein späterer Web/PWA-Companion auf Basis von `dokureader-library-v1.json` sinnvoller als ein nativer Voll-Clone, weil mobile Sandboxes keinen freien Zugriff auf die lokalen Desktop-Dokumentpfade haben.
 
-Der aktuelle Plattformplan steht in `PORTIERUNGSPLAN.md`.
+Der reproduzierbare Desktop-Source-Smoke liegt in `tests/source_platform_smoke.py`. Er prüft App-Start, `open`-/`xdg-open`-Aufrufe, Text- und PDF-Vorschau, simulierte LibreOffice-Konvertierung und Sammel-PDF-Export, ohne echten Nutzerstatus zu berühren.
 
 ## Unterstützte Dateiformate
 
@@ -93,7 +93,6 @@ Der aktuelle Plattformplan steht in `PORTIERUNGSPLAN.md`.
 - `requirements.txt` - Python-Abhängigkeiten
 - `DokuReader.spec` - PyInstaller-Konfiguration
 - `EXPORTFORMAT.md` - Schema für `dokureader-library-v1.json`
-- `PORTIERUNGSPLAN.md` - Plattformstrategie und Austauschformat-Planung
 - `STORE_LISTING.md` - Store-Texte für Windows Store (DE/EN)
 - `PRIVACY_POLICY.md` - Datenschutzhinweise für den Store-Release
 - `SUPPORT.md` - Support- und Kontaktwege

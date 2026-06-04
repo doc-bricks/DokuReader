@@ -23,7 +23,8 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 - README um den JSON-Export und die Exportformat-Dokumentation ergänzt.
 - README auf English-first GitHub-Dokumentation ausgerichtet; die deutsche Fassung bleibt separat erhalten.
 - `PORTIERUNGSPLAN.md` auf den neuen Store-Readiness-Stand synchronisiert.
-- README und Aufgaben/Portierungsplan dokumentieren jetzt den neuen Desktop-Source-Smoke für macOS/Linux.
+- README und README_de dokumentieren jetzt den neuen Desktop-Source-Smoke für macOS/Linux.
+- Öffentliche README-Verweise auf den lokal gehaltenen, nicht getrackten Portierungsplan entfernt.
 - Windows-Build über `build_exe.bat` auf lokalen Arbeitsordner außerhalb von OneDrive umgestellt; `START.bat` startet bevorzugt die gebaute EXE mit Python-Fallback.
 - README-Screenshotpfad auf `README/screenshots/main.png` vereinheitlicht.
 - README um Encoding-Fallback und Drittanbieter-Lizenzübersicht ergänzt.

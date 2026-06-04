@@ -80,8 +80,6 @@ Build output under `build/`, `dist/`, and `releases/` stays local and does not b
 
 The desktop app remains the authoritative local library. Windows Store is the first distribution target; macOS and Linux are tracked as source and smoke-test targets from the same Tkinter codebase. For Android, iOS, and browser use, a later Web/PWA companion based on `dokureader-library-v1.json` is more appropriate than a full native clone because mobile sandboxes cannot freely access local desktop document paths.
 
-See `PORTIERUNGSPLAN.md` for the current platform plan.
-
 The reproducible desktop source smoke lives in `tests/source_platform_smoke.py`. It covers app start, `open`/`xdg-open` dispatch, text and PDF preview, simulated LibreOffice conversion, and merged PDF export without touching real user state.
 
 ## Supported File Formats
@@ -95,7 +93,6 @@ The reproducible desktop source smoke lives in `tests/source_platform_smoke.py`.
 - `requirements.txt` - Python dependencies
 - `DokuReader.spec` - PyInstaller configuration
 - `EXPORTFORMAT.md` - schema for `dokureader-library-v1.json`
-- `PORTIERUNGSPLAN.md` - platform strategy and exchange-format plan
 - `STORE_LISTING.md` - Windows Store copy in German and English
 - `PRIVACY_POLICY.md` - privacy notes for the Store release
 - `SUPPORT.md` - support and contact paths
