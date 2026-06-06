@@ -9,6 +9,7 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 - EXE neu gebaut 2026-06-01 (PyInstaller, `DokuReader.spec` → `C:\_Local_DEV\codex_build\dokureader`); 5/5 Tests grün, Smoke-Test bestanden. Vorherige EXE: 2026-05-22, Anlass: DokuReader.py 2026-05-26.
 
 ### Hinzugefügt / Added
+- GitHub Actions CI-Workflow `source-platform-smoke.yml`: führt `tests/source_platform_smoke.py` auf `ubuntu-latest` (mit Xvfb) und `macos-latest` bei jedem Push/PR auf main aus.
 - Windows-App-Icon und PyInstaller-Spec für lokale Windows-Builds.
 - `PORTIERUNGSPLAN.md` mit Plattformentscheidung für Windows Store, macOS/Linux-Smokes und Web/PWA-Companion auf Basis von `dokureader-library-v1.json`.
 - `EXPORTFORMAT.md` für das stabile Austauschformat `dokureader-library-v1.json`.
@@ -17,6 +18,8 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 - Reproduzierbare Store-Medien via `_WARTUNG/generate_store_media.py` für Screenshots und Basis-Store-Assets.
 - `tests/source_platform_smoke.py` als reproduzierbarer macOS/Linux-Desktop-Smoke für Start, Dateiaufruf, Vorschau, LibreOffice-Fallback und Sammel-PDF.
 - `README_de.md` als deutsche Root-Dokumentation und `llms.txt` als maschinenlesbarer Projektkontext.
+- `web_companion/package.json`, `web_companion/README.md` und `web_companion/tests/pwa_mobile_smoke.test.mjs` für einen reproduzierbaren Android-/iOS-nahen PWA-Smoke.
+- Mobile PWA-Icons und Manifest-Metadaten für installierbare Add-to-Home-Screen-Läufe.
 
 ### Geändert / Changed
 - README um die Plattformstrategie und den Verweis auf den Portierungsplan ergänzt.
@@ -24,6 +27,7 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 - README auf English-first GitHub-Dokumentation ausgerichtet; die deutsche Fassung bleibt separat erhalten.
 - `PORTIERUNGSPLAN.md` auf den neuen Store-Readiness-Stand synchronisiert.
 - README und README_de dokumentieren jetzt den neuen Desktop-Source-Smoke für macOS/Linux.
+- `web_companion/index.html`, `manifest.webmanifest`, `style.css` und `sw.js` für mobile Safe-Areas, PWA-Install-Metadaten und Offline-Shell-Caching nachgezogen.
 - Öffentliche README-Verweise auf den lokal gehaltenen, nicht getrackten Portierungsplan entfernt.
 - Windows-Build über `build_exe.bat` auf lokalen Arbeitsordner außerhalb von OneDrive umgestellt; `START.bat` startet bevorzugt die gebaute EXE mit Python-Fallback.
 - README-Screenshotpfad auf `README/screenshots/main.png` vereinheitlicht.
