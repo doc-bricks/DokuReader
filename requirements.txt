@@ -3,7 +3,7 @@
 Pillow>=10.0.0
 
 # PDF-Handling (mindestens eine empfohlen)
-pypdf>=3.0.0
+pypdf>=3.0.0,<4.0.0
 # Alternativ: PyPDF2>=3.0.0
 
 # Optional - PDF-Vorschau (empfohlen)

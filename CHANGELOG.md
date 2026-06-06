@@ -10,6 +10,9 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ### Hinzugefügt / Added
 - GitHub Actions CI-Workflow `source-platform-smoke.yml`: führt `tests/source_platform_smoke.py` auf `ubuntu-latest` (mit Xvfb) und `macos-latest` bei jedem Push/PR auf main aus.
+
+### Behoben / Fixed
+- `requirements.txt`: `pypdf` auf `<4.0.0` begrenzt, da `PdfMerger` in pypdf 4.x entfernt wurde.
 - Windows-App-Icon und PyInstaller-Spec für lokale Windows-Builds.
 - `PORTIERUNGSPLAN.md` mit Plattformentscheidung für Windows Store, macOS/Linux-Smokes und Web/PWA-Companion auf Basis von `dokureader-library-v1.json`.
 - `EXPORTFORMAT.md` für das stabile Austauschformat `dokureader-library-v1.json`.
