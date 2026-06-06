@@ -247,8 +247,10 @@ class State:
             try:
                 with open(STATE_FILE, "r", encoding="utf-8") as f:
                     data = json.load(f)
-                    self.topics = data.get("topics", {})
-                    self.current_topic = data.get("current_topic")
+                    loaded_topics = data.get("topics")
+                    self.topics = loaded_topics if isinstance(loaded_topics, dict) else {}
+                    ct = data.get("current_topic")
+                    self.current_topic = ct if isinstance(ct, str) else None
             except (OSError, json.JSONDecodeError):
                 # Ignorieren, falls Zustand nicht gelesen werden kann
                 pass
@@ -1092,23 +1094,24 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         """
         if not PdfMerger:
             return False
+        merger = PdfMerger()
         try:
-            merger = PdfMerger()
             for p in pdf_paths:
                 try:
                     merger.append(p)
-                except (OSError, ValueError) as e:
+                except (OSError, ValueError):
                     # Ignoriere defekte Einzel-PDFs
                     continue
             with open(out_path, "wb") as f:
                 merger.write(f)
+            return True
+        except (OSError, ValueError, RuntimeError):
+            return False
+        finally:
             try:
                 merger.close()
             except (OSError, ValueError):
                 pass
-            return True
-        except (OSError, ValueError, RuntimeError):
-            return False
 
     def on_close(self):
         """Callback beim Schließen des Fensters: State speichern und App beenden."""

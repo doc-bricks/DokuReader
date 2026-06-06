@@ -3,7 +3,9 @@ import os
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import MagicMock, patch
 
+import DokuReader as app
 from DokuReader import (
     LIBRARY_EXPORT_SCHEMA,
     build_library_export_payload,
@@ -66,6 +68,58 @@ class LibraryExportTests(unittest.TestCase):
         self.assertIn("Überblick", raw_text)
         self.assertEqual(loaded["current_topic"], "Überblick")
         self.assertEqual(loaded["topics"][0]["name"], "Überblick")
+
+
+class StateLoadRobustnessTests(unittest.TestCase):
+    def test_state_load_tolerates_null_topics(self):
+        """Bug #1: topics=null im State-File darf nicht zu AttributeError führen."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            state_path = Path(tmpdir) / "state.json"
+            state_path.write_text(
+                json.dumps({"topics": None, "current_topic": 42}),
+                encoding="utf-8",
+            )
+            original = app.STATE_FILE
+            app.STATE_FILE = str(state_path)
+            try:
+                s = app.State()
+                s.load()
+            finally:
+                app.STATE_FILE = original
+        self.assertIsInstance(s.topics, dict)
+        self.assertIsNone(s.current_topic)
+
+    def test_state_load_tolerates_list_topics(self):
+        """Bug #1: topics=[] im State-File (korrupter Typ) soll {} ergeben."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            state_path = Path(tmpdir) / "state.json"
+            state_path.write_text(
+                json.dumps({"topics": ["eins", "zwei"]}),
+                encoding="utf-8",
+            )
+            original = app.STATE_FILE
+            app.STATE_FILE = str(state_path)
+            try:
+                s = app.State()
+                s.load()
+            finally:
+                app.STATE_FILE = original
+        self.assertIsInstance(s.topics, dict)
+
+
+class MergePDFTests(unittest.TestCase):
+    def test_merge_pdfs_closes_merger_on_write_failure(self):
+        """Bug #2: merger.close() muss auch bei Schreibfehler aufgerufen werden."""
+        mock_merger = MagicMock()
+        mock_merger.write.side_effect = OSError("disk full")
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            out_path = Path(tmpdir) / "out.pdf"
+            with patch.object(app, "PdfMerger", return_value=mock_merger):
+                result = app.App._merge_pdfs(None, [], out_path)
+
+        self.assertFalse(result)
+        mock_merger.close.assert_called_once()
 
 
 if __name__ == "__main__":
