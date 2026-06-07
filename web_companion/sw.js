@@ -1,5 +1,15 @@
-const CACHE = "dokureader-companion-v1";
-const ASSETS = ["./", "./index.html", "./style.css", "./app.js", "./library.js", "./manifest.webmanifest"];
+const CACHE = "dokureader-companion-v2";
+const ASSETS = [
+  "./",
+  "./index.html",
+  "./style.css",
+  "./app.js",
+  "./library.js",
+  "./manifest.webmanifest",
+  "./icons/dokureader-companion-180.png",
+  "./icons/dokureader-companion-192.png",
+  "./icons/dokureader-companion-512.png"
+];
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));

@@ -5,6 +5,9 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+### Geändert / Changed
+- PDF-Merge von `PdfMerger` auf `PdfWriter` migriert (pypdf 4.x/5.x-kompatibel). `PdfMerger` wurde in pypdf 4.0.0 entfernt. Versions-Pin `pypdf<4.0.0` aufgehoben → `pypdf>=4.0.0`.
+
 ### Build / Release
 - EXE neu gebaut 2026-06-01 (PyInstaller, `DokuReader.spec` → `C:\_Local_DEV\codex_build\dokureader`); 5/5 Tests grün, Smoke-Test bestanden. Vorherige EXE: 2026-05-22, Anlass: DokuReader.py 2026-05-26.
 
@@ -12,7 +15,6 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 - GitHub Actions CI-Workflow `source-platform-smoke.yml`: führt `tests/source_platform_smoke.py` auf `ubuntu-latest` (mit Xvfb) und `macos-latest` bei jedem Push/PR auf main aus.
 
 ### Behoben / Fixed
-- `requirements.txt`: `pypdf` auf `<4.0.0` begrenzt, da `PdfMerger` in pypdf 4.x entfernt wurde.
 - Windows-App-Icon und PyInstaller-Spec für lokale Windows-Builds.
 - `PORTIERUNGSPLAN.md` mit Plattformentscheidung für Windows Store, macOS/Linux-Smokes und Web/PWA-Companion auf Basis von `dokureader-library-v1.json`.
 - `EXPORTFORMAT.md` für das stabile Austauschformat `dokureader-library-v1.json`.

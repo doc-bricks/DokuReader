@@ -82,6 +82,11 @@ Die Desktop-App bleibt die autoritative lokale Bibliothek. Windows Store ist der
 
 Der reproduzierbare Desktop-Source-Smoke liegt in `tests/source_platform_smoke.py`. Er prüft App-Start, `open`-/`xdg-open`-Aufrufe, Text- und PDF-Vorschau, simulierte LibreOffice-Konvertierung und Sammel-PDF-Export, ohne echten Nutzerstatus zu berühren.
 
+Für den mobilen Pfad gibt es jetzt zusätzlich einen reproduzierbaren PWA-Smoke
+unter `web_companion/`: `npm test` prüft Manifest, Offline-Shell und die
+Demo-Bibliothek für Android-/iOS-nahe Installationsläufe, ohne eine native
+Doppel-App aufzubauen.
+
 ## Unterstützte Dateiformate
 
 - Dokumente: `.txt`, `.doc`, `.docx`, `.pdf`, `.odt`, `.rtf`
@@ -93,6 +98,7 @@ Der reproduzierbare Desktop-Source-Smoke liegt in `tests/source_platform_smoke.p
 - `requirements.txt` - Python-Abhängigkeiten
 - `DokuReader.spec` - PyInstaller-Konfiguration
 - `EXPORTFORMAT.md` - Schema für `dokureader-library-v1.json`
+- `web_companion/README.md` - PWA-/Mobile-Smoke für Android und iOS
 - `STORE_LISTING.md` - Store-Texte für Windows Store (DE/EN)
 - `PRIVACY_POLICY.md` - Datenschutzhinweise für den Store-Release
 - `SUPPORT.md` - Support- und Kontaktwege

@@ -1,0 +1,9 @@
+{
+  "name": "dokureader-web-companion",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/library.test.mjs tests/pwa_mobile_smoke.test.mjs",
+    "smoke:pwa": "node --test tests/pwa_mobile_smoke.test.mjs"
+  }
+}

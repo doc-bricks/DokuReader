@@ -108,18 +108,18 @@ class StateLoadRobustnessTests(unittest.TestCase):
 
 
 class MergePDFTests(unittest.TestCase):
-    def test_merge_pdfs_closes_merger_on_write_failure(self):
-        """Bug #2: merger.close() muss auch bei Schreibfehler aufgerufen werden."""
-        mock_merger = MagicMock()
-        mock_merger.write.side_effect = OSError("disk full")
+    def test_merge_pdfs_closes_writer_on_write_failure(self):
+        """Bug #2: writer.close() muss auch bei Schreibfehler aufgerufen werden."""
+        mock_writer = MagicMock()
+        mock_writer.write.side_effect = OSError("disk full")
 
         with tempfile.TemporaryDirectory() as tmpdir:
             out_path = Path(tmpdir) / "out.pdf"
-            with patch.object(app, "PdfMerger", return_value=mock_merger):
+            with patch.object(app, "_PdfWriter", return_value=mock_writer):
                 result = app.App._merge_pdfs(None, [], out_path)
 
         self.assertFalse(result)
-        mock_merger.close.assert_called_once()
+        mock_writer.close.assert_called_once()
 
 
 if __name__ == "__main__":

@@ -55,12 +55,12 @@ except Exception:
     REPORTLAB_AVAILABLE = False
 
 try:
-    from pypdf import PdfMerger
+    from pypdf import PdfWriter as _PdfWriter
 except Exception:
     try:
-        from PyPDF2 import PdfMerger
+        from PyPDF2 import PdfWriter as _PdfWriter
     except Exception:
-        PdfMerger = None
+        _PdfWriter = None
 
 # PDF-Vorschau optional
 try:
@@ -1090,26 +1090,26 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
             out_path: Pfad für die zusammengeführte PDF
 
         Returns:
-            True bei Erfolg, False bei fehlendem PdfMerger oder Fehler
+            True bei Erfolg, False bei fehlendem PdfWriter oder Fehler
         """
-        if not PdfMerger:
+        if not _PdfWriter:
             return False
-        merger = PdfMerger()
+        writer = _PdfWriter()
         try:
             for p in pdf_paths:
                 try:
-                    merger.append(p)
+                    writer.append(p)
                 except (OSError, ValueError):
                     # Ignoriere defekte Einzel-PDFs
                     continue
             with open(out_path, "wb") as f:
-                merger.write(f)
+                writer.write(f)
             return True
         except (OSError, ValueError, RuntimeError):
             return False
         finally:
             try:
-                merger.close()
+                writer.close()
             except (OSError, ValueError):
                 pass
 

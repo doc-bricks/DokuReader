@@ -37,8 +37,8 @@ def _fake_soffice_run(tmpdir: Path):
 def main() -> None:
     if not DokuReader.REPORTLAB_AVAILABLE:
         raise SmokeFailure("ReportLab fehlt; Sammel-PDF-Smoke kann nicht laufen.")
-    if DokuReader.PdfMerger is None:
-        raise SmokeFailure("PdfMerger fehlt; Sammel-PDF-Smoke kann nicht laufen.")
+    if DokuReader._PdfWriter is None:
+        raise SmokeFailure("PdfWriter fehlt; Sammel-PDF-Smoke kann nicht laufen.")
 
     with tempfile.TemporaryDirectory() as tmpdir_str:
         tmpdir = Path(tmpdir_str)
