@@ -8,7 +8,10 @@ const ASSETS = [
   "./manifest.webmanifest",
   "./icons/dokureader-companion-180.png",
   "./icons/dokureader-companion-192.png",
-  "./icons/dokureader-companion-512.png"
+  "./icons/Icon-192.png",
+  "./icons/Icon-512.png",
+  "./icons/Icon-maskable-192.png",
+  "./icons/Icon-maskable-512.png"
 ];
 
 self.addEventListener("install", e => {
@@ -28,6 +31,6 @@ self.addEventListener("activate", e => {
 self.addEventListener("fetch", e => {
   if (e.request.method !== "GET") return;
   e.respondWith(
-    caches.match(e.request).then(cached => cached || fetch(e.request))
+    caches.match(e.request, { ignoreSearch: true }).then(cached => cached || fetch(e.request))
   );
 });

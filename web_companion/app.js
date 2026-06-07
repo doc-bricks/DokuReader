@@ -40,6 +40,7 @@ fileInput.addEventListener("change", e => {
   reader.onload = ev => {
     try { loadLibrary(JSON.parse(ev.target.result)); } catch { setStatus("Ungültige JSON-Datei.", true); }
   };
+  reader.onerror = () => setStatus("Datei konnte nicht gelesen werden.", true);
   reader.readAsText(file, "utf-8");
   e.target.value = "";
 });
@@ -55,6 +56,7 @@ dropZone.addEventListener("drop", e => {
   reader.onload = ev => {
     try { loadLibrary(JSON.parse(ev.target.result)); } catch { setStatus("Ungültige JSON-Datei.", true); }
   };
+  reader.onerror = () => setStatus("Datei konnte nicht gelesen werden.", true);
   reader.readAsText(file, "utf-8");
 });
 

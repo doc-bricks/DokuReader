@@ -49,6 +49,9 @@ desktop.ini
 # Logs
 *.log
 
+# Temporäre Backups (Bugsweep/Fix-Prozess)
+*.bak
+
 # Releases
 releases/
 *.exe
