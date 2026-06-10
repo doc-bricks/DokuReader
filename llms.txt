@@ -23,7 +23,6 @@ DokuReader is a local-first Tkinter desktop app for organizing document referenc
 - Windows launcher: `START.bat`
 - Windows build launcher: `build_exe.bat`
 - Export schema docs: `EXPORTFORMAT.md`
-- Platform plan: `PORTIERUNGSPLAN.md`
 - Store docs: `STORE_LISTING.md`, `PRIVACY_POLICY.md`, `SUPPORT.md`, `store_package.json`
 
 ## Test And Validation
@@ -38,3 +37,5 @@ DokuReader is a local-first Tkinter desktop app for organizing document referenc
 - Do not commit local document libraries, generated releases, converted PDFs, credentials, or `~/.dokubibliothek_state.json`.
 - `releases/`, build outputs, local state, SQLite files, tokens, and private/archive folders are ignored.
 - Optional PyMuPDF support keeps the project in AGPL-3.0 territory unless a commercial Artifex license is used.
+
+## Last-checked: 2026-06-11
