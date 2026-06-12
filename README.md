@@ -6,6 +6,23 @@ DokuReader is a local desktop application for organizing, previewing, and bundli
 
 It is designed for private document libraries, research folders, PDF collections, and topic-based reading queues that should remain local and inspectable.
 
+## Start Here
+
+| Goal | Entry point |
+|---|---|
+| Run the desktop app | `python DokuReader.py` or `START.bat` |
+| Understand the export format | `EXPORTFORMAT.md` |
+| Test the desktop source build | `python tests/source_platform_smoke.py` |
+| Check the mobile/PWA companion smoke | `web_companion/README.md` |
+| Prepare Windows Store copy | `STORE_LISTING.md`, `PRIVACY_POLICY.md`, `SUPPORT.md` |
+| Give LLM tools project context | `llms.txt` |
+
+## Discovery Context
+
+DokuReader is best described as a local-first document library, topic-based PDF organizer, reading-state tracker, and metadata-only document export tool. It is not a cloud document manager, hosted OCR service, general note-taking app, or full literature-citation suite.
+
+Useful search phrases include `local-first document library`, `topic based PDF organizer`, `document read status tracker`, `metadata-only document export`, `Tkinter document manager`, and `offline PDF bundling desktop app`.
+
 ## Features
 
 - Create, rename, and delete document topics

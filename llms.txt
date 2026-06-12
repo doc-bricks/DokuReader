@@ -1,5 +1,7 @@
 # DokuReader
 
+## Last-checked: 2026-06-12
+
 ## Canonical Links
 
 - Repository: https://github.com/doc-bricks/DokuReader
@@ -9,6 +11,30 @@
 ## Summary
 
 DokuReader is a local-first Tkinter desktop app for organizing document references by topic, previewing common file formats, tracking read/unread status, and exporting combined PDFs or a metadata-only JSON library.
+
+## Audience
+
+- Users who keep private document libraries on a local Windows desktop.
+- Researchers and knowledge workers who sort PDF and Office documents by topic.
+- Maintainers preparing a simple AGPL desktop app for Windows Store distribution.
+- LLM agents that need the project boundary, entrypoints, and export format without reading private user data.
+
+## Search Phrases
+
+```text
+local-first document library
+topic based PDF organizer
+document read status tracker
+metadata-only document export
+Tkinter document manager
+offline PDF bundling desktop app
+local document preview app
+dokureader document library GitHub
+```
+
+## Disambiguation
+
+DokuReader is not a cloud document manager, hosted OCR platform, general note-taking app, or full citation-management suite. It stores references and read status for local files; LitZentrum covers the broader literature-management workflow in the same doc-bricks family.
 
 ## Local Data Boundary
 
@@ -37,5 +63,3 @@ DokuReader is a local-first Tkinter desktop app for organizing document referenc
 - Do not commit local document libraries, generated releases, converted PDFs, credentials, or `~/.dokubibliothek_state.json`.
 - `releases/`, build outputs, local state, SQLite files, tokens, and private/archive folders are ignored.
 - Optional PyMuPDF support keeps the project in AGPL-3.0 territory unless a commercial Artifex license is used.
-
-## Last-checked: 2026-06-11

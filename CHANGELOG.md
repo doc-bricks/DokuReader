@@ -5,6 +5,9 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+### Dokumentation / Documentation
+- README, README_de und `llms.txt` um Einstiegstabelle, Suchphrasen, Zielgruppen und Abgrenzung für bessere GitHub-/Web-Auffindbarkeit ergänzt.
+
 ### Geändert / Changed
 - PDF-Merge von `PdfMerger` auf `PdfWriter` migriert (pypdf 4.x/5.x-kompatibel). `PdfMerger` wurde in pypdf 4.0.0 entfernt. Versions-Pin `pypdf<4.0.0` aufgehoben → `pypdf>=4.0.0`.
 
