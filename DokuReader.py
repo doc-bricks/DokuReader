@@ -256,11 +256,12 @@ class State:
                 pass
 
     def save(self):
-        """Speichert den aktuellen Zustand in die JSON-Datei."""
+        """Speichert den aktuellen Zustand in die JSON-Datei (thread-sicher)."""
+        with self._lock:
+            data = {"topics": self.topics, "current_topic": self.current_topic}
         try:
             with open(STATE_FILE, "w", encoding="utf-8") as f:
-                json.dump({"topics": self.topics, "current_topic": self.current_topic},
-                          f, ensure_ascii=False, indent=2)
+                json.dump(data, f, ensure_ascii=False, indent=2)
         except (OSError, TypeError):
             pass
 
@@ -402,11 +403,18 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         search_frame.pack(fill=tk.X, padx=8, pady=(0, 4))
         ttk.Label(search_frame, text="Suche:").pack(side=tk.LEFT, padx=(0, 4))
         self._search_var = tk.StringVar()
-        self._search_var.trace_add("write", lambda *_: self._reload_docs())
-        search_entry = ttk.Entry(search_frame, textvariable=self._search_var)
-        search_entry.pack(side=tk.LEFT, fill=tk.X, expand=True)
-        ttk.Button(search_frame, text="✕", width=2,
-                   command=lambda: self._search_var.set("")).pack(side=tk.LEFT, padx=(4, 0))
+        self._search_var.trace_add("write", self._on_search_changed)
+        self.search_entry = ttk.Entry(search_frame, textvariable=self._search_var)
+        self.search_entry.pack(side=tk.LEFT, fill=tk.X, expand=True)
+        self.search_entry.bind("<Escape>", self.clear_search)
+        self.clear_search_button = ttk.Button(
+            search_frame,
+            text="Leeren",
+            width=8,
+            command=self.clear_search,
+        )
+        self.clear_search_button.pack(side=tk.LEFT, padx=(4, 0))
+        self._update_search_controls()
 
         self.doc_tree = ttk.Treeview(center, columns=("typ", "größe"), show="tree headings", selectmode="browse")
         self.doc_tree.heading("#0", text="Name", anchor="w",
@@ -484,6 +492,25 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         self.topic_list.delete(0, tk.END)
         for t in sorted(self.state_model.topics.keys(), key=str.lower):
             self.topic_list.insert(tk.END, t)
+
+    def _on_search_changed(self, *_args):
+        """Aktualisiert Trefferliste und Suchleisten-Status bei Eingaben."""
+        self._reload_docs()
+        self._update_search_controls()
+
+    def _update_search_controls(self):
+        """Aktiviert die Leeren-Schaltfläche nur bei aktiver Suche."""
+        if not hasattr(self, "clear_search_button"):
+            return
+        has_query = bool(self._search_var.get().strip())
+        self.clear_search_button.state(["!disabled"] if has_query else ["disabled"])
+
+    def clear_search(self, _event=None):
+        """Leert die Suche tastaturfreundlich und behält den Fokus im Suchfeld."""
+        self._search_var.set("")
+        if hasattr(self, "search_entry"):
+            self.search_entry.focus_set()
+        return "break"
 
     def _select_topic(self, topic: str):
         """Setzt das aktuelle Thema und lädt die zugehörigen Dokumente."""
@@ -686,9 +713,9 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
             if platform.system() == "Windows":
                 os.startfile(path)  # type: ignore
             elif platform.system() == "Darwin":
-                subprocess.run(["open", path], check=False)
+                subprocess.run(["open", path], check=False, timeout=30)
             else:
-                subprocess.run(["xdg-open", path], check=False)
+                subprocess.run(["xdg-open", path], check=False, timeout=30)
         except Exception as e:
             messagebox.showerror("Fehler", f"Konnte Datei nicht öffnen:\n{e}")
 
