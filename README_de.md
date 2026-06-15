@@ -1,6 +1,14 @@
-# DokuReader - Dokumentenbibliothek
+<img src="assets/banner.svg" width="100%" alt="DokuReader Banner">
 
-[English](README.md)
+# DokuReader — Dokumentenbibliothek
+
+**[🇬🇧 English](README.md)** · **🇩🇪 Deutsch**
+
+> Dokumente nach Themen verwalten, vorschauen und bündeln — nur Verweise und Lesestatus, Originale bleiben am Platz.
+
+[![Lizenz: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-green)](LICENSE)
+[![Version](https://img.shields.io/badge/Version-v1.0.0-blue)](releases/)
+[![Plattform: Windows](https://img.shields.io/badge/Platform-Windows-blue?logo=windows)](#einstieg)
 
 DokuReader ist eine lokale Desktop-Anwendung zum Verwalten, Vorschauen und Bündeln von Dokumenten nach Themen. Originaldateien bleiben an ihrem Speicherort; die Anwendung speichert nur Verweise und Lesestatus in einer lokalen JSON-Datei.
 

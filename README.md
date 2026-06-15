@@ -1,6 +1,14 @@
-# DokuReader - Local Document Library
+<img src="assets/banner.svg" width="100%" alt="DokuReader Banner">
 
-[Deutsch](README_de.md)
+# DokuReader — Local Document Library
+
+**🇬🇧 English** · **[🇩🇪 Deutsch](README_de.md)**
+
+> Organize, preview, and bundle local documents by topic — references and read status only, originals stay put.
+
+[![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-green)](LICENSE)
+[![Version](https://img.shields.io/badge/Version-v1.0.0-blue)](releases/)
+[![Platform: Windows](https://img.shields.io/badge/Platform-Windows-blue?logo=windows)](#start-here)
 
 DokuReader is a local desktop application for organizing, previewing, and bundling documents by topic. Original files stay where they are; the application stores only file references and read status in a local JSON state file.
 
