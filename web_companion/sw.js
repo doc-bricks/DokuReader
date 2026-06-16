@@ -1,4 +1,4 @@
-const CACHE = "dokureader-companion-v2";
+const CACHE = "dokureader-companion-v3";
 const ASSETS = [
   "./",
   "./index.html",

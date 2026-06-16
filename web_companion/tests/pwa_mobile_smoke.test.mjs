@@ -1,10 +1,10 @@
-import { test } from "node:test";
+import { test, describe } from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { readFileSync } from "node:fs";
+import { readFileSync, existsSync } from "node:fs";
 
 import { buildDemoLibrary, SCHEMA } from "../library.js";
 
@@ -42,7 +42,7 @@ test("index wires mobile shell metadata and icons", async () => {
 
   assert.match(html, /viewport-fit=cover/);
   assert.match(html, /name="theme-color"/);
-  assert.match(html, /apple-mobile-web-app-capable/);
+  assert.doesNotMatch(html, /apple-mobile-web-app-capable/, "deprecated seit iOS 11.3 — entfernt");
   assert.match(html, /apple-touch-icon/);
   assert.match(html, /manifest\.webmanifest/);
 });
@@ -74,6 +74,48 @@ test("service worker caches the full offline shell", async () => {
 test("app.js FileReader onerror handler vorhanden (Bug #4)", () => {
   const occurrences = (appSource.match(/reader\.onerror/g) || []).length;
   assert.ok(occurrences >= 2, "reader.onerror muss in beiden FileReader-Blöcken (fileInput + dropZone) gesetzt sein");
+});
+
+describe("iOS PWA-Härtung", () => {
+  const html = readFileSync(path.join(ROOT, "index.html"), "utf8");
+  const css = readFileSync(path.join(ROOT, "style.css"), "utf8");
+  const sw = readFileSync(path.join(ROOT, "sw.js"), "utf8");
+
+  test("viewport enthält viewport-fit=cover (Notch/Dynamic Island)", () => {
+    assert.match(html, /viewport-fit=cover/);
+  });
+
+  test("apple-touch-icon zeigt auf dokureader-companion-180.png", () => {
+    assert.match(html, /apple-touch-icon.*dokureader-companion-180\.png/s);
+  });
+
+  test("apple-mobile-web-app-title ist vorhanden", () => {
+    assert.match(html, /apple-mobile-web-app-title/);
+  });
+
+  test("apple-mobile-web-app-status-bar-style ist vorhanden", () => {
+    assert.match(html, /apple-mobile-web-app-status-bar-style/);
+  });
+
+  test("KEIN apple-mobile-web-app-capable (deprecated seit iOS 11.3)", () => {
+    assert.doesNotMatch(html, /apple-mobile-web-app-capable/);
+  });
+
+  test("dokureader-companion-180.png existiert physisch in icons/", () => {
+    assert.ok(existsSync(path.join(ROOT, "icons", "dokureader-companion-180.png")));
+  });
+
+  test("style.css enthält safe-area-inset-top", () => {
+    assert.match(css, /safe-area-inset-top/);
+  });
+
+  test("style.css hat body mit env(safe-area-inset-bottom)", () => {
+    assert.match(css, /safe-area-inset-bottom/);
+  });
+
+  test("sw.js enthält dokureader-companion-180.png in ASSETS", () => {
+    assert.match(sw, /dokureader-companion-180\.png/);
+  });
 });
 
 test("demo library stays compatible with the production schema", () => {
