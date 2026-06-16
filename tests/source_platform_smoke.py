@@ -86,13 +86,13 @@ def main() -> None:
             with mock.patch.object(DokuReader.platform, "system", return_value="Darwin"), \
                  mock.patch.object(DokuReader.subprocess, "run") as open_mock:
                 app.on_doc_double_click()
-                open_mock.assert_called_once_with(["open", str(txt_path)], check=False)
+                open_mock.assert_called_once_with(["open", str(txt_path)], check=False, timeout=30)
 
             app.doc_tree.selection_set(str(txt_path))
             with mock.patch.object(DokuReader.platform, "system", return_value="Linux"), \
                  mock.patch.object(DokuReader.subprocess, "run") as xdg_mock:
                 app.on_doc_double_click()
-                xdg_mock.assert_called_once_with(["xdg-open", str(txt_path)], check=False)
+                xdg_mock.assert_called_once_with(["xdg-open", str(txt_path)], check=False, timeout=30)
 
             with mock.patch.object(DokuReader.shutil, "which", side_effect=lambda name: "/usr/bin/soffice" if name == "soffice" else None), \
                  mock.patch.object(DokuReader.subprocess, "run", side_effect=_fake_soffice_run(tmpdir)) as soffice_mock:
