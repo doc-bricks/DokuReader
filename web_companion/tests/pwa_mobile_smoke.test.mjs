@@ -118,6 +118,14 @@ describe("iOS PWA-Härtung", () => {
   });
 });
 
+test("Bug #1 regression: Demo-Handler ruft loadLibrary(buildDemoLibrary()) nicht auf (Doppelparse-Bug)", () => {
+  assert.doesNotMatch(
+    appSource,
+    /loadLibrary\(buildDemoLibrary\(\)\)/,
+    "loadLibrary(buildDemoLibrary()) ist ein Doppelparse-Bug — Demo-Handler muss library direkt zuweisen"
+  );
+});
+
 test("demo library stays compatible with the production schema", () => {
   const demo = buildDemoLibrary();
 

@@ -60,9 +60,15 @@ dropZone.addEventListener("drop", e => {
   reader.readAsText(file, "utf-8");
 });
 
-// Demo
+// Demo — buildDemoLibrary() liefert bereits geparste Library; loadLibrary() würde parseLibrary()
+// nochmals aufrufen und wegen fehlender schema_version werfen.
 document.getElementById("demo-btn").addEventListener("click", () => {
-  loadLibrary(buildDemoLibrary());
+  library = buildDemoLibrary();
+  activeTopic = library.currentTopic || (library.topics[0]?.name ?? null);
+  renderTopics();
+  renderDocs();
+  const total = library.totals;
+  setStatus(`${total.topic_count ?? library.topics.length} Themen · ${total.document_count ?? 0} Dokumente geladen`);
 });
 
 // --- Render ---
@@ -152,7 +158,12 @@ if ("serviceWorker" in navigator) {
 
 // Demo on load if ?demo=1
 if (new URLSearchParams(location.search).get("demo") === "1") {
-  loadLibrary(buildDemoLibrary());
+  library = buildDemoLibrary();
+  activeTopic = library.currentTopic || (library.topics[0]?.name ?? null);
+  renderTopics();
+  renderDocs();
+  const total = library.totals;
+  setStatus(`${total.topic_count ?? library.topics.length} Themen · ${total.document_count ?? 0} Dokumente geladen`);
 } else {
   renderDocs();
 }
