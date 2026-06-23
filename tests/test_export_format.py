@@ -71,6 +71,18 @@ class LibraryExportTests(unittest.TestCase):
 
 
 class StateLoadRobustnessTests(unittest.TestCase):
+    def test_add_docs_deduplicates_paths_within_single_call(self):
+        """Bug #3: derselbe Pfad darf in einem Add-Vorgang nur einmal landen."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            doc_path = Path(tmpdir) / "Plan.pdf"
+            doc_path.write_bytes(b"%PDF-1.4\n%%EOF\n")
+
+            state = app.State()
+            added = state.add_docs("Inbox", [str(doc_path), str(doc_path)])
+
+        self.assertEqual(added, 1)
+        self.assertEqual(len(state.topics["Inbox"]), 1)
+
     def test_state_load_tolerates_null_topics(self):
         """Bug #1: topics=null im State-File darf nicht zu AttributeError führen."""
         with tempfile.TemporaryDirectory() as tmpdir:

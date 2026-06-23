@@ -295,6 +295,7 @@ class State:
             for p in paths:
                 if os.path.isfile(p) and Path(p).suffix.lower() in SUPPORTED_EXTS and p not in known:
                     self.topics[topic].append({"path": p, "read": False})
+                    known.add(p)
                     added += 1
             return added
 
