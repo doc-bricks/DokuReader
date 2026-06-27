@@ -5,17 +5,39 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+### Behoben / Fixed
+- **BUG-D4**: `_split_dnd_paths` — `{` in Dateinamen (z.B. `bericht{2026}.txt`) wurde fälschlicherweise als
+  DnD-Klammer-Öffner gewertet; alles davor Akkumulierte ging verloren. Fix: `{` wird nur als DnD-Trennzeichen
+  gewertet, wenn der aktuelle Token noch leer ist.
+- **BUG-D5**: `_split_dnd_paths` — `}` ohne vorherige öffnende Klammer spaltete den Token in zwei Teile.
+  Fix: `}` schließt nur dann eine Klammer, wenn `in_brace=True`.
+
+### Geändert / Changed (Härtung / Hardening)
+- `State.save()`: JSON-Serialisierung (`json.dumps`) läuft jetzt vollständig innerhalb des `_lock`,
+  so dass kein anderer Thread `self.topics` mutieren kann, während der State geschrieben wird.
+- `State.rename_topic(old, new)` und `State.remove_topic(topic)` als neue atomare, Lock-geschützte
+  Methoden hinzugefügt. `App.rename_topic()` und `App.delete_topic()` nutzen diese Methoden
+  statt direkter `dict`-Mutation auf `state_model.topics`.
+
+### Tests
+- 16 neue Regressions- und Härtungstests (Gesamt: 24 Tests grün).
+  - `TestD4SplitDndOeffnendeKlammer`: 3 Tests für BUG-D4
+  - `TestD5SplitDndSchliessendekKlammer`: 2 Tests für BUG-D5
+  - `TestThreadSafetyHaertung`: 6 Vertragstests für `rename_topic`, `remove_topic`, `save()`
+
 ### Dokumentation / Documentation
 - README, README_de und `llms.txt` um Einstiegstabelle, Suchphrasen, Zielgruppen und Abgrenzung für bessere GitHub-/Web-Auffindbarkeit ergänzt.
 
 ### Geändert / Changed
 - PDF-Merge von `PdfMerger` auf `PdfWriter` migriert (pypdf 4.x/5.x-kompatibel). `PdfMerger` wurde in pypdf 4.0.0 entfernt. Versions-Pin `pypdf<4.0.0` aufgehoben → `pypdf>=4.0.0`.
+- Suchleiste im Desktop-Fenster für kompakte, aber klarere Bedienung nachgeschärft: statt eines uneindeutigen `×`-Symbols gibt es jetzt die beschriftete Schaltfläche `Leeren`, die nur bei aktiver Suche aktiv ist; `Esc` leert die Suche direkt aus dem Suchfeld.
 
 ### Build / Release
 - EXE neu gebaut 2026-06-01 (PyInstaller, `DokuReader.spec` → `C:\_Local_DEV\codex_build\dokureader`); 5/5 Tests grün, Smoke-Test bestanden. Vorherige EXE: 2026-05-22, Anlass: DokuReader.py 2026-05-26.
 
 ### Hinzugefügt / Added
 - GitHub Actions CI-Workflow `source-platform-smoke.yml`: führt `tests/source_platform_smoke.py` auf `ubuntu-latest` (mit Xvfb) und `macos-latest` bei jedem Push/PR auf main aus.
+- GUI-Regressionstest `tests/test_ui_accessibility.py` für die Suchleiste: prüft die beschriftete `Leeren`-Schaltfläche, den deaktivierten Leerzustand und das Tastatur-Zurücksetzen per `Esc`.
 
 ### Behoben / Fixed
 - Windows-App-Icon und PyInstaller-Spec für lokale Windows-Builds.

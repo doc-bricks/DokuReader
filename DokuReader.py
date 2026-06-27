@@ -256,12 +256,20 @@ class State:
                 pass
 
     def save(self):
-        """Speichert den aktuellen Zustand in die JSON-Datei (thread-sicher)."""
+        """Speichert den aktuellen Zustand in die JSON-Datei (thread-sicher).
+
+        Der JSON-String wird innerhalb des Locks serialisiert, damit kein anderer Thread
+        self.topics mutieren kann, während json.dumps läuft.
+        """
         with self._lock:
-            data = {"topics": self.topics, "current_topic": self.current_topic}
+            serialized = json.dumps(
+                {"topics": self.topics, "current_topic": self.current_topic},
+                ensure_ascii=False,
+                indent=2,
+            )
         try:
             with open(STATE_FILE, "w", encoding="utf-8") as f:
-                json.dump(data, f, ensure_ascii=False, indent=2)
+                f.write(serialized)
         except (OSError, TypeError):
             pass
 
@@ -336,6 +344,37 @@ class State:
         """
         with self._lock:
             return list(self.topics.get(topic, []))
+
+    def rename_topic(self, old: str, new: str) -> bool:
+        """
+        Benennt ein Thema atomar um (thread-sicher).
+
+        Args:
+            old: Bisheriger Themenname
+            new: Neuer Themenname
+
+        Returns:
+            True bei Erfolg, False wenn old nicht existiert
+        """
+        with self._lock:
+            if old not in self.topics:
+                return False
+            self.topics[new] = self.topics.pop(old)
+            if self.current_topic == old:
+                self.current_topic = new
+            return True
+
+    def remove_topic(self, topic: str):
+        """
+        Entfernt ein Thema atomar (thread-sicher).
+
+        Args:
+            topic: Name des zu entfernenden Themas
+        """
+        with self._lock:
+            self.topics.pop(topic, None)
+            if self.current_topic == topic:
+                self.current_topic = None
 
 
 class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
@@ -558,9 +597,7 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         if new in self.state_model.topics:
             messagebox.showwarning("Hinweis", "Ein Thema mit diesem Namen existiert bereits.")
             return
-        self.state_model.topics[new] = self.state_model.topics.pop(old)
-        if self.state_model.current_topic == old:
-            self.state_model.current_topic = new
+        self.state_model.rename_topic(old, new)
         self.state_model.save()
         self._reload_topics()
         self._select_topic(new)
@@ -572,9 +609,7 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
             return
         topic = self.topic_list.get(sel[0])
         if messagebox.askyesno("Bestätigen", f"Thema '{topic}' entfernen? (Dateien bleiben am Originalort)"):
-            self.state_model.topics.pop(topic, None)
-            if self.state_model.current_topic == topic:
-                self.state_model.current_topic = None
+            self.state_model.remove_topic(topic)
             self.state_model.save()
             self._reload_topics()
             self.doc_tree.delete(*self.doc_tree.get_children())
@@ -676,14 +711,18 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
             Liste von bereinigten Dateipfaden
         """
         # Formate wie {C:\Pfad mit Leerzeichen\file.pdf} /home/user/x.pdf ...
+        # BUG-D4/D5-Fix: '{' nur als DnD-Trennzeichen werten, wenn cur leer ist (Tokenanfang).
+        # '}' nur als Trennzeichen werten, wenn aktuell eine Klammer geöffnet ist.
+        # Literal-{} in Dateinamen (z.B. "bericht{2026}.txt") werden so korrekt behandelt.
         res = []
         cur = []
         in_brace = False
         for ch in data:
-            if ch == "{":
+            if ch == "{" and not in_brace and not cur:
+                # DnD-Klammer öffnen – nur am Tokenanfang (cur leer, nicht schon in Klammer)
                 in_brace = True
-                cur = []
-            elif ch == "}":
+            elif ch == "}" and in_brace:
+                # Klammer schließen
                 in_brace = False
                 res.append("".join(cur))
                 cur = []
