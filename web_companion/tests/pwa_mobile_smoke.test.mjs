@@ -126,6 +126,18 @@ test("Bug #1 regression: Demo-Handler ruft loadLibrary(buildDemoLibrary()) nicht
   );
 });
 
+// BUG-W1 Regressionstest
+test("BUG-W1 regression: sw.js fetch hat .catch() für Offline-Fallback", async () => {
+  const sw = await read("sw.js");
+  assert.ok(
+    /fetch\(e\.request\)[\s\S]{0,100}\.catch\(/.test(sw),
+    "BUG-W1: sw.js fetch muss .catch() für Offline-Fallback haben"
+  );
+  assert.ok(sw.includes("503"), "BUG-W1: Offline-Fallback muss HTTP 503 zurückgeben");
+  const m = sw.match(/CACHE\s*=\s*["']dokureader-companion-v(\d+)["']/);
+  assert.ok(m && parseInt(m[1]) >= 4, "CACHE muss auf v4+ gebumpt sein (nach BUG-W1-Fix)");
+});
+
 test("demo library stays compatible with the production schema", () => {
   const demo = buildDemoLibrary();
 

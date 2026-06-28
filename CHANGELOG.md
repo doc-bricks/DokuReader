@@ -11,6 +11,11 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
   gewertet, wenn der aktuelle Token noch leer ist.
 - **BUG-D5**: `_split_dnd_paths` — `}` ohne vorherige öffnende Klammer spaltete den Token in zwei Teile.
   Fix: `}` schließt nur dann eine Klammer, wenn `in_brace=True`.
+- **BUG-W1** (web_companion): `sw.js` `fetch`-Handler hatte keinen `.catch()`-Fallback — bei Netzwerkfehler
+  warf der Service Worker unbehandelt, statt eine 503-Antwort zu liefern. Fix: `.catch()` gibt
+  `new Response("Offline", { status: 503 })` zurück; CACHE-Version auf `v5` gebumpt.
+- `manage_translations.py`: Fehler beim Lesen von `translations.json` (korrupte Datei / OS-Fehler) wurde nicht
+  abgefangen — `json.JSONDecodeError` und `OSError` werden jetzt behandelt; Fallback auf leeres Dict.
 
 ### Geändert / Changed (Härtung / Hardening)
 - `State.save()`: JSON-Serialisierung (`json.dumps`) läuft jetzt vollständig innerhalb des `_lock`,
@@ -20,10 +25,12 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
   statt direkter `dict`-Mutation auf `state_model.topics`.
 
 ### Tests
-- 16 neue Regressions- und Härtungstests (Gesamt: 24 Tests grün).
+- 16 neue Regressions- und Härtungstests für Desktop (Gesamt: 23 Python-Tests grün).
   - `TestD4SplitDndOeffnendeKlammer`: 3 Tests für BUG-D4
   - `TestD5SplitDndSchliessendekKlammer`: 2 Tests für BUG-D5
   - `TestThreadSafetyHaertung`: 6 Vertragstests für `rename_topic`, `remove_topic`, `save()`
+- 1 neuer Regressionstest (web_companion): `BUG-W1 regression: sw.js fetch hat .catch() für Offline-Fallback`
+  (Gesamt web_companion: 25 Node-Tests grün).
 
 ### Dokumentation / Documentation
 - README, README_de und `llms.txt` um Einstiegstabelle, Suchphrasen, Zielgruppen und Abgrenzung für bessere GitHub-/Web-Auffindbarkeit ergänzt.

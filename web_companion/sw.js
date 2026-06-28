@@ -1,4 +1,4 @@
-const CACHE = "dokureader-companion-v3";
+const CACHE = "dokureader-companion-v5";
 const ASSETS = [
   "./",
   "./index.html",
@@ -31,6 +31,6 @@ self.addEventListener("activate", e => {
 self.addEventListener("fetch", e => {
   if (e.request.method !== "GET") return;
   e.respondWith(
-    caches.match(e.request, { ignoreSearch: true }).then(cached => cached || fetch(e.request))
+    caches.match(e.request, { ignoreSearch: true }).then(cached => cached || fetch(e.request).catch(() => new Response("Offline", { status: 503, headers: { "Content-Type": "text/plain" } })))
   );
 });
