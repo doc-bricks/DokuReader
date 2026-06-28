@@ -24,13 +24,33 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
   Methoden hinzugefügt. `App.rename_topic()` und `App.delete_topic()` nutzen diese Methoden
   statt direkter `dict`-Mutation auf `state_model.topics`.
 
+### Hinzugefügt / Added (web_companion)
+- **Lesestatus-Toggle + Export** (PORTIERUNGSPLAN Schritt 2):
+  - `library.js`: `setRead(library, path, value)` schaltet den Gelesen-Status eines Dokuments anhand
+    seines Pfads um (Pfad als stabiler Join-Key zum Desktop-Export).
+  - `library.js`: `serializeLibrary(library)` serialisiert eine geparste Library zurück ins
+    `dokureader-library-v1` JSON-Format (Feldnamen-Rückmapping: `sizeBytes→size_bytes` etc.).
+    Das Desktop-Format wird ohne neue Schema-Version wiederverwendet — der Desktop kann es direkt
+    reimportieren.
+  - `app.js`: Dok-Karten sind jetzt klickbar und per Tastatur (Enter/Space) bedienbar; Klick
+    schaltet Gelesen/Ungelesen um und re-rendert die Karte sofort.
+  - `app.js`: Schaltfläche „Status exportieren" erscheint nach dem Laden einer Bibliothek;
+    löst einen Browser-Download von `dokureader-library-v1.json` mit aktuellem Lesestatus aus.
+  - `app.js`: `innerHTML` in `renderDocs`/`renderTopics` durch `replaceChildren()` und
+    `textContent`-basierte DOM-Methoden ersetzt (kein XSS-Risiko durch statische Strings mehr).
+  - `style.css`: `cursor: pointer` und `:hover/:focus-visible`-Border-Hervorhebung für Dok-Karten.
+  - `index.html`: Schaltfläche `#export-btn` (initial `hidden`, wird nach Bibliotheksladung
+    eingeblendet).
+
 ### Tests
-- 16 neue Regressions- und Härtungstests für Desktop (Gesamt: 23 Python-Tests grün).
+- 16 neue Regressions- und Härtungstests für Desktop (Gesamt: 24 Python-Tests grün).
   - `TestD4SplitDndOeffnendeKlammer`: 3 Tests für BUG-D4
   - `TestD5SplitDndSchliessendekKlammer`: 2 Tests für BUG-D5
   - `TestThreadSafetyHaertung`: 6 Vertragstests für `rename_topic`, `remove_topic`, `save()`
-- 1 neuer Regressionstest (web_companion): `BUG-W1 regression: sw.js fetch hat .catch() für Offline-Fallback`
-  (Gesamt web_companion: 25 Node-Tests grün).
+- 1 neuer Regressionstest (web_companion): `BUG-W1 regression: sw.js fetch hat .catch() für Offline-Fallback`.
+- 7 neue Tests (web_companion) für `setRead` und `serializeLibrary` (Round-Trip-Verifikation):
+  `setRead` toggle/false-return, `serializeLibrary` Feldmapping, Round-Trip, Status-Erhalt.
+  (Gesamt web_companion: 32 Node-Tests grün).
 
 ### Dokumentation / Documentation
 - README, README_de und `llms.txt` um Einstiegstabelle, Suchphrasen, Zielgruppen und Abgrenzung für bessere GitHub-/Web-Auffindbarkeit ergänzt.

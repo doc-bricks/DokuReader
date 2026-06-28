@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { parseLibrary, filterDocuments, buildDemoLibrary, SCHEMA } from "../library.js";
+import { parseLibrary, filterDocuments, buildDemoLibrary, setRead, serializeLibrary, SCHEMA } from "../library.js";
 
 const SAMPLE = {
   schema_version: SCHEMA,
@@ -87,4 +87,65 @@ test("buildDemoLibrary returns parseable demo data", () => {
   const lib = buildDemoLibrary();
   assert.ok(lib.topics.length >= 2);
   assert.ok(lib.totals.topic_count >= 2);
+});
+
+// --- setRead ---
+
+test("setRead schaltet Gelesen-Status eines Dokuments anhand des Pfads um", () => {
+  const lib = parseLibrary(SAMPLE);
+  const doc = lib.topics[0].documents[0]; // paper.pdf, read: true
+  assert.equal(doc.read, true);
+  setRead(lib, "/docs/paper.pdf", false);
+  assert.equal(doc.read, false);
+  setRead(lib, "/docs/paper.pdf", true);
+  assert.equal(doc.read, true);
+});
+
+test("setRead gibt false zurück bei unbekanntem Pfad", () => {
+  const lib = parseLibrary(SAMPLE);
+  assert.equal(setRead(lib, "/existiert/nicht.pdf", true), false);
+});
+
+test("setRead gibt true zurück wenn Dokument gefunden und geändert wurde", () => {
+  const lib = parseLibrary(SAMPLE);
+  assert.equal(setRead(lib, "/docs/vertrag.pdf", true), true);
+});
+
+// --- serializeLibrary ---
+
+test("serializeLibrary Round-Trip erhält alle Felder", () => {
+  const lib = parseLibrary(SAMPLE);
+  const serialized = serializeLibrary(lib);
+  const lib2 = parseLibrary(serialized);
+  assert.equal(lib2.topics.length, lib.topics.length);
+  assert.equal(lib2.topics[0].documents[0].filename, "paper.pdf");
+  assert.equal(lib2.topics[0].documents[0].sizeBytes, 100000);
+  assert.equal(lib2.topics[0].documents[1].missing, true);
+  assert.equal(lib2.currentTopic, "Forschung");
+});
+
+test("serializeLibrary Round-Trip überträgt geänderten Gelesen-Status korrekt", () => {
+  const lib = parseLibrary(SAMPLE);
+  setRead(lib, "/docs/paper.pdf", false);
+  const serialized = serializeLibrary(lib);
+  const lib2 = parseLibrary(serialized);
+  assert.equal(lib2.topics[0].documents[0].read, false);
+});
+
+test("serializeLibrary erzeugt gültiges dokureader-library-v1 Schema", () => {
+  const lib = parseLibrary(SAMPLE);
+  const serialized = serializeLibrary(lib);
+  assert.equal(serialized.schema_version, SCHEMA);
+  assert.ok(typeof serialized.exported_at === "string");
+  assert.ok(Array.isArray(serialized.topics));
+  assert.equal(serialized.totals.topic_count, 2);
+  assert.equal(serialized.totals.document_count, 3);
+  assert.equal(serialized.totals.missing_documents, 1);
+});
+
+test("serializeLibrary mappt sizeBytes auf size_bytes zurück", () => {
+  const lib = parseLibrary(SAMPLE);
+  const serialized = serializeLibrary(lib);
+  assert.equal(serialized.topics[0].documents[0].size_bytes, 100000);
+  assert.equal(serialized.topics[0].documents[1].size_bytes, null);
 });

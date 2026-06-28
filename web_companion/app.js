@@ -1,4 +1,4 @@
-import { parseLibrary, filterDocuments, buildDemoLibrary } from "./library.js";
+import { parseLibrary, filterDocuments, buildDemoLibrary, setRead, serializeLibrary } from "./library.js";
 
 let library = null;
 let activeTopic = null;
@@ -10,6 +10,7 @@ const showMissingChk = document.getElementById("show-missing");
 const statusBar = document.getElementById("status-bar");
 const dropZone = document.getElementById("drop-zone");
 const importBtn = document.getElementById("import-btn");
+const exportBtn = document.getElementById("export-btn");
 const fileInput = document.getElementById("file-input");
 
 // --- Import ---
@@ -20,6 +21,7 @@ function loadLibrary(json) {
     activeTopic = library.currentTopic || (library.topics[0]?.name ?? null);
     renderTopics();
     renderDocs();
+    exportBtn.hidden = false;
     const total = library.totals;
     setStatus(`${total.topic_count ?? library.topics.length} Themen · ${total.document_count ?? 0} Dokumente geladen`);
   } catch (e) {
@@ -67,15 +69,31 @@ document.getElementById("demo-btn").addEventListener("click", () => {
   activeTopic = library.currentTopic || (library.topics[0]?.name ?? null);
   renderTopics();
   renderDocs();
+  exportBtn.hidden = false;
   const total = library.totals;
   setStatus(`${total.topic_count ?? library.topics.length} Themen · ${total.document_count ?? 0} Dokumente geladen`);
+});
+
+// --- Export ---
+
+exportBtn.addEventListener("click", () => {
+  if (!library) return;
+  const json = JSON.stringify(serializeLibrary(library), null, 2);
+  const blob = new Blob([json], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "dokureader-library-v1.json";
+  a.click();
+  URL.revokeObjectURL(url);
+  setStatus("Bibliothek mit aktuellem Lesestatus exportiert.");
 });
 
 // --- Render ---
 
 function renderTopics() {
   if (!library) return;
-  topicList.innerHTML = "";
+  topicList.replaceChildren();
 
   const all = document.createElement("li");
   all.textContent = "Alle Themen";
@@ -92,21 +110,31 @@ function renderTopics() {
   }
 }
 
+function emptyMsg(text) {
+  const p = document.createElement("p");
+  p.className = "empty";
+  p.textContent = text;
+  return p;
+}
+
 function renderDocs() {
-  if (!library) { docList.innerHTML = "<p class='empty'>Noch keine Bibliothek geladen.</p>"; return; }
+  if (!library) { docList.replaceChildren(emptyMsg("Noch keine Bibliothek geladen.")); return; }
   const q = searchInput.value;
   const showMissing = showMissingChk.checked;
   const docs = filterDocuments(library, { topic: activeTopic, query: q, showMissing });
 
   if (docs.length === 0) {
-    docList.innerHTML = "<p class='empty'>Keine Dokumente gefunden.</p>";
+    docList.replaceChildren(emptyMsg("Keine Dokumente gefunden."));
     return;
   }
 
-  docList.innerHTML = "";
+  docList.replaceChildren();
   for (const d of docs) {
     const card = document.createElement("div");
     card.className = "doc-card" + (d.missing ? " missing" : "") + (d.read ? " read" : "");
+    card.setAttribute("role", "button");
+    card.setAttribute("tabindex", "0");
+    card.setAttribute("aria-label", `${d.filename} — ${d.read ? "Gelesen" : "Ungelesen"}, Klicken zum Umschalten`);
 
     const badge = document.createElement("span");
     badge.className = "ext-badge";
@@ -133,6 +161,17 @@ function renderDocs() {
 
     info.append(name, meta);
     card.append(badge, info, readBadge);
+
+    // Klick und Enter/Space schalten den Gelesen-Status um
+    const toggleRead = () => {
+      setRead(library, d.path, !d.read);
+      renderDocs();
+    };
+    card.addEventListener("click", toggleRead);
+    card.addEventListener("keydown", e => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleRead(); }
+    });
+
     docList.appendChild(card);
   }
 }
@@ -162,6 +201,7 @@ if (new URLSearchParams(location.search).get("demo") === "1") {
   activeTopic = library.currentTopic || (library.topics[0]?.name ?? null);
   renderTopics();
   renderDocs();
+  exportBtn.hidden = false;
   const total = library.totals;
   setStatus(`${total.topic_count ?? library.topics.length} Themen · ${total.document_count ?? 0} Dokumente geladen`);
 } else {

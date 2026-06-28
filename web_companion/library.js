@@ -39,6 +39,54 @@ export function filterDocuments(library, { topic = null, query = "", showMissing
     );
 }
 
+/**
+ * Setzt den Gelesen-Status eines Dokuments anhand seines Pfads.
+ * Gibt true zurück, wenn das Dokument gefunden und geändert wurde.
+ */
+export function setRead(library, docPath, value) {
+  for (const topic of library.topics) {
+    for (const doc of topic.documents) {
+      if (doc.path === docPath) {
+        doc.read = Boolean(value);
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+/**
+ * Serialisiert eine geparste Library zurück ins dokureader-library-v1 JSON-Format.
+ * Umkehrung von parseLibrary() — Felder werden auf die JSON-Schlüssel zurückgemappt
+ * (sizeBytes → size_bytes, currentTopic → current_topic usw.).
+ */
+export function serializeLibrary(library) {
+  return {
+    schema_version: SCHEMA,
+    exported_at: new Date().toISOString(),
+    current_topic: library.currentTopic || null,
+    topics: library.topics.map(t => ({
+      name: t.name,
+      documents: t.documents.map(d => ({
+        path: d.path,
+        filename: d.filename,
+        extension: d.extension,
+        read: d.read,
+        size_bytes: d.sizeBytes ?? null,
+        mtime: d.mtime || null,
+        missing: d.missing
+      }))
+    })),
+    totals: {
+      topic_count: library.topics.length,
+      document_count: library.topics.reduce((n, t) => n + t.documents.length, 0),
+      missing_documents: library.topics.reduce(
+        (n, t) => n + t.documents.filter(d => d.missing).length, 0
+      )
+    }
+  };
+}
+
 export function buildDemoLibrary() {
   return parseLibrary({
     schema_version: SCHEMA,

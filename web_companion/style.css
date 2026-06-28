@@ -166,9 +166,12 @@ header h1 { font-size: 1.1rem; font-weight: 600; }
   padding: 10px 12px;
   display: flex;
   align-items: center;
+  cursor: pointer;
+  transition: border-color 0.15s;
   gap: 10px;
 }
 
+.doc-card:hover, .doc-card:focus-visible { border-color: var(--primary); outline: none; }
 .doc-card.missing { background: var(--missing); }
 .doc-card.read { border-left: 3px solid #43a047; }
 
