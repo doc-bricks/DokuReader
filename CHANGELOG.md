@@ -5,6 +5,12 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+### Hinzugefügt / Added
+- Windows-Store-Readiness-Gate `_WARTUNG/check_store_readiness.py` ergänzt. Es prüft
+  Store-Metadaten, öffentliche Privacy-/Support-URLs, Pflichtdokumente, Store-Assets,
+  Screenshots, EXE, MSIX und WACK-XML und kann erwartete externe Store-Blocker per
+  `--allow-blockers` transparent ausgeben.
+
 ### Behoben / Fixed
 - **BUG-D4**: `_split_dnd_paths` — `{` in Dateinamen (z.B. `bericht{2026}.txt`) wurde fälschlicherweise als
   DnD-Klammer-Öffner gewertet; alles davor Akkumulierte ging verloren. Fix: `{` wird nur als DnD-Trennzeichen

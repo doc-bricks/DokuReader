@@ -22,6 +22,7 @@ It is designed for private document libraries, research folders, PDF collections
 | Understand the export format | `EXPORTFORMAT.md` |
 | Test the desktop source build | `python tests/source_platform_smoke.py` |
 | Check the mobile/PWA companion smoke | `web_companion/README.md` |
+| Check Windows Store readiness | `python _WARTUNG/check_store_readiness.py --allow-blockers` |
 | Prepare Windows Store copy | `STORE_LISTING.md`, `PRIVACY_POLICY.md`, `SUPPORT.md` |
 | Give LLM tools project context | `llms.txt` |
 
@@ -101,6 +102,14 @@ build_exe.bat
 
 Build output under `build/`, `dist/`, and `releases/` stays local and does not belong in the Git repository. The build uses a local work directory under `C:\_Local_DEV\codex_build\dokureader` and updates `dist\DokuReader.exe`.
 
+## Windows Store Readiness
+
+```bash
+python _WARTUNG/check_store_readiness.py --allow-blockers
+```
+
+The check validates Store metadata, public privacy/support URLs, required documents, Store assets, generated screenshots, a local EXE, and the remaining MSIX/WACK artifacts. `--allow-blockers` is intended for local pre-submission runs where Partner Center, MSIX signing, or the elevated WACK pass are still external gates.
+
 ## Platform Strategy
 
 The desktop app remains the authoritative local library. Windows Store is the first distribution target; macOS and Linux are tracked as source and smoke-test targets from the same Tkinter codebase. For Android, iOS, and browser use, a later Web/PWA companion based on `dokureader-library-v1.json` is more appropriate than a full native clone because mobile sandboxes cannot freely access local desktop document paths.
@@ -123,6 +132,7 @@ native duplicate app line.
 - `requirements.txt` - Python dependencies
 - `DokuReader.spec` - PyInstaller configuration
 - `EXPORTFORMAT.md` - schema for `dokureader-library-v1.json`
+- `_WARTUNG/check_store_readiness.py` - Windows Store readiness gate
 - `web_companion/README.md` - PWA/mobile smoke workflow for Android and iOS
 - `STORE_LISTING.md` - Windows Store copy in German and English
 - `PRIVACY_POLICY.md` - privacy notes for the Store release

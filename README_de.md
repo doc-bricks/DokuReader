@@ -22,6 +22,7 @@ DokuReader eignet sich für private Dokumentenbibliotheken, Forschungsordner, PD
 | Exportformat verstehen | `EXPORTFORMAT.md` |
 | Desktop-Quellstand testen | `python tests/source_platform_smoke.py` |
 | Mobile/PWA-Companion prüfen | `web_companion/README.md` |
+| Windows-Store-Readiness prüfen | `python _WARTUNG/check_store_readiness.py --allow-blockers` |
 | Windows-Store-Texte vorbereiten | `STORE_LISTING.md`, `PRIVACY_POLICY.md`, `SUPPORT.md` |
 | LLM-Tools Projektkontext geben | `llms.txt` |
 
@@ -101,6 +102,14 @@ build_exe.bat
 
 Build-Ausgaben unter `build/`, `dist/` und `releases/` bleiben lokal und gehören nicht in das Git-Repository. Der Build nutzt einen lokalen Arbeitsordner unter `C:\_Local_DEV\codex_build\dokureader` und aktualisiert `dist\DokuReader.exe`.
 
+## Windows-Store-Readiness
+
+```bash
+python _WARTUNG/check_store_readiness.py --allow-blockers
+```
+
+Der Check prüft Store-Metadaten, öffentliche Privacy-/Support-URLs, Pflichtdokumente, Store-Assets, generierte Screenshots, eine lokale EXE sowie die verbleibenden MSIX-/WACK-Artefakte. `--allow-blockers` ist für lokale Pre-Submission-Läufe gedacht, bei denen Partner Center, MSIX-Signierung oder der erhöhte WACK-Lauf noch externe Gates sind.
+
 ## Plattformstrategie
 
 Die Desktop-App bleibt die autoritative lokale Bibliothek. Windows Store ist der erste Distributionskanal; macOS und Linux werden als Source- und Smoke-Test-Ziele aus derselben Tkinter-Codebasis geführt. Für Android, iOS und Browser ist ein späterer Web/PWA-Companion auf Basis von `dokureader-library-v1.json` sinnvoller als ein nativer Voll-Clone, weil mobile Sandboxes keinen freien Zugriff auf die lokalen Desktop-Dokumentpfade haben.
@@ -123,6 +132,7 @@ Doppel-App aufzubauen.
 - `requirements.txt` - Python-Abhängigkeiten
 - `DokuReader.spec` - PyInstaller-Konfiguration
 - `EXPORTFORMAT.md` - Schema für `dokureader-library-v1.json`
+- `_WARTUNG/check_store_readiness.py` - Windows-Store-Readiness-Gate
 - `web_companion/README.md` - PWA-/Mobile-Smoke für Android und iOS
 - `STORE_LISTING.md` - Store-Texte für Windows Store (DE/EN)
 - `PRIVACY_POLICY.md` - Datenschutzhinweise für den Store-Release
