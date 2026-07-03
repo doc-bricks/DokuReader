@@ -28,6 +28,7 @@ STORE_SCREENSHOTS = (
     "pdf-preview.png",
     "collection-export.png",
 )
+WACK_REPORT_PREFIX = "wack_"
 
 REQUIRED_DOCS = (
     "STORE_LISTING.md",
@@ -184,10 +185,6 @@ def check_build_artifacts(root: Path) -> list[CheckResult]:
         root / "releases" / "windowsstore" / "store_package" / "DokuReader.msix",
         root / "store_package" / "DokuReader.msix",
     )
-    wack_reports = sorted((root / "releases" / "windowsstore").glob("*wack*.xml")) + sorted(
-        (root / "releases" / "windowsstore").glob("*WACK*.xml")
-    )
-
     results: list[CheckResult] = []
     exe = _first_existing(exe_candidates)
     if exe:
@@ -200,13 +197,97 @@ def check_build_artifacts(root: Path) -> list[CheckResult]:
         results.append(_result("MSIX package", "OK", "package artifact present", msix, root))
     else:
         results.append(_result("MSIX package", "BLOCKER", "no signed MSIX package found", msix_candidates[0], root))
-
-    wack = _first_existing(wack_reports)
-    if wack:
-        results.append(_result("WACK XML report", "OK", "report present", wack, root))
-    else:
-        results.append(_result("WACK XML report", "BLOCKER", "no WACK XML report found", root / "releases" / "windowsstore", root))
     return results
+
+
+def _load_json_object(path: Path) -> tuple[dict, str | None]:
+    data, error = _read_json(path)
+    if error:
+        return {}, error
+    return data, None
+
+
+def _latest_wack_summary(root: Path) -> Path | None:
+    report_dirs = (
+        root / "releases" / "windowsstore" / "test_reports",
+        root / "releases" / "windowsstore",
+    )
+    summaries: list[Path] = []
+    for directory in report_dirs:
+        if directory.exists():
+            summaries.extend(directory.glob(f"{WACK_REPORT_PREFIX}*.json"))
+    summaries.sort(key=lambda path: (path.stat().st_mtime, path.name))
+    return summaries[-1] if summaries else None
+
+
+def _latest_wack_xml(root: Path) -> Path | None:
+    report_dirs = (
+        root / "releases" / "windowsstore" / "test_reports",
+        root / "releases" / "windowsstore",
+    )
+    reports: list[Path] = []
+    for directory in report_dirs:
+        if directory.exists():
+            reports.extend(directory.glob(f"{WACK_REPORT_PREFIX}*.xml"))
+            reports.extend(directory.glob("*WACK*.xml"))
+    reports.sort(key=lambda path: (path.stat().st_mtime, path.name))
+    return reports[-1] if reports else None
+
+
+def _int_from_json(value: object) -> int:
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return 0
+
+
+def check_wack_runner(root: Path) -> list[CheckResult]:
+    path = root / "_WARTUNG" / "run_windows_wack.py"
+    if path.exists() and path.stat().st_size > 0:
+        return [_result("WACK runner", "OK", "runner present", path, root)]
+    return [_result("WACK runner", "BLOCKER", "missing _WARTUNG/run_windows_wack.py", path, root)]
+
+
+def check_wack_report(root: Path) -> list[CheckResult]:
+    summary_path = _latest_wack_summary(root)
+    if summary_path is None:
+        xml_path = _latest_wack_xml(root)
+        if xml_path is not None:
+            return [
+                _result(
+                    "WACK JSON summary",
+                    "BLOCKER",
+                    "XML report exists but has not been parsed to JSON; run _WARTUNG/run_windows_wack.py --parse-report",
+                    xml_path,
+                    root,
+                )
+            ]
+        return [
+            _result(
+                "WACK JSON summary",
+                "BLOCKER",
+                "no parsed WACK JSON summary found",
+                root / "releases" / "windowsstore" / "test_reports",
+                root,
+            )
+        ]
+
+    payload, error = _load_json_object(summary_path)
+    if error:
+        return [_result("WACK JSON summary", "BLOCKER", f"unreadable summary: {error}", summary_path, root)]
+
+    overall = str(payload.get("overall_result", "UNKNOWN")).upper()
+    fail_count = _int_from_json(payload.get("fail_count"))
+    pass_count = _int_from_json(payload.get("pass_count"))
+    warning_count = _int_from_json(payload.get("warning_count"))
+    requirement_count = _int_from_json(payload.get("requirement_count"))
+    detail = (
+        f"{overall}, {pass_count} PASS, {fail_count} FAIL, "
+        f"{warning_count} WARNING, {requirement_count} requirements"
+    )
+    if fail_count > 0 or overall == "FAIL":
+        return [_result("WACK JSON summary", "BLOCKER", detail, summary_path, root)]
+    return [_result("WACK JSON summary", "OK", detail, summary_path, root)]
 
 
 def run_checks(root: Path = PROJECT_ROOT) -> list[CheckResult]:
@@ -218,6 +299,8 @@ def run_checks(root: Path = PROJECT_ROOT) -> list[CheckResult]:
     results.extend(check_store_assets(root))
     results.extend(check_screenshots(root))
     results.extend(check_build_artifacts(root))
+    results.extend(check_wack_runner(root))
+    results.extend(check_wack_report(root))
     return results
 
 

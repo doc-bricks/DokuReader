@@ -23,6 +23,7 @@ DokuReader eignet sich für private Dokumentenbibliotheken, Forschungsordner, PD
 | Desktop-Quellstand testen | `python tests/source_platform_smoke.py` |
 | Mobile/PWA-Companion prüfen | `web_companion/README.md` |
 | Windows-Store-Readiness prüfen | `python _WARTUNG/check_store_readiness.py --allow-blockers` |
+| WACK-Reports vorbereiten oder parsen | `python _WARTUNG/run_windows_wack.py --dry-run` |
 | Windows-Store-Texte vorbereiten | `STORE_LISTING.md`, `PRIVACY_POLICY.md`, `SUPPORT.md` |
 | LLM-Tools Projektkontext geben | `llms.txt` |
 
@@ -110,6 +111,18 @@ python _WARTUNG/check_store_readiness.py --allow-blockers
 
 Der Check prüft Store-Metadaten, öffentliche Privacy-/Support-URLs, Pflichtdokumente, Store-Assets, generierte Screenshots, eine lokale EXE sowie die verbleibenden MSIX-/WACK-Artefakte. `--allow-blockers` ist für lokale Pre-Submission-Läufe gedacht, bei denen Partner Center, MSIX-Signierung oder der erhöhte WACK-Lauf noch externe Gates sind.
 
+Der WACK-Runner macht den erhöhten Zertifizierungsschritt reproduzierbar:
+
+```bash
+python _WARTUNG/run_windows_wack.py --dry-run
+```
+
+Der Dry-Run zeigt den erwarteten MSIX-Pfad, den XML-Reportpfad, gefundenes `appcert.exe` und den exakten Zertifizierungsbefehl. Der echte Lauf muss nach einem frisch signierten MSIX in einer erhöhten PowerShell ausgeführt werden. Vorhandene XML-Reports lassen sich in die JSON-Zusammenfassung umwandeln, die das Readiness-Gate auswertet:
+
+```bash
+python _WARTUNG/run_windows_wack.py --parse-report releases/windowsstore/test_reports/wack_YYYYMMDD_HHMMSS.xml
+```
+
 ## Plattformstrategie
 
 Die Desktop-App bleibt die autoritative lokale Bibliothek. Windows Store ist der erste Distributionskanal; macOS und Linux werden als Source- und Smoke-Test-Ziele aus derselben Tkinter-Codebasis geführt. Für Android, iOS und Browser ist ein späterer Web/PWA-Companion auf Basis von `dokureader-library-v1.json` sinnvoller als ein nativer Voll-Clone, weil mobile Sandboxes keinen freien Zugriff auf die lokalen Desktop-Dokumentpfade haben.
@@ -133,6 +146,7 @@ Doppel-App aufzubauen.
 - `DokuReader.spec` - PyInstaller-Konfiguration
 - `EXPORTFORMAT.md` - Schema für `dokureader-library-v1.json`
 - `_WARTUNG/check_store_readiness.py` - Windows-Store-Readiness-Gate
+- `_WARTUNG/run_windows_wack.py` - WACK-Dry-Run, echter Lauf und XML-zu-JSON-Zusammenfassung
 - `web_companion/README.md` - PWA-/Mobile-Smoke für Android und iOS
 - `STORE_LISTING.md` - Store-Texte für Windows Store (DE/EN)
 - `PRIVACY_POLICY.md` - Datenschutzhinweise für den Store-Release

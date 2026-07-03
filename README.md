@@ -23,6 +23,7 @@ It is designed for private document libraries, research folders, PDF collections
 | Test the desktop source build | `python tests/source_platform_smoke.py` |
 | Check the mobile/PWA companion smoke | `web_companion/README.md` |
 | Check Windows Store readiness | `python _WARTUNG/check_store_readiness.py --allow-blockers` |
+| Prepare or parse WACK reports | `python _WARTUNG/run_windows_wack.py --dry-run` |
 | Prepare Windows Store copy | `STORE_LISTING.md`, `PRIVACY_POLICY.md`, `SUPPORT.md` |
 | Give LLM tools project context | `llms.txt` |
 
@@ -110,6 +111,18 @@ python _WARTUNG/check_store_readiness.py --allow-blockers
 
 The check validates Store metadata, public privacy/support URLs, required documents, Store assets, generated screenshots, a local EXE, and the remaining MSIX/WACK artifacts. `--allow-blockers` is intended for local pre-submission runs where Partner Center, MSIX signing, or the elevated WACK pass are still external gates.
 
+The WACK runner keeps the elevated certification step reproducible:
+
+```bash
+python _WARTUNG/run_windows_wack.py --dry-run
+```
+
+The dry run prints the expected MSIX path, XML report path, discovered `appcert.exe`, and the exact certification command. The real run must happen in an elevated PowerShell after a fresh signed MSIX exists. Existing XML reports can be converted to the JSON summary that the readiness gate reads:
+
+```bash
+python _WARTUNG/run_windows_wack.py --parse-report releases/windowsstore/test_reports/wack_YYYYMMDD_HHMMSS.xml
+```
+
 ## Platform Strategy
 
 The desktop app remains the authoritative local library. Windows Store is the first distribution target; macOS and Linux are tracked as source and smoke-test targets from the same Tkinter codebase. For Android, iOS, and browser use, a later Web/PWA companion based on `dokureader-library-v1.json` is more appropriate than a full native clone because mobile sandboxes cannot freely access local desktop document paths.
@@ -133,6 +146,7 @@ native duplicate app line.
 - `DokuReader.spec` - PyInstaller configuration
 - `EXPORTFORMAT.md` - schema for `dokureader-library-v1.json`
 - `_WARTUNG/check_store_readiness.py` - Windows Store readiness gate
+- `_WARTUNG/run_windows_wack.py` - WACK dry-run, execution, and XML-to-JSON summary helper
 - `web_companion/README.md` - PWA/mobile smoke workflow for Android and iOS
 - `STORE_LISTING.md` - Windows Store copy in German and English
 - `PRIVACY_POLICY.md` - privacy notes for the Store release

@@ -44,6 +44,8 @@ def _create_store_ready_fixture(root: Path) -> None:
     )
     for name in ("STORE_LISTING.md", "PRIVACY_POLICY.md", "SUPPORT.md", "LICENSE", "THIRD_PARTY_LICENSES.txt"):
         (root / name).write_text(f"# {name}\n", encoding="utf-8")
+    (root / "_WARTUNG").mkdir(parents=True, exist_ok=True)
+    (root / "_WARTUNG" / "run_windows_wack.py").write_text("# WACK runner fixture\n", encoding="utf-8")
 
     module = _load_module()
     for filename, size in module.STORE_ASSETS.items():
@@ -74,7 +76,8 @@ def test_store_readiness_reports_external_msix_and_wack_blockers(tmp_path):
 
     assert results["Store metadata"].status == "OK"
     assert results["MSIX package"].status == "BLOCKER"
-    assert results["WACK XML report"].status == "BLOCKER"
+    assert results["WACK runner"].status == "OK"
+    assert results["WACK JSON summary"].status == "BLOCKER"
 
 
 def test_store_readiness_flags_unfilled_packager_publisher(tmp_path):
@@ -92,9 +95,46 @@ def test_store_readiness_passes_when_msix_and_wack_are_present(tmp_path):
     module = _load_module()
     _create_store_ready_fixture(tmp_path)
     (tmp_path / "releases" / "windowsstore" / "DokuReader.msix").write_bytes(b"PK")
-    (tmp_path / "releases" / "windowsstore" / "wack_20260702.xml").write_text("<report />", encoding="utf-8")
+    report_dir = tmp_path / "releases" / "windowsstore" / "test_reports"
+    report_dir.mkdir(parents=True, exist_ok=True)
+    (report_dir / "wack_20260702.json").write_text(
+        json.dumps(
+            {
+                "overall_result": "PASS",
+                "requirement_count": 2,
+                "pass_count": 2,
+                "fail_count": 0,
+                "warning_count": 0,
+            }
+        ),
+        encoding="utf-8",
+    )
 
     results = module.run_checks(tmp_path)
     summary = module.summarize(results)
 
     assert summary["BLOCKER"] == 0
+
+
+def test_store_readiness_blocks_failed_wack_summary(tmp_path):
+    module = _load_module()
+    _create_store_ready_fixture(tmp_path)
+    (tmp_path / "releases" / "windowsstore" / "DokuReader.msix").write_bytes(b"PK")
+    report_dir = tmp_path / "releases" / "windowsstore" / "test_reports"
+    report_dir.mkdir(parents=True, exist_ok=True)
+    (report_dir / "wack_20260702.json").write_text(
+        json.dumps(
+            {
+                "overall_result": "FAIL",
+                "requirement_count": 2,
+                "pass_count": 1,
+                "fail_count": 1,
+                "warning_count": 0,
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    results = _by_name(module.run_checks(tmp_path))
+
+    assert results["WACK JSON summary"].status == "BLOCKER"

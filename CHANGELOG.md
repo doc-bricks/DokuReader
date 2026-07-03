@@ -8,8 +8,11 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 ### Hinzugefügt / Added
 - Windows-Store-Readiness-Gate `_WARTUNG/check_store_readiness.py` ergänzt. Es prüft
   Store-Metadaten, öffentliche Privacy-/Support-URLs, Pflichtdokumente, Store-Assets,
-  Screenshots, EXE, MSIX und WACK-XML und kann erwartete externe Store-Blocker per
-  `--allow-blockers` transparent ausgeben.
+  Screenshots, EXE, MSIX, WACK-Runner und geparste WACK-JSON-Zusammenfassungen und
+  kann erwartete externe Store-Blocker per `--allow-blockers` transparent ausgeben.
+- WACK-Runner `_WARTUNG/run_windows_wack.py` ergänzt. Er bietet Dry-Run-Pfade,
+  kontrollierte `appcert.exe`-Ausführung, Admin-/Tool-Blocker und `--parse-report`
+  für XML-zu-JSON-Zusammenfassungen.
 
 ### Behoben / Fixed
 - **BUG-D4**: `_split_dnd_paths` — `{` in Dateinamen (z.B. `bericht{2026}.txt`) wurde fälschlicherweise als

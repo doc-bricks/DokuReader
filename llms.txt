@@ -1,6 +1,6 @@
 # DokuReader
 
-## Last-checked: 2026-06-12
+## Last-checked: 2026-07-03
 
 ## Canonical Links
 
@@ -51,13 +51,14 @@ DokuReader is not a cloud document manager, hosted OCR platform, general note-ta
 - Export schema docs: `EXPORTFORMAT.md`
 - Store docs: `STORE_LISTING.md`, `PRIVACY_POLICY.md`, `SUPPORT.md`, `store_package.json`
 - Store readiness gate: `python _WARTUNG/check_store_readiness.py --allow-blockers`
+- WACK runner and parser: `python _WARTUNG/run_windows_wack.py --dry-run`
 
 ## Test And Validation
 
 - Python tests live under `tests/`.
 - Current focused validation: `python -m pytest -q`
 - Store readiness validation: `python _WARTUNG/check_store_readiness.py --allow-blockers`
-- Syntax smoke: `python -m py_compile DokuReader.py manage_translations.py translator.py _WARTUNG/generate_store_media.py _WARTUNG/check_store_readiness.py`
+- Syntax smoke: `python -m py_compile DokuReader.py manage_translations.py translator.py _WARTUNG/generate_store_media.py _WARTUNG/check_store_readiness.py _WARTUNG/run_windows_wack.py`
 - Workflow YAML should parse before push.
 
 ## Safety Notes
