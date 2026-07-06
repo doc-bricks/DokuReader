@@ -479,10 +479,19 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         self.doc_tree.bind("<Button-3>", self.on_doc_right_click)
         self.doc_tree.bind("<Double-1>", self.on_doc_double_click)
         self.doc_tree.bind("<<TreeviewSelect>>", self.on_doc_select)
+        self.doc_tree.bind("<Shift-F10>", self.open_selected_doc_menu)
+        self.doc_tree.bind("<Menu>", self.open_selected_doc_menu)
 
         # Drag & Drop
         addbar = ttk.Frame(center)
         addbar.pack(fill=tk.X, padx=8, pady=(0, 8))
+        self.doc_actions_button = ttk.Button(
+            addbar,
+            text="Aktionen…",
+            command=self.open_selected_doc_menu,
+            state="disabled",
+        )
+        self.doc_actions_button.pack(side=tk.LEFT)
         ttk.Button(addbar, text="Hinzufügen", command=self.add_files_dialog).pack(side=tk.RIGHT)
         if TKDND_AVAILABLE:
             self.doc_tree.drop_target_register('*')  # type: ignore
@@ -544,6 +553,13 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
             return
         has_query = bool(self._search_var.get().strip())
         self.clear_search_button.state(["!disabled"] if has_query else ["disabled"])
+
+    def _update_doc_action_controls(self):
+        """Aktiviert Dokumentaktionen nur bei ausgewähltem Dokument."""
+        if not hasattr(self, "doc_actions_button"):
+            return
+        has_selection = bool(self.doc_tree.selection())
+        self.doc_actions_button.state(["!disabled"] if has_selection else ["disabled"])
 
     def clear_search(self, _event=None):
         """Leert die Suche tastaturfreundlich und behält den Fokus im Suchfeld."""
@@ -630,6 +646,7 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         self.doc_tree.delete(*self.doc_tree.get_children())
         topic = self.state_model.current_topic
         if not topic:
+            self._update_doc_action_controls()
             return
         docs = self.state_model.list_docs(topic)
         # Suchfilter anwenden (case-insensitiv, nach Dateiname)
@@ -669,6 +686,7 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
             self.doc_tree.insert("", "end", iid=path, text=name,
                                  values=(ext[1:].upper(), size), tags=tags)
         self.clear_preview()
+        self._update_doc_action_controls()
 
     def add_files_dialog(self):
         """Öffnet einen Dateidialog und fügt ausgewählte Dateien dem aktuellen Thema hinzu."""
@@ -741,7 +759,31 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         iid = self.doc_tree.identify_row(event.y)
         if iid:
             self.doc_tree.selection_set(iid)
-            self.doc_menu.tk_popup(event.x_root, event.y_root)
+            self.doc_tree.focus(iid)
+            self._update_doc_action_controls()
+            return self.open_selected_doc_menu(event)
+        return "break"
+
+    def open_selected_doc_menu(self, event=None):
+        """Öffnet Dokumentaktionen per Tastatur, Schaltfläche oder Rechtsklick."""
+        sel = self.doc_tree.selection()
+        if not sel:
+            self._update_doc_action_controls()
+            return "break"
+        if event is not None and getattr(event, "x_root", 0) and getattr(event, "y_root", 0):
+            x_root = event.x_root
+            y_root = event.y_root
+        else:
+            bbox = self.doc_tree.bbox(sel[0])
+            if bbox:
+                x, y, width, height = bbox
+                x_root = self.doc_tree.winfo_rootx() + x + max(width // 2, 16)
+                y_root = self.doc_tree.winfo_rooty() + y + height
+            else:
+                x_root = self.doc_tree.winfo_rootx() + 16
+                y_root = self.doc_tree.winfo_rooty() + 16
+        self.doc_menu.tk_popup(x_root, y_root)
+        return "break"
 
     def on_doc_double_click(self, _=None):
         """Öffnet die ausgewählte Datei im Standard-Programm des Betriebssystems."""
@@ -789,6 +831,7 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
     def on_doc_select(self, _=None):
         """Callback: Dokument im Treeview ausgewählt; zeigt Vorschau oder löscht sie."""
         sel = self.doc_tree.selection()
+        self._update_doc_action_controls()
         if not sel:
             self.clear_preview()
             return
@@ -797,6 +840,7 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
     # Vorschau
     def clear_preview(self):
         """Leert Canvas und Textfeld der Vorschau und zeigt Platzhaltertext."""
+        self._update_doc_action_controls()
         self.preview.delete("all")
         self.preview_text.delete("1.0", tk.END)
         self.preview.create_text(10, 10, anchor="nw", text="Keine Vorschau", fill="#666")

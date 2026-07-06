@@ -13,6 +13,10 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 - WACK-Runner `_WARTUNG/run_windows_wack.py` ergänzt. Er bietet Dry-Run-Pfade,
   kontrollierte `appcert.exe`-Ausführung, Admin-/Tool-Blocker und `--parse-report`
   für XML-zu-JSON-Zusammenfassungen.
+- Desktop-Dokumentliste hat jetzt einen sichtbaren Einstieg `Aktionen…` für
+  `Als gelesen markieren`, `Gelesen-Markierung entfernen` und `Aus Bibliothek entfernen`.
+  Derselbe Menüpfad ist zusätzlich per `Shift+F10` und Kontextmenü-Taste
+  tastaturfreundlich erreichbar.
 
 ### Behoben / Fixed
 - **BUG-D4**: `_split_dnd_paths` — `{` in Dateinamen (z.B. `bericht{2026}.txt`) wurde fälschlicherweise als
@@ -56,6 +60,8 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
   - `TestD4SplitDndOeffnendeKlammer`: 3 Tests für BUG-D4
   - `TestD5SplitDndSchliessendekKlammer`: 2 Tests für BUG-D5
   - `TestThreadSafetyHaertung`: 6 Vertragstests für `rename_topic`, `remove_topic`, `save()`
+- GUI-Regression erweitert: `tests/test_ui_accessibility.py` prüft jetzt zusätzlich den
+  sichtbaren `Aktionen…`-Button und den Tastaturzugang zum Dokument-Kontextmenü.
 - 1 neuer Regressionstest (web_companion): `BUG-W1 regression: sw.js fetch hat .catch() für Offline-Fallback`.
 - 7 neue Tests (web_companion) für `setRead` und `serializeLibrary` (Round-Trip-Verifikation):
   `setRead` toggle/false-return, `serializeLibrary` Feldmapping, Round-Trip, Status-Erhalt.

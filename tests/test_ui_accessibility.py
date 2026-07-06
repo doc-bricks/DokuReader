@@ -81,6 +81,30 @@ class SearchUiAccessibilityTests(unittest.TestCase):
         self.assertIn("disabled", self.app.clear_search_button.state())
         self.assertEqual(len(self.app.doc_tree.get_children()), 2)
 
+    def test_doc_actions_button_and_keyboard_menu_are_available(self):
+        self.assertEqual(self.app.doc_actions_button.cget("text"), "Aktionen…")
+        self.assertIn("disabled", self.app.doc_actions_button.state())
+        self.assertTrue(self.app.doc_tree.bind("<Shift-F10>"))
+        self.assertTrue(self.app.doc_tree.bind("<Menu>"))
+
+        popup_calls: list[tuple[int, int]] = []
+        original_popup = self.app.doc_menu.tk_popup
+        self.app.doc_menu.tk_popup = lambda x, y: popup_calls.append((x, y))
+        self.addCleanup(setattr, self.app.doc_menu, "tk_popup", original_popup)
+
+        self.app.doc_tree.selection_set(str(self._first_doc))
+        self.app.on_doc_select()
+        self.app.update()
+        self.app.update_idletasks()
+
+        self.assertNotIn("disabled", self.app.doc_actions_button.state())
+        result = self.app.open_selected_doc_menu()
+
+        self.assertEqual(result, "break")
+        self.assertEqual(len(popup_calls), 1)
+        self.assertGreaterEqual(popup_calls[0][0], self.app.doc_tree.winfo_rootx())
+        self.assertGreaterEqual(popup_calls[0][1], self.app.doc_tree.winfo_rooty())
+
 
 if __name__ == "__main__":
     unittest.main()
