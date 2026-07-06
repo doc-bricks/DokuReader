@@ -6,6 +6,11 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 ## [Unreleased]
 
 ### Hinzugefügt / Added
+- Erster Design-Refresh-Slice für die Desktop-Oberfläche: `DokuReader.py`
+  rendert jetzt einen klareren Kopfbereich mit Untertitel, ein ruhigeres
+  Farbsystem, konsistentere Karten-/Toolbar-Stile sowie aufgeräumtere
+  Such-, Themen-, Dokument- und Exportflächen, ohne das bestehende
+  Bedienmodell zu ändern.
 - Windows-Store-Readiness-Gate `_WARTUNG/check_store_readiness.py` ergänzt. Es prüft
   Store-Metadaten, öffentliche Privacy-/Support-URLs, Pflichtdokumente, Store-Assets,
   Screenshots, EXE, MSIX, WACK-Runner und geparste WACK-JSON-Zusammenfassungen und

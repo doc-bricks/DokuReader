@@ -59,6 +59,8 @@ class SearchUiAccessibilityTests(unittest.TestCase):
         self._tmpdir.cleanup()
 
     def test_clear_search_button_is_labeled_and_disabled_without_query(self):
+        self.assertEqual(self.app.app_title_label.cget("text"), "DokuReader")
+        self.assertIn("Lokale Dokumentbibliothek", self.app.app_subtitle_label.cget("text"))
         self.assertEqual(self.app.clear_search_button.cget("text"), "Leeren")
         self.assertIn("disabled", self.app.clear_search_button.state())
         self.assertEqual(len(self.app.doc_tree.get_children()), 2)

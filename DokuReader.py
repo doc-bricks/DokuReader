@@ -394,6 +394,9 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         self.geometry("1200x700")
         self.minsize(1000, 600)
         self._apply_window_icon()
+        self._theme = self._build_theme()
+        self.configure(bg=self._theme["window_bg"])
+        self._configure_styles()
 
         self.state_model = State()
         self.state_model.load()
@@ -415,32 +418,125 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         except tk.TclError:
             pass
 
+    def _build_theme(self) -> dict[str, str]:
+        """Definiert die Farb- und Stilwerte für den ersten UI-Refresh-Slice."""
+        return {
+            "window_bg": "#eef1f6",
+            "shell_bg": "#f7f8fb",
+            "card_bg": "#ffffff",
+            "card_alt_bg": "#f4f6fb",
+            "border": "#d6dce8",
+            "text": "#172033",
+            "muted": "#5f6c86",
+            "accent": "#275efe",
+            "accent_soft": "#eaf0ff",
+            "success": "#0d6b42",
+            "success_soft": "#e6f5ec",
+            "preview_bg": "#fbfcfe",
+            "preview_text_bg": "#f8f9fc",
+            "button_neutral": "#edf1f7",
+            "button_neutral_hover": "#e4eaf4",
+        }
+
+    def _configure_styles(self):
+        """Konfiguriert eine ruhige, modernere Tk/ttk-Oberfläche."""
+        style = ttk.Style(self)
+        try:
+            if "clam" in style.theme_names():
+                style.theme_use("clam")
+        except tk.TclError:
+            pass
+
+        self.option_add("*TCombobox*Listbox*Font", "TkDefaultFont 10")
+
+        style.configure("Shell.TFrame", background=self._theme["shell_bg"])
+        style.configure("Column.TFrame", background=self._theme["card_bg"])
+        style.configure("Toolbar.TFrame", background=self._theme["card_bg"])
+        style.configure("SectionTitle.TLabel", background=self._theme["card_bg"], foreground=self._theme["text"], font=("TkDefaultFont", 11, "bold"))
+        style.configure("SectionSubtitle.TLabel", background=self._theme["card_bg"], foreground=self._theme["muted"], font=("TkDefaultFont", 9))
+        style.configure("Hero.TFrame", background=self._theme["shell_bg"])
+        style.configure("HeroTitle.TLabel", background=self._theme["shell_bg"], foreground=self._theme["text"], font=("TkDefaultFont", 20, "bold"))
+        style.configure("HeroSubtitle.TLabel", background=self._theme["shell_bg"], foreground=self._theme["muted"], font=("TkDefaultFont", 10))
+        style.configure("HeroBadge.TLabel", background=self._theme["accent_soft"], foreground=self._theme["accent"], font=("TkDefaultFont", 9, "bold"), padding=(10, 4))
+        style.configure("TLabel", background=self._theme["card_bg"], foreground=self._theme["text"])
+        style.configure("TButton", background=self._theme["button_neutral"], foreground=self._theme["text"], bordercolor=self._theme["border"], focusthickness=1, focuscolor=self._theme["accent"], padding=(12, 7))
+        style.map("TButton", background=[("active", self._theme["button_neutral_hover"])], bordercolor=[("focus", self._theme["accent"])])
+        style.configure("Accent.TButton", background=self._theme["accent"], foreground="#ffffff", bordercolor=self._theme["accent"], padding=(12, 7))
+        style.map("Accent.TButton", background=[("active", "#1e4ed8")], foreground=[("disabled", "#d7dff7")])
+        style.configure("Treeview", background=self._theme["card_bg"], fieldbackground=self._theme["card_bg"], foreground=self._theme["text"], bordercolor=self._theme["border"], rowheight=26)
+        style.configure("Treeview.Heading", background=self._theme["card_alt_bg"], foreground=self._theme["text"], bordercolor=self._theme["border"], relief="flat", font=("TkDefaultFont", 9, "bold"))
+        style.map("Treeview", background=[("selected", self._theme["accent_soft"])], foreground=[("selected", self._theme["text"])])
+        style.map("Treeview.Heading", background=[("active", self._theme["button_neutral_hover"])])
+        style.configure("Card.TLabelframe", background=self._theme["card_bg"], bordercolor=self._theme["border"], relief="solid")
+        style.configure("Card.TLabelframe.Label", background=self._theme["card_bg"], foreground=self._theme["text"], font=("TkDefaultFont", 10, "bold"))
+        style.configure("TRadiobutton", background=self._theme["card_bg"], foreground=self._theme["text"], padding=(2, 2))
+        style.map("TRadiobutton", background=[("active", self._theme["card_bg"])])
+        style.configure("App.Horizontal.TPanedwindow", background=self._theme["shell_bg"], sashrelief="flat", sashwidth=10)
+
+    def _build_section_header(self, parent, title: str, subtitle: str | None = None):
+        """Rendert eine einheitliche Abschnittsüberschrift mit optionalem Untertitel."""
+        wrapper = ttk.Frame(parent, style="Column.TFrame")
+        wrapper.pack(fill=tk.X, padx=14, pady=(14, 6))
+        ttk.Label(wrapper, text=title, style="SectionTitle.TLabel").pack(anchor="w")
+        if subtitle:
+            ttk.Label(wrapper, text=subtitle, style="SectionSubtitle.TLabel", wraplength=340, justify="left").pack(anchor="w", pady=(2, 0))
+        return wrapper
+
     def _build_ui(self):
         """Erstellt alle GUI-Widgets (PanedWindow, Themenliste, Dokumententree, Vorschau, Export)."""
-        paned = ttk.Panedwindow(self, orient=tk.HORIZONTAL)
+        shell = ttk.Frame(self, style="Shell.TFrame", padding=(18, 16, 18, 18))
+        shell.pack(fill=tk.BOTH, expand=True)
+
+        hero = ttk.Frame(shell, style="Hero.TFrame")
+        hero.pack(fill=tk.X, pady=(0, 14))
+        hero_copy = ttk.Frame(hero, style="Hero.TFrame")
+        hero_copy.pack(side=tk.LEFT, fill=tk.X, expand=True)
+        self.app_title_label = ttk.Label(hero_copy, text="DokuReader", style="HeroTitle.TLabel")
+        self.app_title_label.pack(anchor="w")
+        self.app_subtitle_label = ttk.Label(
+            hero_copy,
+            text="Lokale Dokumentbibliothek mit Lesestatus, Vorschau und ruhigem Arbeitsfluss.",
+            style="HeroSubtitle.TLabel",
+        )
+        self.app_subtitle_label.pack(anchor="w", pady=(4, 0))
+        ttk.Label(hero, text="Desktop-Refresh", style="HeroBadge.TLabel").pack(side=tk.RIGHT, anchor="n")
+
+        paned = ttk.Panedwindow(shell, orient=tk.HORIZONTAL, style="App.Horizontal.TPanedwindow")
         paned.pack(fill=tk.BOTH, expand=True)
 
         # Linke Spalte: Themen
-        left = ttk.Frame(paned)
+        left = ttk.Frame(paned, style="Column.TFrame")
         paned.add(left, weight=1)
-        ttk.Label(left, text="Themen").pack(anchor="w", padx=8, pady=(8, 2))
+        self._build_section_header(left, "Themen", "Strukturiere deine Leselisten nach Projekten, Fachgebieten oder Ordnern.")
         self.topic_list = tk.Listbox(left)
-        self.topic_list.pack(fill=tk.BOTH, expand=True, padx=8, pady=(0, 6))
+        self.topic_list.configure(
+            bg=self._theme["card_alt_bg"],
+            fg=self._theme["text"],
+            selectbackground=self._theme["accent"],
+            selectforeground="#ffffff",
+            relief="flat",
+            borderwidth=0,
+            highlightthickness=1,
+            highlightbackground=self._theme["border"],
+            highlightcolor=self._theme["accent"],
+            activestyle="none",
+        )
+        self.topic_list.pack(fill=tk.BOTH, expand=True, padx=14, pady=(0, 10))
         self.topic_list.bind("<<ListboxSelect>>", self.on_topic_select)
-        btns = ttk.Frame(left)
-        btns.pack(fill=tk.X, padx=8, pady=(0, 8))
-        ttk.Button(btns, text="Neu", command=self.add_topic).pack(side=tk.LEFT, padx=2)
-        ttk.Button(btns, text="Umbenennen", command=self.rename_topic).pack(side=tk.LEFT, padx=2)
-        ttk.Button(btns, text="Löschen", command=self.delete_topic).pack(side=tk.LEFT, padx=2)
+        btns = ttk.Frame(left, style="Toolbar.TFrame")
+        btns.pack(fill=tk.X, padx=14, pady=(0, 14))
+        ttk.Button(btns, text="Neu", command=self.add_topic, style="Accent.TButton").pack(side=tk.LEFT)
+        ttk.Button(btns, text="Umbenennen", command=self.rename_topic).pack(side=tk.LEFT, padx=(8, 0))
+        ttk.Button(btns, text="Löschen", command=self.delete_topic).pack(side=tk.LEFT, padx=(8, 0))
 
         # Mitte: Dokumente
-        center = ttk.Frame(paned)
+        center = ttk.Frame(paned, style="Column.TFrame")
         paned.add(center, weight=3)
-        ttk.Label(center, text="Dokumente im Thema").pack(anchor="w", padx=8, pady=(8, 2))
+        self._build_section_header(center, "Dokumente im Thema", "Suche, sortiere und markiere Einträge direkt aus der Bibliothek heraus.")
 
         # Suchleiste
-        search_frame = ttk.Frame(center)
-        search_frame.pack(fill=tk.X, padx=8, pady=(0, 4))
+        search_frame = ttk.Frame(center, style="Toolbar.TFrame")
+        search_frame.pack(fill=tk.X, padx=14, pady=(0, 8))
         ttk.Label(search_frame, text="Suche:").pack(side=tk.LEFT, padx=(0, 4))
         self._search_var = tk.StringVar()
         self._search_var.trace_add("write", self._on_search_changed)
@@ -466,12 +562,17 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         self.doc_tree.column("#0", width=550, anchor="w")
         self.doc_tree.column("typ", width=100, anchor="w")
         self.doc_tree.column("größe", width=100, anchor="e")
-        self.doc_tree.pack(fill=tk.BOTH, expand=True, padx=8, pady=(0, 6))
+        self.doc_tree.pack(fill=tk.BOTH, expand=True, padx=14, pady=(0, 8))
         self._sort_key = "name"
         self._sort_reverse = False
 
         # Tag für gelesene Einträge: grün + fett
-        self.doc_tree.tag_configure("read", foreground="#08660c", font=("TkDefaultFont", 9, "bold"))
+        self.doc_tree.tag_configure(
+            "read",
+            foreground=self._theme["success"],
+            background=self._theme["success_soft"],
+            font=("TkDefaultFont", 9, "bold"),
+        )
         # Optionaler Hintergrund statt Textfarbe:
         # self.doc_tree.tag_configure("read", background="#d9f7d9")
 
@@ -483,8 +584,8 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         self.doc_tree.bind("<Menu>", self.open_selected_doc_menu)
 
         # Drag & Drop
-        addbar = ttk.Frame(center)
-        addbar.pack(fill=tk.X, padx=8, pady=(0, 8))
+        addbar = ttk.Frame(center, style="Toolbar.TFrame")
+        addbar.pack(fill=tk.X, padx=14, pady=(0, 14))
         self.doc_actions_button = ttk.Button(
             addbar,
             text="Aktionen…",
@@ -492,30 +593,49 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
             state="disabled",
         )
         self.doc_actions_button.pack(side=tk.LEFT)
-        ttk.Button(addbar, text="Hinzufügen", command=self.add_files_dialog).pack(side=tk.RIGHT)
+        ttk.Button(addbar, text="Hinzufügen", command=self.add_files_dialog, style="Accent.TButton").pack(side=tk.RIGHT)
         if TKDND_AVAILABLE:
             self.doc_tree.drop_target_register('*')  # type: ignore
             self.doc_tree.dnd_bind('<<Drop>>', self.on_drop)  # type: ignore
 
         # Rechte Spalte: Vorschau + Export
-        right = ttk.Frame(paned)
+        right = ttk.Frame(paned, style="Column.TFrame")
         paned.add(right, weight=2)
-        ttk.Label(right, text="Vorschau").pack(anchor="w", padx=8, pady=(8, 2))
-        self.preview = tk.Canvas(right, bg="#fafafa", height=320)
-        self.preview.pack(fill=tk.BOTH, expand=False, padx=8, pady=(0, 6))
+        self._build_section_header(right, "Vorschau", "Prüfe Inhalte und exportiere nur den Stand, den du wirklich weitergeben willst.")
+        self.preview = tk.Canvas(
+            right,
+            bg=self._theme["preview_bg"],
+            height=320,
+            borderwidth=0,
+            highlightthickness=1,
+            highlightbackground=self._theme["border"],
+        )
+        self.preview.pack(fill=tk.BOTH, expand=False, padx=14, pady=(0, 8))
         self.preview_text = tk.Text(right, height=10, wrap="word")
-        self.preview_text.pack(fill=tk.BOTH, expand=True, padx=8, pady=(0, 8))
+        self.preview_text.configure(
+            bg=self._theme["preview_text_bg"],
+            fg=self._theme["text"],
+            relief="flat",
+            borderwidth=0,
+            highlightthickness=1,
+            highlightbackground=self._theme["border"],
+            highlightcolor=self._theme["accent"],
+            insertbackground=self._theme["text"],
+            padx=10,
+            pady=10,
+        )
+        self.preview_text.pack(fill=tk.BOTH, expand=True, padx=14, pady=(0, 10))
 
-        export_frame = ttk.LabelFrame(right, text="Sammel-PDF")
-        export_frame.pack(fill=tk.X, padx=8, pady=(0, 8))
+        export_frame = ttk.LabelFrame(right, text="Sammel-PDF", style="Card.TLabelframe")
+        export_frame.pack(fill=tk.X, padx=14, pady=(0, 10))
         self.filter_var = tk.StringVar(value="alle")
         ttk.Radiobutton(export_frame, text="Alle", variable=self.filter_var, value="alle").pack(side=tk.LEFT, padx=6, pady=6)
         ttk.Radiobutton(export_frame, text="Gelesene", variable=self.filter_var, value="gelesene").pack(side=tk.LEFT, padx=6, pady=6)
         ttk.Radiobutton(export_frame, text="Ungelesene", variable=self.filter_var, value="ungelesene").pack(side=tk.LEFT, padx=6, pady=6)
-        ttk.Button(export_frame, text="Sammel-PDF erzeugen", command=self.create_collection_pdf).pack(side=tk.RIGHT, padx=6, pady=6)
+        ttk.Button(export_frame, text="Sammel-PDF erzeugen", command=self.create_collection_pdf, style="Accent.TButton").pack(side=tk.RIGHT, padx=6, pady=6)
 
-        library_export_frame = ttk.LabelFrame(right, text="Bibliothek (JSON)")
-        library_export_frame.pack(fill=tk.X, padx=8, pady=(0, 8))
+        library_export_frame = ttk.LabelFrame(right, text="Bibliothek (JSON)", style="Card.TLabelframe")
+        library_export_frame.pack(fill=tk.X, padx=14, pady=(0, 14))
         ttk.Label(
             library_export_frame,
             text="Exportiert Themen, Pfade, Metadaten und Lesestatus ohne Dokumentinhalte.",
@@ -526,6 +646,7 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
             library_export_frame,
             text="JSON-Export…",
             command=self.export_library_json,
+            style="Accent.TButton",
         ).pack(anchor="e", padx=8, pady=(0, 8))
 
         # Kontextmenü
