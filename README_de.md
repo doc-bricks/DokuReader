@@ -33,6 +33,17 @@ DokuReader ist am treffendsten als lokale Dokumentenbibliothek, themenbasierter 
 
 Nützliche Suchphrasen sind `local-first document library`, `topic based PDF organizer`, `document read status tracker`, `metadata-only document export`, `Tkinter document manager` und `offline PDF bundling desktop app`.
 
+## Einsatz und Abgrenzung
+
+| Bedarf | DokuReader eignet sich für |
+|---|---|
+| Leseablage aufbauen | PDFs, Office-Dateien, Texte und Bilder nach Themen gruppieren, ohne Originale zu verschieben |
+| Bearbeitungsstand verfolgen | Dokumente als gelesen oder ungelesen markieren und Exporte danach filtern |
+| Bibliotheksübersicht teilen | `dokureader-library-v1.json` mit Pfaden, Metadaten, Themen und Lesestatus exportieren |
+| Lokales PDF-Bündel erstellen | Aus gelesenen, ungelesenen oder allen Dokumenten ein Sammel-PDF erzeugen |
+
+Innerhalb der doc-bricks-Familie ist DokuReader die private Lese- und Dokumentenbibliothek. `LitZentrum` deckt Literaturverwaltung und Zitation ab, `CleanMarkdown` ist für Markdown-Lesen und -Bearbeitung zuständig, und `UniversalDocsGrabber` übernimmt den Mail-Anhang-Import.
+
 ## Funktionen
 
 - Themen für Dokumente erstellen, umbenennen und löschen

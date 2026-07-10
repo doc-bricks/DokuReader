@@ -1,6 +1,6 @@
 # DokuReader
 
-## Last-checked: 2026-07-03
+## Last-checked: 2026-07-10
 
 ## Canonical Links
 
@@ -30,11 +30,20 @@ Tkinter document manager
 offline PDF bundling desktop app
 local document preview app
 dokureader document library GitHub
+local PDF reading queue
+read unread document tracker
+desktop document library JSON export
 ```
 
 ## Disambiguation
 
 DokuReader is not a cloud document manager, hosted OCR platform, general note-taking app, or full citation-management suite. It stores references and read status for local files; LitZentrum covers the broader literature-management workflow in the same doc-bricks family.
+
+## External Discovery Notes
+
+- GitHub and GitHub Topic pages currently index `doc-bricks/DokuReader` directly for document-library and pdf-tools contexts.
+- Broader web searches still collide with generic document, OCR, and Bricks Builder documentation results, so keep the canonical phrase `doc-bricks/DokuReader` and local-first document-library wording visible in README surfaces.
+- The repo has no external directory listing beyond GitHub surfaces; editorial posts or curated Python/Tkinter desktop-app lists remain manual follow-up work.
 
 ## Local Data Boundary
 

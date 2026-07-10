@@ -33,6 +33,17 @@ DokuReader is best described as a local-first document library, topic-based PDF 
 
 Useful search phrases include `local-first document library`, `topic based PDF organizer`, `document read status tracker`, `metadata-only document export`, `Tkinter document manager`, and `offline PDF bundling desktop app`.
 
+## Workflow Fit
+
+| Need | Use DokuReader for |
+|---|---|
+| Build a reading queue | Group PDFs, Office files, text files, and images by topic without moving originals |
+| Track review progress | Mark documents read or unread and filter exports by that state |
+| Share a library outline | Export `dokureader-library-v1.json` with paths, metadata, topics, and read status |
+| Prepare a local PDF bundle | Merge selected read, unread, or all documents into one PDF |
+
+Within the doc-bricks family, DokuReader is the private reading-library layer. `LitZentrum` is the citation and literature-management layer, `CleanMarkdown` is the Markdown reading/editing layer, and `UniversalDocsGrabber` is the mail-attachment intake layer.
+
 ## Features
 
 - Create, rename, and delete document topics

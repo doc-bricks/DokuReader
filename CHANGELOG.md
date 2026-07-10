@@ -73,6 +73,7 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
   (Gesamt web_companion: 32 Node-Tests grün).
 
 ### Dokumentation / Documentation
+- README und README_de um Workflow-Fit und Abgrenzung innerhalb der doc-bricks-Familie ergänzt; `llms.txt` auf den Sichtbarkeitscheck vom 2026-07-10 mit aktuellen Suchphrasen und External-Discovery-Notes synchronisiert.
 - README, README_de und `llms.txt` um Einstiegstabelle, Suchphrasen, Zielgruppen und Abgrenzung für bessere GitHub-/Web-Auffindbarkeit ergänzt.
 
 ### Geändert / Changed
