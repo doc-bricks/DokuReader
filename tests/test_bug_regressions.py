@@ -14,13 +14,13 @@ import manage_translations as mt
 
 
 class TestD3WorkstationTimeout(unittest.TestCase):
-    """BUG-D3: DokuReader-WORKSTATION-LG.py subprocess.run ohne timeout=."""
+    """BUG-D3: OS open subprocess.run calls need a timeout."""
 
     def test_open_calls_have_timeout(self):
-        src = (ROOT / "DokuReader-WORKSTATION-LG.py").read_text(encoding="utf-8")
+        src = (ROOT / "DokuReader.py").read_text(encoding="utf-8")
         for cmd in ('"open"', '"xdg-open"'):
             idx = src.find(cmd)
-            self.assertGreater(idx, 0, f"{cmd} nicht in DokuReader-WORKSTATION-LG.py gefunden")
+            self.assertGreater(idx, 0, f"{cmd} nicht in DokuReader.py gefunden")
             snippet = src[max(0, idx - 30):idx + 80]
             self.assertIn("timeout", snippet,
                           f"subprocess.run mit {cmd} ohne timeout= — BUG-D3")

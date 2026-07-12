@@ -24,6 +24,9 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
   tastaturfreundlich erreichbar.
 
 ### Behoben / Fixed
+- Regressionstest für den macOS-/Linux-Dateiöffner prüft jetzt die kanonische
+  `DokuReader.py` statt einer privaten Workstation-Kopie, damit die öffentliche
+  Testsuite ohne lokale Zusatzdateien lauffähig bleibt.
 - **BUG-D4**: `_split_dnd_paths` — `{` in Dateinamen (z.B. `bericht{2026}.txt`) wurde fälschlicherweise als
   DnD-Klammer-Öffner gewertet; alles davor Akkumulierte ging verloren. Fix: `{` wird nur als DnD-Trennzeichen
   gewertet, wenn der aktuelle Token noch leer ist.
