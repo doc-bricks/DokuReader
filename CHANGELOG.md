@@ -24,6 +24,10 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
   tastaturfreundlich erreichbar.
 
 ### Behoben / Fixed
+- Der Bereich `Sammel-PDF` spiegelt seine Verfügbarkeit jetzt direkt im UI:
+  Ohne aktuelles Thema oder ohne passende Dokumente bleibt die Exportaktion
+  deaktiviert und erklärt den Zustand mit einer kurzen Statuszeile, statt erst
+  nach dem Klick einen Hinweisdialog zu zeigen.
 - Regressionstest für den macOS-/Linux-Dateiöffner prüft jetzt die kanonische
   `DokuReader.py` statt einer privaten Workstation-Kopie, damit die öffentliche
   Testsuite ohne lokale Zusatzdateien lauffähig bleibt.
@@ -70,6 +74,9 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
   - `TestThreadSafetyHaertung`: 6 Vertragstests für `rename_topic`, `remove_topic`, `save()`
 - GUI-Regression erweitert: `tests/test_ui_accessibility.py` prüft jetzt zusätzlich den
   sichtbaren `Aktionen…`-Button und den Tastaturzugang zum Dokument-Kontextmenü.
+- `tests/test_ui_accessibility.py` deckt jetzt auch den direkt erklärten
+  Verfügbarkeitszustand des Sammel-PDF-Exports für leere, passende und
+  filterleere Themen ab.
 - 1 neuer Regressionstest (web_companion): `BUG-W1 regression: sw.js fetch hat .catch() für Offline-Fallback`.
 - 7 neue Tests (web_companion) für `setRead` und `serializeLibrary` (Round-Trip-Verifikation):
   `setRead` toggle/false-return, `serializeLibrary` Feldmapping, Round-Trip, Status-Erhalt.

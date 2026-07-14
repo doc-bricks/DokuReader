@@ -629,10 +629,27 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         export_frame = ttk.LabelFrame(right, text="Sammel-PDF", style="Card.TLabelframe")
         export_frame.pack(fill=tk.X, padx=14, pady=(0, 10))
         self.filter_var = tk.StringVar(value="alle")
-        ttk.Radiobutton(export_frame, text="Alle", variable=self.filter_var, value="alle").pack(side=tk.LEFT, padx=6, pady=6)
-        ttk.Radiobutton(export_frame, text="Gelesene", variable=self.filter_var, value="gelesene").pack(side=tk.LEFT, padx=6, pady=6)
-        ttk.Radiobutton(export_frame, text="Ungelesene", variable=self.filter_var, value="ungelesene").pack(side=tk.LEFT, padx=6, pady=6)
-        ttk.Button(export_frame, text="Sammel-PDF erzeugen", command=self.create_collection_pdf, style="Accent.TButton").pack(side=tk.RIGHT, padx=6, pady=6)
+        self.filter_var.trace_add("write", self._on_collection_filter_changed)
+        self.collection_filter_buttons = [
+            ttk.Radiobutton(export_frame, text="Alle", variable=self.filter_var, value="alle"),
+            ttk.Radiobutton(export_frame, text="Gelesene", variable=self.filter_var, value="gelesene"),
+            ttk.Radiobutton(export_frame, text="Ungelesene", variable=self.filter_var, value="ungelesene"),
+        ]
+        for button in self.collection_filter_buttons:
+            button.pack(side=tk.LEFT, padx=6, pady=6)
+        self.collection_export_button = ttk.Button(
+            export_frame,
+            text="Sammel-PDF erzeugen",
+            command=self.create_collection_pdf,
+            style="Accent.TButton",
+        )
+        self.collection_export_button.pack(side=tk.RIGHT, padx=6, pady=6)
+        self.collection_export_hint_label = ttk.Label(
+            export_frame,
+            text="Wähle zuerst ein Thema mit passenden Dokumenten aus.",
+            style="SectionSubtitle.TLabel",
+        )
+        self.collection_export_hint_label.pack(anchor="w", padx=8, pady=(0, 8))
 
         library_export_frame = ttk.LabelFrame(right, text="Bibliothek (JSON)", style="Card.TLabelframe")
         library_export_frame.pack(fill=tk.X, padx=14, pady=(0, 14))
@@ -681,6 +698,58 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
             return
         has_selection = bool(self.doc_tree.selection())
         self.doc_actions_button.state(["!disabled"] if has_selection else ["disabled"])
+
+    def _on_collection_filter_changed(self, *_args):
+        """Aktualisiert den Sammel-PDF-Zustand bei Filterwechseln."""
+        self._update_collection_export_controls()
+
+    def _matching_collection_docs(self) -> list[dict]:
+        """Liefert die zur aktuellen Exportauswahl passenden Dokumente."""
+        topic = self.state_model.current_topic
+        if not topic:
+            return []
+        docs = self.state_model.list_docs(topic)
+        filter_mode = self.filter_var.get()
+        if filter_mode == "gelesene":
+            return [d for d in docs if d.get("read")]
+        if filter_mode == "ungelesene":
+            return [d for d in docs if not d.get("read")]
+        return docs
+
+    def _update_collection_export_controls(self):
+        """Spiegelt Export-Verfügbarkeit direkt im UI statt erst nach dem Klick."""
+        if not hasattr(self, "collection_export_button"):
+            return
+        topic = self.state_model.current_topic
+        if not topic:
+            hint = "Wähle zuerst ein Thema mit passenden Dokumenten aus."
+            enabled = False
+        else:
+            matching_docs = self._matching_collection_docs()
+            if matching_docs:
+                filter_labels = {
+                    "alle": "alle",
+                    "gelesene": "gelesenen",
+                    "ungelesene": "ungelesenen",
+                }
+                hint = (
+                    f"Exportiert {len(matching_docs)} {filter_labels.get(self.filter_var.get(), 'alle')} "
+                    f"Dokumente aus „{topic}“."
+                )
+                enabled = True
+            else:
+                empty_labels = {
+                    "alle": f"Im Thema „{topic}“ sind noch keine Dokumente.",
+                    "gelesene": f"Im Thema „{topic}“ gibt es noch keine gelesenen Dokumente.",
+                    "ungelesene": f"Im Thema „{topic}“ gibt es noch keine ungelesenen Dokumente.",
+                }
+                hint = empty_labels.get(self.filter_var.get(), f"Im Thema „{topic}“ sind noch keine Dokumente.")
+                enabled = False
+
+        self.collection_export_hint_label.configure(text=hint)
+        self.collection_export_button.state(["!disabled"] if enabled else ["disabled"])
+        for button in self.collection_filter_buttons:
+            button.state(["!disabled"] if topic else ["disabled"])
 
     def clear_search(self, _event=None):
         """Leert die Suche tastaturfreundlich und behält den Fokus im Suchfeld."""
@@ -768,6 +837,7 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         topic = self.state_model.current_topic
         if not topic:
             self._update_doc_action_controls()
+            self._update_collection_export_controls()
             return
         docs = self.state_model.list_docs(topic)
         # Suchfilter anwenden (case-insensitiv, nach Dateiname)
@@ -808,6 +878,7 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
                                  values=(ext[1:].upper(), size), tags=tags)
         self.clear_preview()
         self._update_doc_action_controls()
+        self._update_collection_export_controls()
 
     def add_files_dialog(self):
         """Öffnet einen Dateidialog und fügt ausgewählte Dateien dem aktuellen Thema hinzu."""

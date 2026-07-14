@@ -107,6 +107,42 @@ class SearchUiAccessibilityTests(unittest.TestCase):
         self.assertGreaterEqual(popup_calls[0][0], self.app.doc_tree.winfo_rootx())
         self.assertGreaterEqual(popup_calls[0][1], self.app.doc_tree.winfo_rooty())
 
+    def test_collection_export_controls_explain_availability(self):
+        self.assertNotIn("disabled", self.app.collection_export_button.state())
+        self.assertIn("2 alle Dokumente", self.app.collection_export_hint_label.cget("text"))
+        for button in self.app.collection_filter_buttons:
+            self.assertNotIn("disabled", button.state())
+
+        self.app.state_model.current_topic = None
+        self.app._reload_docs()
+        self.app.update()
+        self.app.update_idletasks()
+
+        self.assertIn("disabled", self.app.collection_export_button.state())
+        self.assertIn("Wähle zuerst ein Thema", self.app.collection_export_hint_label.cget("text"))
+        for button in self.app.collection_filter_buttons:
+            self.assertIn("disabled", button.state())
+
+    def test_collection_export_controls_cover_empty_filter_results(self):
+        self.app.state_model.topics["Forschung"] = [
+            {"path": str(self._first_doc), "read": False},
+            {"path": str(self._second_doc), "read": False},
+        ]
+        self.app._select_topic("Forschung")
+        self.app.filter_var.set("gelesene")
+        self.app.update()
+        self.app.update_idletasks()
+
+        self.assertIn("disabled", self.app.collection_export_button.state())
+        self.assertIn("keine gelesenen Dokumente", self.app.collection_export_hint_label.cget("text"))
+
+        self.app.filter_var.set("ungelesene")
+        self.app.update()
+        self.app.update_idletasks()
+
+        self.assertNotIn("disabled", self.app.collection_export_button.state())
+        self.assertIn("2 ungelesenen Dokumente", self.app.collection_export_hint_label.cget("text"))
+
 
 if __name__ == "__main__":
     unittest.main()
