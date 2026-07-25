@@ -1,6 +1,6 @@
 # DokuReader
 
-## Last-checked: 2026-07-10
+## Last-checked: 2026-07-25
 
 ## Canonical Links
 

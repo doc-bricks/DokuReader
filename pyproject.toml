@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dokureader"
+version = "2.0.0"
+description = "Local-first document library organizer and topic-based PDF manager"
+readme = "README.md"
+authors = [
+    { name = "doc-bricks Team" }
+]
+license = { text = "AGPL-3.0" }
+requires-python = ">=3.8"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Win32 (MS Windows)",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: GNU Affero General Public License v3",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Office/Business",
+    "Topic :: Utilities",
+]
+dependencies = [
+    "PyMuPDF>=1.20.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/doc-bricks/DokuReader"
+Repository = "https://github.com/doc-bricks/DokuReader.git"
+Issues = "https://github.com/doc-bricks/DokuReader/issues"
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra -q"
+testpaths = [
+    "tests",
+]
