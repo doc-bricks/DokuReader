@@ -8,7 +8,13 @@
 
 [![Lizenz: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-green)](LICENSE)
 [![Version](https://img.shields.io/badge/Version-v1.0.0-blue)](releases/)
+[![Python: 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python)](pyproject.toml)
 [![Plattform: Windows](https://img.shields.io/badge/Platform-Windows-blue?logo=windows)](#einstieg)
+[![LLM-Ready: llms.txt](https://img.shields.io/badge/LLM--Ready-llms.txt-success)](llms.txt)
+[![Ökosystem: doc-bricks](https://img.shields.io/badge/%C3%96kosystem-doc--bricks-purple)](https://github.com/doc-bricks)
+
+> [!NOTE]
+> DokuReader ist Teil der **doc-bricks** Suite für lokales Dokumentenmanagement. Es ergänzt [LitZentrum](https://github.com/doc-bricks/LitZentrum) (Literatur- & Zitationsverwaltung), [CleanMarkdown](https://github.com/doc-bricks/CleanMarkdown) (Markdown-Lese- & Editierumgebung) und [UniversalDocsGrabber](https://github.com/doc-bricks/UniversalDocsGrabber) (Mail-Anhang-Import). DokuReader ist für KI/LLM-Entwicklungsassistenten über [`llms.txt`](llms.txt) indexiert.
 
 DokuReader ist eine lokale Desktop-Anwendung zum Verwalten, Vorschauen und Bündeln von Dokumenten nach Themen. Originaldateien bleiben an ihrem Speicherort; die Anwendung speichert nur Verweise und Lesestatus in einer lokalen JSON-Datei.
 
@@ -43,6 +49,31 @@ Nützliche Suchphrasen sind `local-first document library`, `topic based PDF org
 | Lokales PDF-Bündel erstellen | Aus gelesenen, ungelesenen oder allen Dokumenten ein Sammel-PDF erzeugen |
 
 Innerhalb der doc-bricks-Familie ist DokuReader die private Lese- und Dokumentenbibliothek. `LitZentrum` deckt Literaturverwaltung und Zitation ab, `CleanMarkdown` ist für Markdown-Lesen und -Bearbeitung zuständig, und `UniversalDocsGrabber` übernimmt den Mail-Anhang-Import.
+
+## Systemarchitektur
+
+```mermaid
+graph TD
+    subgraph Desktop ["Desktop Client (Python / Tkinter)"]
+        UI["DokuReader.py"]
+        State["State Manager (~/.dokubibliothek_state.json)"]
+        Preview["Dateivorschau (PDF, Bilder, Text, Office)"]
+        Exporter["Export Engine (PyMuPDF / reportlab / LibreOffice)"]
+        UI --> State
+        UI --> Preview
+        UI --> Exporter
+    end
+
+    subgraph Output ["Daten-Exporte & Weitergabe"]
+        Exporter --> PDFBundle["Sammel-PDF (Merged PDF)"]
+        Exporter --> JSONExport["dokureader-library-v1.json (Metadaten & Lesestatus)"]
+    end
+
+    subgraph Companion ["PWA / Mobile Companion (web_companion)"]
+        JSONExport -. Import / Sync .-> CompanionPWA["Offline PWA / Mobile Web App"]
+        CompanionPWA -. Export aktualisierter Lesestatus .-> JSONExport
+    end
+```
 
 ## Funktionen
 

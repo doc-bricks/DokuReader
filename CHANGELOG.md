@@ -6,6 +6,11 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 ## [Unreleased]
 
 ### Hinzugefügt / Added
+- **Sichtbarkeit & Discoverability (Pfad B Audit 2026-07-27)**:
+  - Shields.io Badges für Python 3.10+, AGPL-3.0, Version v1.0.0, Platform Windows, LLM-Ready `llms.txt` und Ecosystem `doc-bricks` in `README.md` & `README_de.md` ergänzt.
+  - Standardisierter GitHub-Flavored-Markdown (`> [!NOTE]`) Callout-Block für KI/LLM-Assistenten und Ökosystem-Kontext (LitZentrum, CleanMarkdown, UniversalDocsGrabber) eingebunden.
+  - Systemarchitektur-Diagramm (Mermaid) für Desktop Client, Export Engine (Combined PDF / JSON) und PWA Companion App (`web_companion`) hinzugefügt.
+  - `llms.txt` Index-Header auf `Last-checked: 2026-07-27` und Verifikationsnotizen (34 Pytest-Tests + 32 Web Companion Node-Tests) aktualisiert.
 - `pyproject.toml`: PEP 621-konformes Projekt-Metadaten- und Build-System inklusive Pytest-Konfiguration angelegt
 - Erster Design-Refresh-Slice für die Desktop-Oberfläche: `DokuReader.py`
   rendert jetzt einen klareren Kopfbereich mit Untertitel, ein ruhigeres
