@@ -10,8 +10,11 @@
 [![Version](https://img.shields.io/badge/Version-v1.0.0-blue)](releases/)
 [![Python: 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python)](pyproject.toml)
 [![Platform: Windows](https://img.shields.io/badge/Platform-Windows-blue?logo=windows)](#start-here)
+[![Tests: 34 passed](https://img.shields.io/badge/Tests-34%20passed-success?logo=pytest)](pyproject.toml)
 [![LLM-Ready: llms.txt](https://img.shields.io/badge/LLM--Ready-llms.txt-success)](llms.txt)
 [![Ecosystem: doc-bricks](https://img.shields.io/badge/Ecosystem-doc--bricks-purple)](https://github.com/doc-bricks)
+[![Umbrella: open-bricks](https://img.shields.io/badge/Umbrella-open--bricks-blue)](https://github.com/open-bricks)
+
 
 > [!NOTE]
 > DokuReader is part of the **doc-bricks** local document management suite. It works seamlessly alongside [LitZentrum](https://github.com/doc-bricks/LitZentrum) (citation & literature management), [CleanMarkdown](https://github.com/doc-bricks/CleanMarkdown) (Markdown reading & editing), and [UniversalDocsGrabber](https://github.com/doc-bricks/UniversalDocsGrabber) (mail attachment intake). DokuReader is fully indexed for AI/LLM coding assistants via [`llms.txt`](llms.txt).

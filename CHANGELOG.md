@@ -6,6 +6,9 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 ## [Unreleased]
 
 ### Hinzugefügt / Added
+- **Sichtbarkeit & Discoverability (Pfad B Audit 2026-07-30)**:
+  - Dachorganisations-Badge für `open-bricks` und Pytest Test-Pass-Badge in `README.md` & `README_de.md` hinzugefügt.
+  - `llms.txt` Index-Header auf `Last-checked: 2026-07-30` und Verifikationsstand (34 Pytest-Tests + 32 Web Companion Node-Tests 100% grün) nachgeführt.
 - **Sichtbarkeit & Discoverability (Pfad B Audit 2026-07-27)**:
   - Shields.io Badges für Python 3.10+, AGPL-3.0, Version v1.0.0, Platform Windows, LLM-Ready `llms.txt` und Ecosystem `doc-bricks` in `README.md` & `README_de.md` ergänzt.
   - Standardisierter GitHub-Flavored-Markdown (`> [!NOTE]`) Callout-Block für KI/LLM-Assistenten und Ökosystem-Kontext (LitZentrum, CleanMarkdown, UniversalDocsGrabber) eingebunden.
