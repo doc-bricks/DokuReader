@@ -47,6 +47,20 @@ test("index wires mobile shell metadata and icons", async () => {
   assert.match(html, /manifest\.webmanifest/);
 });
 
+test("web companion provides keyboard-accessible import and status feedback", async () => {
+  const html = await read("index.html");
+
+  assert.match(html, /<button id="drop-zone" type="button"/);
+  assert.match(html, /aria-describedby="drop-zone-help"/);
+  assert.match(html, /id="status-bar"[^>]*role="status"[^>]*aria-live="polite"/);
+  assert.match(appSource, /dropZone\.addEventListener\("click", \(\) => fileInput\.click\(\)\)/);
+});
+
+test("topics render as native buttons with current-state feedback", () => {
+  assert.match(appSource, /document\.createElement\("button"\)/);
+  assert.match(appSource, /button\.setAttribute\("aria-current", "true"\)/);
+});
+
 test("service worker caches the full offline shell", async () => {
   const sw = await read("sw.js");
 

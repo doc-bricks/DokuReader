@@ -6,6 +6,11 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 ## [Unreleased]
 
 ### Hinzugefügt / Added
+- **Web/PWA-Companion Accessibility Polish (TW-DOKUREADER-04):** Der
+  Importbereich ist als Tastatur-Schaltfläche mit Drag-and-drop-Hinweis
+  umgesetzt, Themenfilter sind native Schaltflächen mit aktuellem Zustand und
+  Lade-/Fehlermeldungen verwenden eine höfliche Statusregion. Die bestehende
+  lokale Export- und Offline-Grenze bleibt unverändert.
 - **Sichtbarkeit & Discoverability (Pfad B Audit 2026-07-30)**:
   - Dachorganisations-Badge für `open-bricks` und Pytest Test-Pass-Badge in `README.md` & `README_de.md` hinzugefügt.
   - `llms.txt` Index-Header auf `Last-checked: 2026-07-30` und Verifikationsstand (34 Pytest-Tests + 32 Web Companion Node-Tests 100% grün) nachgeführt.

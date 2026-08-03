@@ -24,11 +24,11 @@
     </div>
   </header>
 
-  <div id="drop-zone" aria-label="JSON-Datei hierher ziehen">
-    <p>dokureader-library-v1.json hierher ziehen oder oben importieren</p>
-  </div>
+  <button id="drop-zone" type="button" aria-describedby="drop-zone-help">
+    <span id="drop-zone-help">dokureader-library-v1.json hierher ziehen oder zum Auswählen aktivieren</span>
+  </button>
 
-  <div id="status-bar" class="status-bar"></div>
+  <div id="status-bar" class="status-bar" role="status" aria-live="polite" aria-atomic="true"></div>
 
   <div id="main-layout">
     <aside id="sidebar">

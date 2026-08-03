@@ -35,6 +35,7 @@ function setStatus(msg, isError = false) {
 }
 
 importBtn.addEventListener("click", () => fileInput.click());
+dropZone.addEventListener("click", () => fileInput.click());
 fileInput.addEventListener("change", e => {
   const file = e.target.files?.[0];
   if (!file) return;
@@ -95,18 +96,23 @@ function renderTopics() {
   if (!library) return;
   topicList.replaceChildren();
 
-  const all = document.createElement("li");
-  all.textContent = "Alle Themen";
-  all.className = "topic-item" + (activeTopic === null ? " active" : "");
-  all.addEventListener("click", () => { activeTopic = null; renderTopics(); renderDocs(); });
-  topicList.appendChild(all);
+  const addTopic = (label, topic) => {
+    const item = document.createElement("li");
+    const button = document.createElement("button");
+    const isActive = activeTopic === topic;
+    button.type = "button";
+    button.className = "topic-item" + (isActive ? " active" : "");
+    button.textContent = label;
+    if (isActive) button.setAttribute("aria-current", "true");
+    button.addEventListener("click", () => { activeTopic = topic; renderTopics(); renderDocs(); });
+    item.appendChild(button);
+    topicList.appendChild(item);
+  };
+
+  addTopic("Alle Themen", null);
 
   for (const t of library.topics) {
-    const li = document.createElement("li");
-    li.className = "topic-item" + (activeTopic === t.name ? " active" : "");
-    li.textContent = `${t.name} (${t.documents.length})`;
-    li.addEventListener("click", () => { activeTopic = t.name; renderTopics(); renderDocs(); });
-    topicList.appendChild(li);
+    addTopic(`${t.name} (${t.documents.length})`, t.name);
   }
 }
 

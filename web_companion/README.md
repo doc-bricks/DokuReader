@@ -5,6 +5,9 @@ Der Companion ist die mobile und browserfreundliche Leseschicht für
 zeigt Themen, Dokumentnamen, Lesestatus und Missing-Flags an und bleibt dabei
 read-only.
 
+Der Importbereich ist per Tastatur aktivierbar; Themenfilter sind native
+Schaltflächen und der aktuelle Ladezustand wird als Statusmeldung ausgegeben.
+
 ## Ziel
 
 - Android und iOS sollen keinen nativen Voll-Clone bekommen.
