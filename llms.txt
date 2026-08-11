@@ -1,6 +1,6 @@
 # DokuReader
 
-## Last-checked: 2026-07-30
+## Last-checked: 2026-08-11
 
 
 ## Canonical Links
@@ -60,17 +60,28 @@ DokuReader is not a cloud document manager, hosted OCR platform, general note-ta
 - Windows build launcher: `build_exe.bat`
 - Export schema docs: `EXPORTFORMAT.md`
 - Store docs: `STORE_LISTING.md`, `PRIVACY_POLICY.md`, `SUPPORT.md`, `store_package.json`
+- Version/release readback: `RELEASE_STATUS.md`, `PORTIERUNGSPLAN.md`
 - Store readiness gate: `python _WARTUNG/check_store_readiness.py --allow-blockers`
 - WACK runner and parser: `python _WARTUNG/run_windows_wack.py --dry-run`
 
 ## Test And Validation
 
-- Python tests live under `tests/` (34 Pytest tests verified: 33 passed, 1 skipped for display-less environments).
+- Python tests live under `tests/` (38 collected; 36 passed and two Tkinter GUI checks skip on this host because the Tcl/ttk runtime is incomplete).
 - Web Companion tests live under `web_companion/tests/` (32 Node.js tests verified: 100% green).
 - Current focused validation: `python -m pytest -q` and `npm test` in `web_companion`.
 - Store readiness validation: `python _WARTUNG/check_store_readiness.py --allow-blockers`
 - Syntax smoke: `python -m py_compile DokuReader.py manage_translations.py translator.py _WARTUNG/generate_store_media.py _WARTUNG/check_store_readiness.py _WARTUNG/run_windows_wack.py`
 - Workflow YAML should parse before push.
+
+## Version And Release Boundary
+
+- Runtime development version: `DokuReader.py` `APP_VERSION=1.0.1-dev`.
+- Python package metadata: `pyproject.toml` `1.0.1.dev0`.
+- Windows Store package metadata: `store_package.json` `1.0.1.0`.
+- No public release, signed MSIX, WACK certification, or Store submission is verified.
+- The metadata-first accessibility contract covers semantic names, roles, states,
+  descriptions, focus order, and read-only preview text; it does not claim
+  screen-reader, visual-runner, or device acceptance.
 
 ## Safety Notes
 

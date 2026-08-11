@@ -5,7 +5,7 @@ This file summarizes the Python packages declared or supported by DokuReader.
 The project itself is licensed under AGPL-3.0; optional PyMuPDF support also
 requires AGPL-3.0 compliance unless a commercial Artifex license is used.
 
-Generated/checked on: 2026-05-19
+Generated/checked on: 2026-08-11
 Source: installed package metadata via pip-licenses, plus PyPI classifier check
 for odfpy.
 

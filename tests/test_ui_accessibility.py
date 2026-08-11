@@ -107,6 +107,14 @@ class SearchUiAccessibilityTests(unittest.TestCase):
         self.assertGreaterEqual(popup_calls[0][0], self.app.doc_tree.winfo_rootx())
         self.assertGreaterEqual(popup_calls[0][1], self.app.doc_tree.winfo_rooty())
 
+    def test_metadata_first_contract_and_read_only_preview(self):
+        self.assertEqual(self.app._a11y_registry["document_list"]["name"], "Dokumentenliste")
+        self.assertEqual(self.app._a11y_registry["document_state"]["role"], "status")
+        self.assertEqual(self.app.search_entry.accessible_name, "Dokumente suchen")
+        self.assertEqual(self.app.preview_text.cget("state"), "disabled")
+        self.assertIn(str(self.app.search_entry.cget("takefocus")), {"1", "true"})
+        self.assertIn("2 Dokumente sichtbar", self.app.doc_state_label.cget("text"))
+
     def test_collection_export_controls_explain_availability(self):
         self.assertNotIn("disabled", self.app.collection_export_button.state())
         self.assertIn("2 alle Dokumente", self.app.collection_export_hint_label.cget("text"))

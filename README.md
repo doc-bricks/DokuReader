@@ -7,10 +7,10 @@
 > Organize, preview, and bundle local documents by topic — references and read status only, originals stay put.
 
 [![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-green)](LICENSE)
-[![Version](https://img.shields.io/badge/Version-v1.0.0-blue)](releases/)
+[![Version](https://img.shields.io/badge/Version-1.0.1--dev-blue)](CHANGELOG.md#unreleased)
 [![Python: 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python)](pyproject.toml)
 [![Platform: Windows](https://img.shields.io/badge/Platform-Windows-blue?logo=windows)](#start-here)
-[![Tests: 34 passed](https://img.shields.io/badge/Tests-34%20passed-success?logo=pytest)](pyproject.toml)
+[![Tests: 36 passed](https://img.shields.io/badge/Tests-36%20passed-success?logo=pytest)](pyproject.toml)
 [![LLM-Ready: llms.txt](https://img.shields.io/badge/LLM--Ready-llms.txt-success)](llms.txt)
 [![Ecosystem: doc-bricks](https://img.shields.io/badge/Ecosystem-doc--bricks-purple)](https://github.com/doc-bricks)
 [![Umbrella: open-bricks](https://img.shields.io/badge/Umbrella-open--bricks-blue)](https://github.com/open-bricks)
@@ -35,6 +35,16 @@ It is designed for private document libraries, research folders, PDF collections
 | Prepare or parse WACK reports | `python _WARTUNG/run_windows_wack.py --dry-run` |
 | Prepare Windows Store copy | `STORE_LISTING.md`, `PRIVACY_POLICY.md`, `SUPPORT.md` |
 | Give LLM tools project context | `llms.txt` |
+
+## Version and release status
+
+The version roles are intentionally separate and read back from the current
+source tree: the development runtime is `1.0.1-dev` (`DokuReader.py` and
+`pyproject.toml` `1.0.1.dev0`), the Windows Store package metadata is `1.0.1.0`
+(`store_package.json`), and there is no verified public release artifact in
+this repository. The ignored `releases/` tree, signing, MSIX, WACK and Store
+submission remain external gates; the `1.0.1-dev` badge is not a release claim.
+See [RELEASE_STATUS.md](RELEASE_STATUS.md) and [PORTIERUNGSPLAN.md](PORTIERUNGSPLAN.md).
 
 ## Discovery Context
 

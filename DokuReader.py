@@ -130,6 +130,39 @@ PDF_EXTS = {".pdf"}
 TXT_PREVIEW_CHARS = 5000
 OFFICE_PREVIEW_PARAGRAPHS = 30
 
+# Tkinter has no portable ``accessibleName`` option.  Keep the semantic
+# contract next to each widget so native labels/states/focus order and future
+# accessibility bridges have one authoritative source of metadata.
+A11Y_CONTRACT_VERSION = "1.0"
+
+
+def apply_accessibility_metadata(widget, *, name: str, description: str, role: str, focusable: bool) -> dict[str, object]:
+    """Attach the metadata-first accessibility contract to a Tk widget.
+
+    The metadata is intentionally plain Python data: Tk/ttk expose native
+    text, state and keyboard focus to the platform, while this contract keeps
+    the semantic name, description and role testable and bridgeable without
+    pretending that a local Tk smoke is a screen-reader acceptance test.
+    """
+    metadata = {
+        "name": name,
+        "description": description,
+        "role": role,
+        "focusable": bool(focusable),
+        "contract_version": A11Y_CONTRACT_VERSION,
+    }
+    setattr(widget, "_dokureader_accessibility", metadata)
+    setattr(widget, "accessible_name", name)
+    setattr(widget, "accessible_description", description)
+    setattr(widget, "accessible_role", role)
+    try:
+        widget.configure(takefocus="1" if focusable else "0")
+    except (AttributeError, tk.TclError):
+        # Small test doubles and a few Tk platform widgets may not expose the
+        # option; their semantic metadata remains useful and verifiable.
+        pass
+    return metadata
+
 
 def human_size(num_bytes: int) -> str:
     for unit in ["B", "KB", "MB", "GB"]:
@@ -390,6 +423,7 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
     def __init__(self):
         """Initialisiert die App: Fenster konfigurieren, State laden, GUI aufbauen."""
         super().__init__()
+        self._a11y_registry: dict[str, dict[str, object]] = {}
         self.title(APP_NAME)
         self.geometry("1200x700")
         self.minsize(1000, 600)
@@ -407,6 +441,17 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
             self._select_topic(self.state_model.current_topic)
 
         self.protocol("WM_DELETE_WINDOW", self.on_close)
+
+    def _register_accessibility(self, key: str, widget, *, name: str, description: str, role: str, focusable: bool):
+        """Registriert ein Widget im metadata-first-A11y-Vertrag."""
+        self._a11y_registry[key] = apply_accessibility_metadata(
+            widget,
+            name=name,
+            description=description,
+            role=role,
+            focusable=focusable,
+        )
+        return widget
 
     def _apply_window_icon(self):
         """Setzt nach Möglichkeit das Windows-App-Icon aus dem Projektordner."""
@@ -493,13 +538,38 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         hero_copy.pack(side=tk.LEFT, fill=tk.X, expand=True)
         self.app_title_label = ttk.Label(hero_copy, text="DokuReader", style="HeroTitle.TLabel")
         self.app_title_label.pack(anchor="w")
+        self._register_accessibility(
+            "app_title",
+            self.app_title_label,
+            name="DokuReader",
+            description="Lokale Dokumentenbibliothek",
+            role="heading",
+            focusable=False,
+        )
         self.app_subtitle_label = ttk.Label(
             hero_copy,
             text="Lokale Dokumentbibliothek mit Lesestatus, Vorschau und ruhigem Arbeitsfluss.",
             style="HeroSubtitle.TLabel",
         )
         self.app_subtitle_label.pack(anchor="w", pady=(4, 0))
-        ttk.Label(hero, text="Desktop-Refresh", style="HeroBadge.TLabel").pack(side=tk.RIGHT, anchor="n")
+        self._register_accessibility(
+            "app_subtitle",
+            self.app_subtitle_label,
+            name="DokuReader Beschreibung",
+            description="Lokale Bibliothek mit Lesestatus, Vorschau und Export",
+            role="description",
+            focusable=False,
+        )
+        self.hero_badge_label = ttk.Label(hero, text="Desktop-Refresh", style="HeroBadge.TLabel")
+        self.hero_badge_label.pack(side=tk.RIGHT, anchor="n")
+        self._register_accessibility(
+            "hero_badge",
+            self.hero_badge_label,
+            name="Desktop-Refresh",
+            description="Aktueller Desktop-Oberflächenstand",
+            role="status",
+            focusable=False,
+        )
 
         paned = ttk.Panedwindow(shell, orient=tk.HORIZONTAL, style="App.Horizontal.TPanedwindow")
         paned.pack(fill=tk.BOTH, expand=True)
@@ -507,7 +577,11 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         # Linke Spalte: Themen
         left = ttk.Frame(paned, style="Column.TFrame")
         paned.add(left, weight=1)
-        self._build_section_header(left, "Themen", "Strukturiere deine Leselisten nach Projekten, Fachgebieten oder Ordnern.")
+        self.topic_section_header = self._build_section_header(
+            left,
+            "Themen",
+            "Strukturiere deine Leselisten nach Projekten, Fachgebieten oder Ordnern.",
+        )
         self.topic_list = tk.Listbox(left)
         self.topic_list.configure(
             bg=self._theme["card_alt_bg"],
@@ -522,27 +596,62 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
             activestyle="none",
         )
         self.topic_list.pack(fill=tk.BOTH, expand=True, padx=14, pady=(0, 10))
+        self._register_accessibility(
+            "topic_list",
+            self.topic_list,
+            name="Themenliste",
+            description="Wähle ein Thema für die zugehörige Dokumentenliste",
+            role="list",
+            focusable=True,
+        )
         self.topic_list.bind("<<ListboxSelect>>", self.on_topic_select)
         btns = ttk.Frame(left, style="Toolbar.TFrame")
         btns.pack(fill=tk.X, padx=14, pady=(0, 14))
-        ttk.Button(btns, text="Neu", command=self.add_topic, style="Accent.TButton").pack(side=tk.LEFT)
-        ttk.Button(btns, text="Umbenennen", command=self.rename_topic).pack(side=tk.LEFT, padx=(8, 0))
-        ttk.Button(btns, text="Löschen", command=self.delete_topic).pack(side=tk.LEFT, padx=(8, 0))
+        self.add_topic_button = ttk.Button(btns, text="Neu", command=self.add_topic, style="Accent.TButton")
+        self.add_topic_button.pack(side=tk.LEFT)
+        self.rename_topic_button = ttk.Button(btns, text="Umbenennen", command=self.rename_topic)
+        self.rename_topic_button.pack(side=tk.LEFT, padx=(8, 0))
+        self.delete_topic_button = ttk.Button(btns, text="Löschen", command=self.delete_topic)
+        self.delete_topic_button.pack(side=tk.LEFT, padx=(8, 0))
+        self._register_accessibility("add_topic", self.add_topic_button, name="Thema neu", description="Legt ein neues Thema an", role="button", focusable=True)
+        self._register_accessibility("rename_topic", self.rename_topic_button, name="Thema umbenennen", description="Benennt das ausgewählte Thema um", role="button", focusable=True)
+        self._register_accessibility("delete_topic", self.delete_topic_button, name="Thema löschen", description="Löscht das ausgewählte Thema; Originaldateien bleiben erhalten", role="button", focusable=True)
 
         # Mitte: Dokumente
         center = ttk.Frame(paned, style="Column.TFrame")
         paned.add(center, weight=3)
-        self._build_section_header(center, "Dokumente im Thema", "Suche, sortiere und markiere Einträge direkt aus der Bibliothek heraus.")
+        self.document_section_header = self._build_section_header(
+            center,
+            "Dokumente im Thema",
+            "Suche, sortiere und markiere Einträge direkt aus der Bibliothek heraus.",
+        )
 
         # Suchleiste
         search_frame = ttk.Frame(center, style="Toolbar.TFrame")
         search_frame.pack(fill=tk.X, padx=14, pady=(0, 8))
-        ttk.Label(search_frame, text="Suche:").pack(side=tk.LEFT, padx=(0, 4))
+        self.search_label = ttk.Label(search_frame, text="Suche:")
+        self.search_label.pack(side=tk.LEFT, padx=(0, 4))
+        self._register_accessibility(
+            "search_label",
+            self.search_label,
+            name="Suche",
+            description="Beschriftung des Dokumente-Suchfelds",
+            role="label",
+            focusable=False,
+        )
         self._search_var = tk.StringVar()
         self._search_var.trace_add("write", self._on_search_changed)
         self.search_entry = ttk.Entry(search_frame, textvariable=self._search_var)
         self.search_entry.pack(side=tk.LEFT, fill=tk.X, expand=True)
         self.search_entry.bind("<Escape>", self.clear_search)
+        self._register_accessibility(
+            "search_entry",
+            self.search_entry,
+            name="Dokumente suchen",
+            description="Filtert die Dokumente des ausgewählten Themas nach Dateiname; Escape leert die Suche",
+            role="searchbox",
+            focusable=True,
+        )
         self.clear_search_button = ttk.Button(
             search_frame,
             text="Leeren",
@@ -550,6 +659,14 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
             command=self.clear_search,
         )
         self.clear_search_button.pack(side=tk.LEFT, padx=(4, 0))
+        self._register_accessibility(
+            "clear_search",
+            self.clear_search_button,
+            name="Suche leeren",
+            description="Entfernt den Suchfilter und setzt den Fokus zurück ins Suchfeld",
+            role="button",
+            focusable=True,
+        )
         self._update_search_controls()
 
         self.doc_tree = ttk.Treeview(center, columns=("typ", "größe"), show="tree headings", selectmode="browse")
@@ -563,6 +680,14 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         self.doc_tree.column("typ", width=100, anchor="w")
         self.doc_tree.column("größe", width=100, anchor="e")
         self.doc_tree.pack(fill=tk.BOTH, expand=True, padx=14, pady=(0, 8))
+        self._register_accessibility(
+            "document_list",
+            self.doc_tree,
+            name="Dokumentenliste",
+            description="Dokumente des Themas; Enter öffnet die Datei, Shift+F10 öffnet Aktionen",
+            role="list",
+            focusable=True,
+        )
         self._sort_key = "name"
         self._sort_reverse = False
 
@@ -582,6 +707,8 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         self.doc_tree.bind("<<TreeviewSelect>>", self.on_doc_select)
         self.doc_tree.bind("<Shift-F10>", self.open_selected_doc_menu)
         self.doc_tree.bind("<Menu>", self.open_selected_doc_menu)
+        self.doc_tree.bind("<Return>", self.on_doc_double_click)
+        self.doc_tree.bind("<KP_Enter>", self.on_doc_double_click)
 
         # Drag & Drop
         addbar = ttk.Frame(center, style="Toolbar.TFrame")
@@ -593,7 +720,39 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
             state="disabled",
         )
         self.doc_actions_button.pack(side=tk.LEFT)
-        ttk.Button(addbar, text="Hinzufügen", command=self.add_files_dialog, style="Accent.TButton").pack(side=tk.RIGHT)
+        self._register_accessibility(
+            "document_actions",
+            self.doc_actions_button,
+            name="Dokumentaktionen",
+            description="Öffnet Aktionen für das ausgewählte Dokument; ohne Auswahl deaktiviert",
+            role="button",
+            focusable=True,
+        )
+        self.add_files_button = ttk.Button(addbar, text="Hinzufügen", command=self.add_files_dialog, style="Accent.TButton")
+        self.add_files_button.pack(side=tk.RIGHT)
+        self._register_accessibility(
+            "add_files",
+            self.add_files_button,
+            name="Dateien hinzufügen",
+            description="Öffnet einen Dateidialog oder nimmt Dateien per Drag-and-drop auf",
+            role="button",
+            focusable=True,
+        )
+        self.doc_state_label = ttk.Label(
+            center,
+            text="Wähle zuerst ein Thema; danach kannst du Dateien hinzufügen oder hierher ziehen.",
+            style="SectionSubtitle.TLabel",
+            anchor="w",
+        )
+        self.doc_state_label.pack(fill=tk.X, padx=14, pady=(0, 5), before=addbar)
+        self._register_accessibility(
+            "document_state",
+            self.doc_state_label,
+            name="Dokumentenstatus",
+            description="Erklärt leere, gefilterte und Drag-and-drop-Zustände der Dokumentenliste",
+            role="status",
+            focusable=False,
+        )
         if TKDND_AVAILABLE:
             self.doc_tree.drop_target_register('*')  # type: ignore
             self.doc_tree.dnd_bind('<<Drop>>', self.on_drop)  # type: ignore
@@ -601,7 +760,11 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         # Rechte Spalte: Vorschau + Export
         right = ttk.Frame(paned, style="Column.TFrame")
         paned.add(right, weight=2)
-        self._build_section_header(right, "Vorschau", "Prüfe Inhalte und exportiere nur den Stand, den du wirklich weitergeben willst.")
+        self.preview_section_header = self._build_section_header(
+            right,
+            "Vorschau",
+            "Prüfe Inhalte und exportiere nur den Stand, den du wirklich weitergeben willst.",
+        )
         self.preview = tk.Canvas(
             right,
             bg=self._theme["preview_bg"],
@@ -611,7 +774,30 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
             highlightbackground=self._theme["border"],
         )
         self.preview.pack(fill=tk.BOTH, expand=False, padx=14, pady=(0, 8))
-        self.preview_text = tk.Text(right, height=10, wrap="word")
+        self._register_accessibility(
+            "preview_canvas",
+            self.preview,
+            name="Vorschaubildfläche",
+            description="Zeigt eine Bild- oder Dokumentvorschau, wenn verfügbar",
+            role="presentation",
+            focusable=False,
+        )
+        self.preview_state_label = ttk.Label(
+            right,
+            text="Keine Datei ausgewählt.",
+            style="SectionSubtitle.TLabel",
+            anchor="w",
+        )
+        self.preview_state_label.pack(fill=tk.X, padx=14, pady=(0, 4))
+        self._register_accessibility(
+            "preview_state",
+            self.preview_state_label,
+            name="Vorschau-Status",
+            description="Erklärt Vorschau-, Leer- und Fehlerzustände",
+            role="status",
+            focusable=False,
+        )
+        self.preview_text = tk.Text(right, height=10, wrap="word", state="disabled")
         self.preview_text.configure(
             bg=self._theme["preview_text_bg"],
             fg=self._theme["text"],
@@ -625,9 +811,25 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
             pady=10,
         )
         self.preview_text.pack(fill=tk.BOTH, expand=True, padx=14, pady=(0, 10))
+        self._register_accessibility(
+            "preview_text",
+            self.preview_text,
+            name="Vorschautext",
+            description="Nicht editierbare Text- und Metadatenvorschau des ausgewählten Dokuments",
+            role="document",
+            focusable=True,
+        )
 
         export_frame = ttk.LabelFrame(right, text="Sammel-PDF", style="Card.TLabelframe")
         export_frame.pack(fill=tk.X, padx=14, pady=(0, 10))
+        self._register_accessibility(
+            "collection_export_frame",
+            export_frame,
+            name="Sammel-PDF",
+            description="Filter und Aktion für den Sammel-PDF-Export",
+            role="group",
+            focusable=False,
+        )
         self.filter_var = tk.StringVar(value="alle")
         self.filter_var.trace_add("write", self._on_collection_filter_changed)
         self.collection_filter_buttons = [
@@ -637,6 +839,13 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         ]
         for button in self.collection_filter_buttons:
             button.pack(side=tk.LEFT, padx=6, pady=6)
+        filter_metadata = (
+            ("all_documents", "Alle Dokumente", "Exportiert alle Dokumente des Themas", "radio"),
+            ("read_documents", "Gelesene Dokumente", "Beschränkt den Export auf gelesene Dokumente", "radio"),
+            ("unread_documents", "Ungelesene Dokumente", "Beschränkt den Export auf ungelesene Dokumente", "radio"),
+        )
+        for (key, name, description, role), button in zip(filter_metadata, self.collection_filter_buttons):
+            self._register_accessibility(key, button, name=name, description=description, role=role, focusable=True)
         self.collection_export_button = ttk.Button(
             export_frame,
             text="Sammel-PDF erzeugen",
@@ -644,27 +853,69 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
             style="Accent.TButton",
         )
         self.collection_export_button.pack(side=tk.RIGHT, padx=6, pady=6)
+        self._register_accessibility(
+            "collection_export",
+            self.collection_export_button,
+            name="Sammel-PDF erzeugen",
+            description="Erzeugt ein PDF aus der gewählten Dokumentmenge; ohne passende Dokumente deaktiviert",
+            role="button",
+            focusable=True,
+        )
         self.collection_export_hint_label = ttk.Label(
             export_frame,
             text="Wähle zuerst ein Thema mit passenden Dokumenten aus.",
             style="SectionSubtitle.TLabel",
         )
         self.collection_export_hint_label.pack(anchor="w", padx=8, pady=(0, 8))
+        self._register_accessibility(
+            "collection_export_status",
+            self.collection_export_hint_label,
+            name="Sammel-PDF-Status",
+            description="Erklärt die aktuelle Exportverfügbarkeit",
+            role="status",
+            focusable=False,
+        )
 
         library_export_frame = ttk.LabelFrame(right, text="Bibliothek (JSON)", style="Card.TLabelframe")
         library_export_frame.pack(fill=tk.X, padx=14, pady=(0, 14))
-        ttk.Label(
+        self._register_accessibility(
+            "library_export_frame",
+            library_export_frame,
+            name="Bibliothek JSON",
+            description="Exportiert Metadaten und Lesestatus ohne Dokumentinhalte",
+            role="group",
+            focusable=False,
+        )
+        self.library_export_desc_label = ttk.Label(
             library_export_frame,
             text="Exportiert Themen, Pfade, Metadaten und Lesestatus ohne Dokumentinhalte.",
             wraplength=340,
             justify="left",
-        ).pack(anchor="w", padx=8, pady=(8, 4))
-        ttk.Button(
+        )
+        self.library_export_desc_label.pack(anchor="w", padx=8, pady=(8, 4))
+        self._register_accessibility(
+            "library_export_description",
+            self.library_export_desc_label,
+            name="Bibliothek JSON Beschreibung",
+            description="Erklärender Text zum Metadatenexport",
+            role="description",
+            focusable=False,
+        )
+        self.library_export_button = ttk.Button(
             library_export_frame,
             text="JSON-Export…",
             command=self.export_library_json,
             style="Accent.TButton",
-        ).pack(anchor="e", padx=8, pady=(0, 8))
+        )
+        self.library_export_button.pack(anchor="e", padx=8, pady=(0, 8))
+        self._register_accessibility(
+            "library_export",
+            self.library_export_button,
+            name="Bibliothek als JSON exportieren",
+            description="Öffnet einen Speicherndialog für den Metadaten- und Lesestatus-Export",
+            role="button",
+            focusable=True,
+        )
 
         # Kontextmenü
         self.doc_menu = tk.Menu(self, tearoff=0)
@@ -751,6 +1002,24 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         for button in self.collection_filter_buttons:
             button.state(["!disabled"] if topic else ["disabled"])
 
+    def _set_document_state(self, text: str) -> None:
+        """Setzt den sichtbaren und semantischen Dokumentlistenstatus."""
+        if hasattr(self, "doc_state_label"):
+            self.doc_state_label.configure(text=text)
+
+    def _set_preview_text(self, text: str) -> None:
+        """Schreibt Vorschautext kontrolliert in das nicht editierbare Textfeld."""
+        self.preview_text.configure(state="normal")
+        self.preview_text.delete("1.0", tk.END)
+        if text:
+            self.preview_text.insert("1.0", text)
+        self.preview_text.configure(state="disabled")
+
+    def _set_preview_state(self, text: str) -> None:
+        """Aktualisiert den kurzen Status oberhalb der Vorschautextfläche."""
+        if hasattr(self, "preview_state_label"):
+            self.preview_state_label.configure(text=text)
+
     def clear_search(self, _event=None):
         """Leert die Suche tastaturfreundlich und behält den Fokus im Suchfeld."""
         self._search_var.set("")
@@ -836,12 +1105,16 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         self.doc_tree.delete(*self.doc_tree.get_children())
         topic = self.state_model.current_topic
         if not topic:
+            self._set_document_state("Wähle zuerst ein Thema; danach kannst du Dateien hinzufügen oder hierher ziehen.")
+            self.clear_preview()
             self._update_doc_action_controls()
             self._update_collection_export_controls()
             return
-        docs = self.state_model.list_docs(topic)
+        all_docs = self.state_model.list_docs(topic)
+        docs = list(all_docs)
         # Suchfilter anwenden (case-insensitiv, nach Dateiname)
         search = getattr(self, "_search_var", None)
+        query = ""
         if search:
             query = search.get().strip().lower()
             if query:
@@ -876,6 +1149,16 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
                 name = "✓ " + name
             self.doc_tree.insert("", "end", iid=path, text=name,
                                  values=(ext[1:].upper(), size), tags=tags)
+        if not all_docs:
+            self._set_document_state(
+                f"Im Thema „{topic}“ sind noch keine Dokumente. Nutze „Hinzufügen“ oder ziehe Dateien hierher."
+            )
+        elif not docs and query:
+            self._set_document_state(f"Keine Treffer für „{query}“. Drücke Escape, um die Suche zu leeren.")
+        else:
+            self._set_document_state(
+                f"{len(docs)} Dokumente sichtbar. Enter öffnet die Auswahl, Shift+F10 öffnet Aktionen."
+            )
         self.clear_preview()
         self._update_doc_action_controls()
         self._update_collection_export_controls()
@@ -902,13 +1185,18 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         """Callback für Drag-&-Drop: Fügt gedropte Dateien dem aktuellen Thema hinzu."""
         topic = self.state_model.current_topic
         if not topic:
-            return
+            self._set_document_state("Wähle zuerst ein Thema, bevor du Dateien per Drag-and-drop hinzufügst.")
+            return "break"
         paths = self._split_dnd_paths(event.data)
+        if not paths:
+            self._set_document_state("Keine gültigen Dateipfade im Drag-and-drop-Ereignis erkannt.")
+            return "break"
         added = self.state_model.add_docs(topic, paths)
         self.state_model.save()
         self._reload_docs()
         if added == 0:
-            self.status_info("Keine neuen unterstützten Dateien per Drag&Drop hinzugefügt.")
+            self._set_document_state("Keine neuen unterstützten Dateien per Drag-and-drop hinzugefügt.")
+        return "break"
 
     @staticmethod
     def _split_dnd_paths(data: str):
@@ -1034,8 +1322,16 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         """Leert Canvas und Textfeld der Vorschau und zeigt Platzhaltertext."""
         self._update_doc_action_controls()
         self.preview.delete("all")
-        self.preview_text.delete("1.0", tk.END)
-        self.preview.create_text(10, 10, anchor="nw", text="Keine Vorschau", fill="#666")
+        self._set_preview_text("")
+        self.preview.create_text(
+            14,
+            14,
+            anchor="nw",
+            text="Keine Vorschau\nWähle ein Dokument aus der Liste.",
+            fill=self._theme["muted"],
+            font=("TkDefaultFont", 10),
+        )
+        self._set_preview_state("Keine Datei ausgewählt.")
 
     def show_preview(self, path: str):
         """Zeigt eine Vorschau der Datei (Bild, Text, PDF, DOCX, ODT) je nach Dateityp.
@@ -1044,7 +1340,7 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
             path: Absoluter Pfad zur anzuzeigenden Datei
         """
         self.preview.delete("all")
-        self.preview_text.delete("1.0", tk.END)
+        self._set_preview_text("")
         ext = Path(path).suffix.lower()
         try:
             if ext in IMAGE_EXTS and PIL_AVAILABLE:
@@ -1054,11 +1350,17 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
                 img.thumbnail((cw - 20, ch - 20))
                 self._preview_img = ImageTk.PhotoImage(img)
                 self.preview.create_image(10, 10, anchor="nw", image=self._preview_img)
-                self.preview_text.insert("1.0", f"Bild: {img.width}x{img.height}px\n{path}")
+                self._set_preview_text(f"Bild: {img.width}x{img.height}px\n{path}")
+                self._set_preview_state(f"Bildvorschau geladen: {os.path.basename(path)}")
             elif ext in TXT_EXTS:
                 content = read_text_with_fallback(path, max_chars=TXT_PREVIEW_CHARS)
-                self.preview.create_text(10, 10, anchor="nw", text="Textdatei", fill="#666")
-                self.preview_text.insert("1.0", content if content else "(Leer)")
+                self.preview.create_text(14, 14, anchor="nw", text="Textdatei", fill=self._theme["muted"], font=("TkDefaultFont", 10))
+                self._set_preview_text(content if content else "(Leer)")
+                self._set_preview_state(
+                    f"Textvorschau geladen: {os.path.basename(path)}"
+                    if content
+                    else f"Textdatei ist leer: {os.path.basename(path)}"
+                )
             elif ext in PDF_EXTS and (PDF2IMG_AVAILABLE or PYMUPDF_AVAILABLE) and PIL_AVAILABLE:
                 img = None
                 if PDF2IMG_AVAILABLE:
@@ -1086,35 +1388,42 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
                     img.thumbnail((cw - 20, ch - 20))
                     self._preview_img = ImageTk.PhotoImage(img)
                     self.preview.create_image(10, 10, anchor="nw", image=self._preview_img)
-                self.preview_text.insert("1.0", f"PDF: {os.path.basename(path)}\n{path}")
+                self._set_preview_text(f"PDF: {os.path.basename(path)}\n{path}")
+                self._set_preview_state(f"PDF-Vorschau geladen: {os.path.basename(path)}")
             elif ext == ".docx" and DOCPREVIEW_AVAILABLE:
                 try:
                     doc = docx.Document(path)
                     text = "\n".join(p.text for p in doc.paragraphs[:OFFICE_PREVIEW_PARAGRAPHS])
-                    self.preview.create_text(10, 10, anchor="nw", text="DOCX-Vorschau", fill="#666")
-                    self.preview_text.insert("1.0", text if text.strip() else "(Kein Textinhalt erkannt)")
+                    self.preview.create_text(14, 14, anchor="nw", text="DOCX-Vorschau", fill=self._theme["muted"], font=("TkDefaultFont", 10))
+                    self._set_preview_text(text if text.strip() else "(Kein Textinhalt erkannt)")
+                    self._set_preview_state(f"DOCX-Vorschau geladen: {os.path.basename(path)}")
                 except (OSError, ValueError, KeyError) as e:
-                    self.preview_text.insert("1.0", f"(Keine DOCX-Vorschau möglich)\n{e}")
+                    self._set_preview_text(f"(Keine DOCX-Vorschau möglich)\n{e}")
+                    self._set_preview_state(f"DOCX-Vorschau fehlgeschlagen: {os.path.basename(path)}")
             elif ext == ".odt" and ODFPREVIEW_AVAILABLE:
                 try:
                     odt_doc = odf_load(path)
                     paras = odt_doc.getElementsByType(odf_text.P)  # type: ignore
                     text_content = "\n".join(teletype.extractText(p) for p in paras[:OFFICE_PREVIEW_PARAGRAPHS])
-                    self.preview.create_text(10, 10, anchor="nw", text="ODT-Vorschau", fill="#666")
-                    self.preview_text.insert("1.0", text_content if text_content.strip() else "(Kein Textinhalt erkannt)")
+                    self.preview.create_text(14, 14, anchor="nw", text="ODT-Vorschau", fill=self._theme["muted"], font=("TkDefaultFont", 10))
+                    self._set_preview_text(text_content if text_content.strip() else "(Kein Textinhalt erkannt)")
+                    self._set_preview_state(f"ODT-Vorschau geladen: {os.path.basename(path)}")
                 except (OSError, ValueError, KeyError) as e:
-                    self.preview_text.insert("1.0", f"(Keine ODT-Vorschau möglich)\n{e}")
+                    self._set_preview_text(f"(Keine ODT-Vorschau möglich)\n{e}")
+                    self._set_preview_state(f"ODT-Vorschau fehlgeschlagen: {os.path.basename(path)}")
             else:
                 # Generische Metadaten
                 try:
                     size = human_size(os.path.getsize(path))
                 except OSError:
                     size = "?"
-                self.preview.create_text(10, 10, anchor="nw", text="Keine Vorschau verfügbar", fill="#666")
-                self.preview_text.insert("1.0", f"Datei: {os.path.basename(path)}\nTyp: {ext}\nGröße: {size}\nPfad: {path}")
+                self.preview.create_text(14, 14, anchor="nw", text="Keine Vorschau verfügbar", fill=self._theme["muted"], font=("TkDefaultFont", 10))
+                self._set_preview_text(f"Datei: {os.path.basename(path)}\nTyp: {ext}\nGröße: {size}\nPfad: {path}")
+                self._set_preview_state(f"Keine Vorschau verfügbar: {os.path.basename(path)}")
         except (OSError, ValueError, RuntimeError) as e:
-            self.preview.create_text(10, 10, anchor="nw", text="Vorschau-Fehler", fill="#666")
-            self.preview_text.insert("1.0", f"Fehler: {e}")
+            self.preview.create_text(14, 14, anchor="nw", text="Vorschau-Fehler", fill=self._theme["muted"], font=("TkDefaultFont", 10))
+            self._set_preview_text(f"Fehler: {e}")
+            self._set_preview_state(f"Vorschaufehler: {os.path.basename(path)}")
 
     # Export Sammel-PDF
     def create_collection_pdf(self):

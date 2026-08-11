@@ -1,6 +1,10 @@
 # Datenschutz - DokuReader
 
-Stand: 2026-05-28
+Stand: 2026-08-11
+
+Die Dokumentation beschreibt den Entwicklungsstand `1.0.1-dev`; die Store-
+Paketmetadaten `1.0.1.0` sind keine Aussage über eine Einreichung oder
+Veröffentlichung. Siehe `RELEASE_STATUS.md` für den belegten Gate-Stand.
 
 ## Kurzfassung
 

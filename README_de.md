@@ -7,10 +7,10 @@
 > Dokumente nach Themen verwalten, vorschauen und bündeln — nur Verweise und Lesestatus, Originale bleiben am Platz.
 
 [![Lizenz: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-green)](LICENSE)
-[![Version](https://img.shields.io/badge/Version-v1.0.0-blue)](releases/)
+[![Version](https://img.shields.io/badge/Version-1.0.1--dev-blue)](CHANGELOG.md#unreleased)
 [![Python: 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python)](pyproject.toml)
 [![Plattform: Windows](https://img.shields.io/badge/Platform-Windows-blue?logo=windows)](#einstieg)
-[![Tests: 34 passed](https://img.shields.io/badge/Tests-34%20passed-success?logo=pytest)](pyproject.toml)
+[![Tests: 36 passed](https://img.shields.io/badge/Tests-36%20passed-success?logo=pytest)](pyproject.toml)
 [![LLM-Ready: llms.txt](https://img.shields.io/badge/LLM--Ready-llms.txt-success)](llms.txt)
 [![Ökosystem: doc-bricks](https://img.shields.io/badge/%C3%96kosystem-doc--bricks-purple)](https://github.com/doc-bricks)
 [![Dachorganisation: open-bricks](https://img.shields.io/badge/Dachorganisation-open--bricks-blue)](https://github.com/open-bricks)
@@ -35,6 +35,17 @@ DokuReader eignet sich für private Dokumentenbibliotheken, Forschungsordner, PD
 | WACK-Reports vorbereiten oder parsen | `python _WARTUNG/run_windows_wack.py --dry-run` |
 | Windows-Store-Texte vorbereiten | `STORE_LISTING.md`, `PRIVACY_POLICY.md`, `SUPPORT.md` |
 | LLM-Tools Projektkontext geben | `llms.txt` |
+
+## Versions- und Release-Status
+
+Die Versionsrollen sind bewusst getrennt und aus dem aktuellen Quellstand
+abgelesen: Die Entwicklungs-Runtime ist `1.0.1-dev` (`DokuReader.py` und
+`pyproject.toml` `1.0.1.dev0`), die Windows-Store-Metadaten stehen auf `1.0.1.0`
+(`store_package.json`), und ein öffentlich belegtes Release-Artefakt liegt in
+diesem Repository nicht vor. Der ignorierte `releases/`-Baum, Signierung, MSIX,
+WACK und Store-Einreichung bleiben externe Gates; das Badge `1.0.1-dev` ist kein
+Release-Claim. Siehe [RELEASE_STATUS.md](RELEASE_STATUS.md) und
+[PORTIERUNGSPLAN.md](PORTIERUNGSPLAN.md).
 
 ## Auffindbarkeit
 

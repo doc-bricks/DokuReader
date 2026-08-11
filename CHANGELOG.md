@@ -6,11 +6,19 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 ## [Unreleased]
 
 ### Hinzugefügt / Added
+- **Versions- und Release-Readback (2026-08-11)**:
+  - Laufzeit `1.0.1-dev`, PEP-440-Metadaten `1.0.1.dev0` und Store-Paket `1.0.1.0` sind als getrennte Rollen dokumentiert.
+  - README-Badges verweisen auf `1.0.1-dev`; ein öffentliches Release, MSIX, WACK- oder Store-Einreichung wird nicht behauptet.
+  - `RELEASE_STATUS.md` und `PORTIERUNGSPLAN.md` halten die offenen externen Gates und die OneDrive-Read-only-Grenze fest.
+- **Metadata-first A11y/UI-Polish (2026-08-11)**:
+  - Semantische Namen, Rollen, Beschreibungen, Fokuspfade und der schreibgeschützte Vorschautext sind über einen testbaren Tkinter-Vertrag registriert.
+  - Dokumentenliste, Vorschau, Leer-/Filter-/Drag-and-drop-Zustände und Return/Shift+F10-Tastaturpfade werden sichtbar und erklärend dargestellt.
+  - Der Vertrag ist kein Screenreader-Abnahmetest; vollständige Tk-/visuelle Runner- und Gerätesmokes bleiben offene Gates.
 - **Sichtbarkeit & Discoverability (Pfad B Audit 2026-07-30)**:
   - Dachorganisations-Badge für `open-bricks` und Pytest Test-Pass-Badge in `README.md` & `README_de.md` hinzugefügt.
-  - `llms.txt` Index-Header auf `Last-checked: 2026-07-30` und Verifikationsstand (34 Pytest-Tests + 32 Web Companion Node-Tests 100% grün) nachgeführt.
+  - `llms.txt` Index-Header auf `Last-checked: 2026-08-11` und Verifikationsstand (38 Pytest-Tests gesammelt, 36 bestanden/2 Tkinter-Skips + 32 Web Companion Node-Tests 100% grün) nachgeführt.
 - **Sichtbarkeit & Discoverability (Pfad B Audit 2026-07-27)**:
-  - Shields.io Badges für Python 3.10+, AGPL-3.0, Version v1.0.0, Platform Windows, LLM-Ready `llms.txt` und Ecosystem `doc-bricks` in `README.md` & `README_de.md` ergänzt.
+  - Shields.io Badges für Python 3.10+, AGPL-3.0, den Entwicklungsstand `1.0.1-dev`, Platform Windows, LLM-Ready `llms.txt` und Ecosystem `doc-bricks` in `README.md` & `README_de.md` ergänzt; der frühere Versions-Badge ist damit abgelöst.
   - Standardisierter GitHub-Flavored-Markdown (`> [!NOTE]`) Callout-Block für KI/LLM-Assistenten und Ökosystem-Kontext (LitZentrum, CleanMarkdown, UniversalDocsGrabber) eingebunden.
   - Systemarchitektur-Diagramm (Mermaid) für Desktop Client, Export Engine (Combined PDF / JSON) und PWA Companion App (`web_companion`) hinzugefügt.
   - `llms.txt` Index-Header auf `Last-checked: 2026-07-27` und Verifikationsnotizen (34 Pytest-Tests + 32 Web Companion Node-Tests) aktualisiert.
