@@ -33,8 +33,8 @@ hohem Cloud-Lock-Risiko und fremdem Dirty-State weder synchronisiert noch
 
 ## Verifikation
 
-- `python -m pytest -ra`: 38 Tests gesammelt, 36 bestanden und zwei erwartete
-  Tkinter-Skips auf diesem Host ohne vollständige Tcl/ttk-Runtime.
+- `python -X utf8 -m pytest -ra`: 38 Tests gesammelt, 37 bestanden und ein
+  erwarteter Tkinter-Skip auf diesem Host ohne vollständige Tcl/ttk-Runtime.
 - `python tests/source_platform_smoke.py`: Exit 0.
 - `npm test` in `web_companion`: 32/32 grün.
 - `python -m py_compile DokuReader.py manage_translations.py translator.py

@@ -66,7 +66,7 @@ DokuReader is not a cloud document manager, hosted OCR platform, general note-ta
 
 ## Test And Validation
 
-- Python tests live under `tests/` (38 collected; 36 passed and two Tkinter GUI checks skip on this host because the Tcl/ttk runtime is incomplete).
+- Python tests live under `tests/` (38 collected; 37 passed and one Tkinter GUI check skips on this host because the Tcl/ttk runtime is incomplete).
 - Web Companion tests live under `web_companion/tests/` (32 Node.js tests verified: 100% green).
 - Current focused validation: `python -m pytest -q` and `npm test` in `web_companion`.
 - Store readiness validation: `python _WARTUNG/check_store_readiness.py --allow-blockers`
