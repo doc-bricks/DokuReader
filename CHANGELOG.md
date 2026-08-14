@@ -6,6 +6,12 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 ## [Unreleased]
 
 ### Hinzugefügt / Added
+- **Technische Hygiene & Code-Bereinigung (2026-08-14)**:
+  - Unbenutzte Imports (`sys` in `DokuReader.py` und `_WARTUNG/check_store_readiness.py`) sowie ungenutzte Variablen (`errors` in `tests/test_bug_regressions.py`) vollständig bereinigt (`ruff check` 100% sauber).
+  - PEP 8 E402 Import-Guards (`# noqa: E402`) in Wartungs- und Testskripten (`_WARTUNG/generate_store_media.py`, `tests/source_platform_smoke.py`, `tests/test_bug_regressions.py`, `tests/test_ui_accessibility.py`) standardisiert.
+  - `pyproject.toml` um `pythonpath = ["."]` unter `[tool.pytest.ini_options]` erweitert für zuverlässige Standalone-Pytest-Ausführung.
+  - Exception-Capture in Threading-Regressionstest `test_thread_safe_save` verankert (`self.assertEqual(errors, [])`).
+  - `llms.txt` Last-checked Zeitstempel auf 2026-08-14 und Teststand (36 passed / 2 skipped, ruff 100% sauber, 32 Web Companion Node-Tests) synchronisiert.
 - **Versions- und Release-Readback (2026-08-11)**:
   - Laufzeit `1.0.1-dev`, PEP-440-Metadaten `1.0.1.dev0` und Store-Paket `1.0.1.0` sind als getrennte Rollen dokumentiert.
   - README-Badges verweisen auf `1.0.1-dev`; ein öffentliches Release, MSIX, WACK- oder Store-Einreichung wird nicht behauptet.
