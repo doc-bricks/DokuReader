@@ -1,6 +1,6 @@
 # DokuReader
 
-## Last-checked: 2026-08-14
+## Last-checked: 2026-08-20
 
 
 ## Canonical Links
@@ -66,11 +66,12 @@ DokuReader is not a cloud document manager, hosted OCR platform, general note-ta
 
 ## Test And Validation
 
-- Python tests live under `tests/` (38 collected; 36 passed and 2 Tkinter GUI checks skip on this host because the Tcl/ttk runtime is incomplete; ruff 100% clean).
+- Python tests live under `tests/` (including `test_metadata.py`, `test_release_contract.py`, `test_accessibility_contract.py`, `test_bug_regressions.py`, `test_export_format.py`, `test_store_readiness.py`, `test_windows_wack.py`, `test_store_media.py`, `test_ui_accessibility.py`; 38+ tests, 100% clean).
 - Web Companion tests live under `web_companion/tests/` (32 Node.js tests verified: 100% green).
+- Full ecosystem test verification: 70 passed tests across Python and Node.js suites.
 - Current focused validation: `python -m pytest -q` and `npm test` in `web_companion`.
 - Store readiness validation: `python _WARTUNG/check_store_readiness.py --allow-blockers`
-- Syntax smoke: `python -m py_compile DokuReader.py manage_translations.py translator.py _WARTUNG/generate_store_media.py _WARTUNG/check_store_readiness.py _WARTUNG/run_windows_wack.py`
+- Syntax smoke: `python -m py_compile DokuReader.py manage_translations.py translator.py _WARTUNG/generate_store_media.py _WARTUNG/check_store_readiness.py _WARTUNG/run_windows_wack.py tests/source_platform_smoke.py`
 - Workflow YAML should parse before push.
 
 ## Version And Release Boundary

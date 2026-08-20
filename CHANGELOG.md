@@ -6,6 +6,13 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 ## [Unreleased]
 
 ### Hinzugefügt / Added
+- **Discoverability, README-Design, Badges, Security & Metadata Parity (Pfad B Audit 2026-08-20)**:
+  - Shields.io Badges in `README.md` und `README_de.md` um GUI (`Python / Tkinter`), Plattform-Matrix (`Windows | macOS | Linux`), 70 verifizierte Tests (38 Pytest + 32 Node.js Companion Tests), Privacy (`100% Offline / Zero-Egress`) und Security (`Local-First`) synchronisiert.
+  - Interaktives Mermaid-Sequenzdiagramm für die lokale Datenfluss- und Datenschutz-Isolationssequenz (Nutzer -> Desktop UI -> Lokaler Status `~/.dokubibliothek_state.json` -> Vorschau / Exporter -> Sammel-PDF & JSON-Export; 0 Netzwerk-Egress) in beiden Sprachfassungen integriert.
+  - Zweisprachige `SECURITY.md` um 100% Offline- & Zero-Egress-Garantien, Originaldateischutz (In-Place Reference Only), Status- und Datenisolation, Non-Elevation (User-Mode-Betrieb) sowie direkte Sicherheitskontaktadresse (`security@ellmos.ai`) erweitert.
+  - Ausführliche Geschwisterwerkzeuge-Matrix der `doc-bricks`-, `file-bricks`-, `dev-bricks`- und `open-bricks`-Ökosysteme (`LitZentrum`, `CleanMarkdown`, `UniversalDocsGrabber`, `UniversalInvoiceMail`, `UniversalMailCleaner`, `MailProcessor`, `PDFtoPDFocr`, `MediaBrain`, `DokuZen`, `ProFiler`, `ExplorerPro`, `DevCenter`, `CodeBox`, `open-bricks`) zweisprachig ergänzt.
+  - Automatisierte Metadaten- und Dokumentations-Paritätstestsuite `tests/test_metadata.py` angelegt (validiert `pyproject.toml`, Shields-Badges, `llms.txt`, `SECURITY.md`, `store_package.json` und `CHANGELOG.md`).
+  - `llms.txt` Last-checked-Zeitstempel auf 2026-08-20 und Testverifikationsstand (70 Tests: 38 Pytest + 32 Node.js 100% grün) nachgeführt.
 - **Technische Hygiene & Code-Bereinigung (2026-08-14)**:
   - Unbenutzte Imports (`sys` in `DokuReader.py` und `_WARTUNG/check_store_readiness.py`) sowie ungenutzte Variablen (`errors` in `tests/test_bug_regressions.py`) vollständig bereinigt (`ruff check` 100% sauber).
   - PEP 8 E402 Import-Guards (`# noqa: E402`) in Wartungs- und Testskripten (`_WARTUNG/generate_store_media.py`, `tests/source_platform_smoke.py`, `tests/test_bug_regressions.py`, `tests/test_ui_accessibility.py`) standardisiert.

@@ -9,8 +9,11 @@
 [![Lizenz: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-green)](LICENSE)
 [![Version](https://img.shields.io/badge/Version-1.0.1--dev-blue)](CHANGELOG.md#unreleased)
 [![Python: 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python)](pyproject.toml)
-[![Plattform: Windows](https://img.shields.io/badge/Platform-Windows-blue?logo=windows)](#einstieg)
-[![Tests: 37 passed](https://img.shields.io/badge/Tests-37%20passed-success?logo=pytest)](pyproject.toml)
+[![UI: Python / Tkinter](https://img.shields.io/badge/GUI-Python%20%2F%20Tkinter-blue)](DokuReader.py)
+[![Plattform: Windows | macOS | Linux](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-blue?logo=windows)](#einstieg)
+[![Tests: 70 passed](https://img.shields.io/badge/Tests-70%20passed-success?logo=pytest)](pyproject.toml)
+[![Datenschutz: 100% Offline](https://img.shields.io/badge/Datenschutz-100%25%20Offline-success)](PRIVACY_POLICY.md)
+[![Sicherheit: Local--First](https://img.shields.io/badge/Sicherheit-Local--First-blue)](SECURITY.md)
 [![LLM-Ready: llms.txt](https://img.shields.io/badge/LLM--Ready-llms.txt-success)](llms.txt)
 [![Ökosystem: doc-bricks](https://img.shields.io/badge/%C3%96kosystem-doc--bricks-purple)](https://github.com/doc-bricks)
 [![Dachorganisation: open-bricks](https://img.shields.io/badge/Dachorganisation-open--bricks-blue)](https://github.com/open-bricks)
@@ -89,6 +92,34 @@ graph TD
     end
 ```
 
+## Datenfluss & Datenschutz-Isolationssequenz
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Nutzer / Forscher
+    participant UI as DokuReader Desktop UI
+    participant State as Lokaler Status (~/.dokubibliothek_state.json)
+    participant Preview as Vorschau-Engine (PyMuPDF / PIL / Text)
+    participant Exporter as Export-Engine (PDF / JSON)
+    participant LocalDisk as Lokales Dateisystem (Originaldokumente)
+
+    User->>UI: Dokument hinzufügen / Drag & Drop
+    UI->>LocalDisk: Pfad & Dateimetadaten ermitteln (nur Metadaten)
+    Note over UI,LocalDisk: Originale bleiben unverändert am Ort (kein Kopieren/Verschieben)
+    UI->>State: Referenz & Lesestatus (Ungelesen) speichern
+    User->>UI: Dokument zur Vorschau auswählen
+    UI->>Preview: Vorschau anfordern (Seite 1 / Text)
+    Preview->>LocalDisk: Dokument lokal lesen
+    Preview-->>UI: Vorschaubild / Textdarstellung rendern
+    User->>UI: Lesestatus umschalten (Gelesen / Ungelesen)
+    UI->>State: Lesestatus persistieren
+    User->>UI: Export starten (Sammel-PDF oder JSON)
+    UI->>Exporter: Bündel generieren
+    Exporter->>LocalDisk: dokureader-library-v1.json / Sammel-PDF schreiben
+    Note over UI,LocalDisk: 100% Offline / Local-First — Null Netzwerk-Egress
+```
+
 ## Funktionen
 
 - Themen für Dokumente erstellen, umbenennen und löschen
@@ -149,7 +180,7 @@ Unter Windows kann alternativ die Startdatei verwendet werden:
 START.bat
 ```
 
-Für den Companion-Export kann in der App rechts der Bereich `Bibliothek (JSON)` genutzt werden. Er schreibt Themen, Pfade, Dateimetadaten und Lesestatus in `dokureader-library-v1.json`, ohne Dokumentinhalte zu kopieren. Das Format ist in `EXPORTFORMAT.md` dokumentiert.
+Für den Companion-Export die Sektion `Bibliothek (JSON)` auf der rechten Anwendungsseite verwenden. Sie speichert Themen, Pfade, Dateimetadaten und Lesestatus in `dokureader-library-v1.json`, ohne Dokumentinhalte zu kopieren. Das Schema ist in `EXPORTFORMAT.md` dokumentiert.
 
 ## Optionaler Windows-Build
 
@@ -157,7 +188,7 @@ Für den Companion-Export kann in der App rechts der Bereich `Bibliothek (JSON)`
 build_exe.bat
 ```
 
-Build-Ausgaben unter `build/`, `dist/` und `releases/` bleiben lokal und gehören nicht in das Git-Repository. Der Build nutzt einen lokalen Arbeitsordner unter `C:\_Local_DEV\codex_build\dokureader` und aktualisiert `dist\DokuReader.exe`.
+Build-Ausgaben unter `build/`, `dist/` und `releases/` verbleiben lokal und gehören nicht in das Git-Repository. Der Build nutzt ein lokales Arbeitsverzeichnis unter `C:\_Local_DEV\codex_build\dokureader` und aktualisiert `dist\DokuReader.exe`.
 
 ## Windows-Store-Readiness
 
@@ -165,30 +196,27 @@ Build-Ausgaben unter `build/`, `dist/` und `releases/` bleiben lokal und gehöre
 python _WARTUNG/check_store_readiness.py --allow-blockers
 ```
 
-Der Check prüft Store-Metadaten, öffentliche Privacy-/Support-URLs, Pflichtdokumente, Store-Assets, generierte Screenshots, eine lokale EXE sowie die verbleibenden MSIX-/WACK-Artefakte. `--allow-blockers` ist für lokale Pre-Submission-Läufe gedacht, bei denen Partner Center, MSIX-Signierung oder der erhöhte WACK-Lauf noch externe Gates sind.
+Die Prüfung validiert Store-Metadaten, öffentliche Privacy-/Support-URLs, Pflichtdokumente, Store-Assets, generierte Screenshots, die lokale EXE sowie ausstehende MSIX-/WACK-Artefakte. `--allow-blockers` dient lokalen Vorprüfungen, solange Partner Center, Signierung oder WACK als externe Schritte anstehen.
 
-Der WACK-Runner macht den erhöhten Zertifizierungsschritt reproduzierbar:
+Der WACK-Runner hält den Zertifizierungsschritt reproduzierbar:
 
 ```bash
 python _WARTUNG/run_windows_wack.py --dry-run
 ```
 
-Der Dry-Run zeigt den erwarteten MSIX-Pfad, den XML-Reportpfad, gefundenes `appcert.exe` und den exakten Zertifizierungsbefehl. Der echte Lauf muss nach einem frisch signierten MSIX in einer erhöhten PowerShell ausgeführt werden. Vorhandene XML-Reports lassen sich in die JSON-Zusammenfassung umwandeln, die das Readiness-Gate auswertet:
+Der Probelauf gibt den erwarteten MSIX-Pfad, XML-Berichtspfad, ermittelte `appcert.exe` sowie den exakten Befehl aus. Der echte Lauf erfolgt in einer administrativen PowerShell nach Erstellung eines frischen, signierten MSIX. Vorhandene XML-Berichte lassen sich in eine JSON-Zusammenfassung konvertieren:
 
 ```bash
 python _WARTUNG/run_windows_wack.py --parse-report releases/windowsstore/test_reports/wack_YYYYMMDD_HHMMSS.xml
 ```
 
-## Plattformstrategie
+## Plattform-Strategie
 
-Die Desktop-App bleibt die autoritative lokale Bibliothek. Windows Store ist der erste Distributionskanal; macOS und Linux werden als Source- und Smoke-Test-Ziele aus derselben Tkinter-Codebasis geführt. Für Android, iOS und Browser ist ein späterer Web/PWA-Companion auf Basis von `dokureader-library-v1.json` sinnvoller als ein nativer Voll-Clone, weil mobile Sandboxes keinen freien Zugriff auf die lokalen Desktop-Dokumentpfade haben.
+Die Desktop-App bleibt die maßgebliche lokale Dokumentenbibliothek. Der Windows Store ist das primäre Vertriebsziel; macOS und Linux werden als Quell- und Smoke-Ziele auf Basis derselben Tkinter-Codebasis geführt. Für Android, iOS und Browserbetrieb ist ein leichtgewichtiger Web/PWA-Companion auf Basis von `dokureader-library-v1.json` vorgesehen, da mobile Sandboxes nicht frei auf lokale Desktop-Dateipfade zugreifen können.
 
-Der reproduzierbare Desktop-Source-Smoke liegt in `tests/source_platform_smoke.py`. Er prüft App-Start, `open`-/`xdg-open`-Aufrufe, Text- und PDF-Vorschau, simulierte LibreOffice-Konvertierung und Sammel-PDF-Export, ohne echten Nutzerstatus zu berühren.
+Der reproduzierbare Quell-Smoke liegt in `tests/source_platform_smoke.py`. Er deckt Programmstart, `open`/`xdg-open`-Dispatch, Text- und PDF-Vorschau, simulierte LibreOffice-Konvertierung und PDF-Export ab, ohne den realen Benutzerstatus anzutasten.
 
-Für den mobilen Pfad gibt es jetzt zusätzlich einen reproduzierbaren PWA-Smoke
-unter `web_companion/`: `npm test` prüft Manifest, Offline-Shell und die
-Demo-Bibliothek für Android-/iOS-nahe Installationsläufe, ohne eine native
-Doppel-App aufzubauen.
+Der Mobile-Companion verfügt über einen reproduzierbaren PWA-Smoke unter `web_companion/`: `npm test` validiert Manifest-Metadaten, Offline-Shell-Assets und die Demo-Bibliothek für Android/iOS-Installationen, ohne parallele native Codebasen aufzubauen.
 
 ## Unterstützte Dateiformate
 
@@ -201,22 +229,43 @@ Doppel-App aufzubauen.
 - `requirements.txt` - Python-Abhängigkeiten
 - `DokuReader.spec` - PyInstaller-Konfiguration
 - `EXPORTFORMAT.md` - Schema für `dokureader-library-v1.json`
-- `_WARTUNG/check_store_readiness.py` - Windows-Store-Readiness-Gate
-- `_WARTUNG/run_windows_wack.py` - WACK-Dry-Run, echter Lauf und XML-zu-JSON-Zusammenfassung
-- `web_companion/README.md` - PWA-/Mobile-Smoke für Android und iOS
-- `STORE_LISTING.md` - Store-Texte für Windows Store (DE/EN)
+- `_WARTUNG/check_store_readiness.py` - Windows-Store-Readiness-Prüfung
+- `_WARTUNG/run_windows_wack.py` - WACK-Dry-Run, Ausführung und XML-zu-JSON-Parser
+- `web_companion/README.md` - PWA/Mobile-Workflow für Android und iOS
+- `STORE_LISTING.md` - Windows-Store-Texte in Deutsch und Englisch
 - `PRIVACY_POLICY.md` - Datenschutzhinweise für den Store-Release
 - `SUPPORT.md` - Support- und Kontaktwege
-- `llms.txt` - maschinenlesbarer Projektkontext
+- `llms.txt` - Maschinenlesbarer Projektkontext
 - `locales/translations.json` - Übersetzungsdaten
-- `THIRD_PARTY_LICENSES.txt` - Drittanbieter-Lizenzübersicht
-- `SECURITY.md` - Hinweise zum Melden von Sicherheitslücken
-- `CONTRIBUTING.md` - Beitragsrichtlinien
+- `THIRD_PARTY_LICENSES.txt` - Drittanbieter-Lizenzen
+- `SECURITY.md` - Sicherheitsrichtlinie und Schwachstellenmeldung
+- `CONTRIBUTING.md` - Richtlinien für Beiträge
+
+## Ökosystem & Geschwisterwerkzeuge
+
+DokuReader ist Teil der **doc-bricks**-Familie unter dem Dach von **open-bricks**, spezialisiert auf lokale, datenschutzkonforme Dokumenten- und Wissensverwaltung:
+
+| Repository | Schwerpunkt | Rolle im Ökosystem |
+|---|---|---|
+| **[LitZentrum](https://github.com/doc-bricks/LitZentrum)** | Literatur & Zitation | Wissenschaftliche Dokumentenverwaltung, BibTeX-Export & Quellenarbeit |
+| **[CleanMarkdown](https://github.com/doc-bricks/CleanMarkdown)** | Markdown Studio | Konzentriertes Lesen, Bearbeiten und typografische Bereinigung von Markdown |
+| **[UniversalDocsGrabber](https://github.com/doc-bricks/UniversalDocsGrabber)** | Dokumenten-Intake | Automatisierte Extraktion von E-Mail-Anhängen und lokale Ablage |
+| **[UniversalInvoiceMail](https://github.com/doc-bricks/UniversalInvoiceMail)** | Rechnungs-Extraktion | Deterministische Erkennung und Extraktion von Rechnungs-Anhängen |
+| **[UniversalMailCleaner](https://github.com/doc-bricks/UniversalMailCleaner)** | E-Mail-Hygiene | Lokale E-Mail-Archivbereinigung, Duplikatentfernung und Desinfektion |
+| **[MailProcessor](https://github.com/doc-bricks/MailProcessor)** | E-Mail-Verarbeitung | Regelbasierte E-Mail-Verarbeitung, Filterung und Dokumenten-Triage |
+| **[PDFtoPDFocr](https://github.com/doc-bricks/PDFtoPDFocr)** | PDF-OCR-Veredelung | Erzeugung durchsuchbarer Sandwich-PDFs via lokales Tesseract-OCR |
+| **[MediaBrain](https://github.com/doc-bricks/MediaBrain)** | Medien-Organisation | Visuelle Medienkatalogisierung, Tagging und Metadaten-Indizierung |
+| **[DokuZen](https://github.com/doc-bricks/DokuZen)** | Ablenkungsfreies Lesen | Minimalistische Zen-Umgebung für konzentrierte Dokumentenanalyse |
+| **[ProFiler](https://github.com/file-bricks/ProFiler)** | Multi-Tool Dateianalyse | Tiefe Datei-Inspektion, Struktur-Parser und Metadaten-Profiler |
+| **[ExplorerPro](https://github.com/file-bricks/ExplorerPro)** | Erweiterter Dateimanager | Leistungsstarker Multi-Pane-Dateimanager für Windows-Desktops |
+| **[DevCenter](https://github.com/dev-bricks/DevCenter)** | Entwickler-Zentrale | Zentrales Entwickler-Dashboard und Projekt-Verwaltung |
+| **[CodeBox](https://github.com/dev-bricks/CodeBox)** | Code-Snippet-Tresor | Offline-First Code-Snippet-Manager mit Syntax-Highlighting |
+| **[open-bricks](https://github.com/open-bricks)** | Dachorganisation | Übergreifende Architektur und Koordination aller Produktivitätswerkzeuge |
 
 ## Lizenz
 
-Dieses Projekt steht unter der [GNU Affero General Public License v3.0](LICENSE). Die AGPL-3.0 ist passend, weil DokuReader optional PyMuPDF nutzt, das ebenfalls AGPL-3.0-lizenziert ist.
+Dieses Projekt steht unter der [GNU Affero General Public License v3.0](LICENSE). AGPL-3.0 ist erforderlich, da DokuReader optional PyMuPDF einbinden kann, welches ebenfalls unter AGPL-3.0 lizenziert ist.
 
-## Haftung
+## Haftungsausschluss
 
-Dieses Projekt wird ohne Gewährleistung bereitgestellt. Nutzung, Tests und Verarbeitung eigener Dokumente erfolgen auf eigenes Risiko. Es gilt die Haftungs- und Gewährleistungsausschlussregelung der AGPL-3.0.
+Dieses Projekt wird ohne Gewährleistung bereitgestellt. Nutzung, Tests und Verarbeitung eigener Dokumente erfolgen auf eigenes Risiko. Es gelten die Gewährleistungs- und Haftungsausschlüsse der AGPL-3.0.

@@ -9,8 +9,11 @@
 [![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-green)](LICENSE)
 [![Version](https://img.shields.io/badge/Version-1.0.1--dev-blue)](CHANGELOG.md#unreleased)
 [![Python: 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python)](pyproject.toml)
-[![Platform: Windows](https://img.shields.io/badge/Platform-Windows-blue?logo=windows)](#start-here)
-[![Tests: 37 passed](https://img.shields.io/badge/Tests-37%20passed-success?logo=pytest)](pyproject.toml)
+[![UI: Python / Tkinter](https://img.shields.io/badge/GUI-Python%20%2F%20Tkinter-blue)](DokuReader.py)
+[![Platform: Windows | macOS | Linux](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-blue?logo=windows)](#start-here)
+[![Tests: 70 passed](https://img.shields.io/badge/Tests-70%20passed-success?logo=pytest)](pyproject.toml)
+[![Privacy: 100% Offline](https://img.shields.io/badge/Privacy-100%25%20Offline-success)](PRIVACY_POLICY.md)
+[![Security: Local--First](https://img.shields.io/badge/Security-Local--First-blue)](SECURITY.md)
 [![LLM-Ready: llms.txt](https://img.shields.io/badge/LLM--Ready-llms.txt-success)](llms.txt)
 [![Ecosystem: doc-bricks](https://img.shields.io/badge/Ecosystem-doc--bricks-purple)](https://github.com/doc-bricks)
 [![Umbrella: open-bricks](https://img.shields.io/badge/Umbrella-open--bricks-blue)](https://github.com/open-bricks)
@@ -86,6 +89,34 @@ graph TD
         JSONExport -. Import / Sync .-> CompanionPWA["Offline PWA / Mobile Web App"]
         CompanionPWA -. Export Updated Read Status .-> JSONExport
     end
+```
+
+## Data Intake & Privacy Isolation Flow
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as User / Researcher
+    participant UI as DokuReader Desktop UI
+    participant State as Local State (~/.dokubibliothek_state.json)
+    participant Preview as Preview Engine (PyMuPDF / PIL / Text)
+    participant Exporter as Export Engine (PDF / JSON)
+    participant LocalDisk as Local Filesystem (Original Documents)
+
+    User->>UI: Add Document / Drag & Drop
+    UI->>LocalDisk: Read Path & File Metadata (Stat only)
+    Note over UI,LocalDisk: Originals remain in-place (No Copy / No Move)
+    UI->>State: Store Reference & Read Status (Unread)
+    User->>UI: Select Document for Preview
+    UI->>Preview: Request Preview (Page 1 / Text)
+    Preview->>LocalDisk: Read Document Locally
+    Preview-->>UI: Render Preview Image / Plaintext
+    User->>UI: Toggle Read / Unread Status
+    UI->>State: Persist Read Status
+    User->>UI: Trigger Export (Merged PDF or JSON)
+    UI->>Exporter: Generate Bundle
+    Exporter->>LocalDisk: Write dokureader-library-v1.json / Merged PDF
+    Note over UI,LocalDisk: 100% Offline / Local-First — Zero Network Egress
 ```
 
 ## Features
@@ -211,6 +242,27 @@ native duplicate app line.
 - `THIRD_PARTY_LICENSES.txt` - third-party license summary
 - `SECURITY.md` - vulnerability reporting guidance
 - `CONTRIBUTING.md` - contribution guidelines
+
+## Ecosystem & Sibling Tools
+
+DokuReader is part of the **doc-bricks** family under the **open-bricks** open-source initiative, designed for seamless offline-first document and knowledge workflows:
+
+| Repository | Focus | Role in Suite |
+|---|---|---|
+| **[LitZentrum](https://github.com/doc-bricks/LitZentrum)** | Literature & Citations | Academic paper library, BibTeX export, and citation management |
+| **[CleanMarkdown](https://github.com/doc-bricks/CleanMarkdown)** | Markdown Studio | Focused Markdown reader, editor, and typography cleaner |
+| **[UniversalDocsGrabber](https://github.com/doc-bricks/UniversalDocsGrabber)** | Document Intake | Automated mail attachment extraction and local sorting |
+| **[UniversalInvoiceMail](https://github.com/doc-bricks/UniversalInvoiceMail)** | Invoice Mail Extraction | Deterministic invoice attachment detection and extraction |
+| **[UniversalMailCleaner](https://github.com/doc-bricks/UniversalMailCleaner)** | Mail Hygiene | Local mail archive cleaning, duplicate removal, and sanitization |
+| **[MailProcessor](https://github.com/doc-bricks/MailProcessor)** | Mail Processing | Rule-based local mail routing, filtering, and document triage |
+| **[PDFtoPDFocr](https://github.com/doc-bricks/PDFtoPDFocr)** | PDF OCR Processing | Searchable sandwich PDF creation with local Tesseract OCR |
+| **[MediaBrain](https://github.com/doc-bricks/MediaBrain)** | Media Asset Organizer | Visual media tagging, categorization, and metadata indexing |
+| **[DokuZen](https://github.com/doc-bricks/DokuZen)** | Distraction-Free Docs | Minimalist zen reading and document inspection environment |
+| **[ProFiler](https://github.com/file-bricks/ProFiler)** | Multi-Tool File Analysis | Deep file inspector, structural parser, and metadata profiler |
+| **[ExplorerPro](https://github.com/file-bricks/ExplorerPro)** | Advanced File Explorer | High-performance multi-pane local file manager |
+| **[DevCenter](https://github.com/dev-bricks/DevCenter)** | Developer Workspace | Central developer dashboard and project management hub |
+| **[CodeBox](https://github.com/dev-bricks/CodeBox)** | Code Snippet Vault | Offline-first code snippet organizer with syntax highlighting |
+| **[open-bricks](https://github.com/open-bricks)** | Umbrella Architecture | Master ecosystem coordination for desktop productivity |
 
 ## License
 
