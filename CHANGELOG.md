@@ -5,6 +5,59 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+### Behoben / Fixed
+- **Testclaims zählen wieder getrennt statt summiert (2026-08-24)**:
+  - Die Badges in `README.md` und `README_de.md` trugen `Tests: 70 passed`. Diese Zahl
+    war eine Summe aus zwei verschiedenen Suiten (38 Pytest + 32 Node) und behauptete
+    dabei etwas Falsches: Von den 38 Pytest-Tests waren 37 bestanden und einer
+    übersprungen, es gab also nie 70 bestandene Tests. Die Aggregation verschluckte
+    den Skip und machte die beiden Suiten ununterscheidbar — genau das, was ein
+    Testbadge nicht tun darf.
+  - Ersetzt durch zwei getrennte Badges: `Pytest: 45 tests, 0 failed` und
+    `Web Companion: 32 passed`. Das Pytest-Badge nennt bewusst die gesammelte und
+    die fehlgeschlagene Zahl statt der bestandenen: Letztere schwankt zwischen 44
+    und 45, weil ein Test sporadisch überspringt (siehe nächster Abschnitt). Eine
+    Zahl, die in einem Viertel der Läufe falsch ist, gehört nicht in ein Badge.
+  - **Autoritativer Lauf** vom 2026-08-24 auf Commit `df41cf8`, Python 3.12.10
+    (Windows), jede Suite einzeln und mit Exit-Code:
+    - `python -X utf8 -m pytest -ra` → 45 gesammelt, 0 fehlgeschlagen, Exit 0
+      (fünfzehn Läufe; 44–45 bestanden, siehe sporadischer Skip)
+    - `node --test` in `web_companion/` → 32 bestanden, 0 fehlgeschlagen, Exit 0
+    - `ruff check .` → All checks passed, Exit 0
+    - `python tests/source_platform_smoke.py` → `source_platform_smoke: OK`, Exit 0
+  - `RELEASE_STATUS.md` (38/37/1), `llms.txt` (`38+ tests, 100% clean` sowie
+    `70 passed tests`) und `docs/con2_ANFORDERUNGSANALYSE.md` (`37 Pytest-Tests`,
+    „Zwei erwartete Tkinter-Skips") auf denselben Lauf gebracht. Die Zahlen
+    früherer Einträge bleiben unverändert und datiert.
+
+### Geändert / Changed
+- **Der „erwartete Tkinter-Skip" ist sporadisch, nicht umgebungsbedingt (2026-08-24)**:
+  - Frühere Stände führten einen bis zwei Tkinter-Skips als erwartete Folge einer
+    fehlenden Tcl/ttk-Runtime. Die Messung widerspricht dem: In fünfzehn Läufen derselben
+    Sitzung trat der Skip viermal auf und elfmal nicht — bei unverändertem Host
+    und unverändertem Testcode.
+  - Die Bedingung sitzt in `tests/test_ui_accessibility.py` im `setUp` und greift,
+    wenn `DokuReader.App()` einen `tk.TclError` wirft. Wäre Tcl auf diesem Host
+    tatsächlich defekt, müsste **jeder** Test dieser Klasse überspringen — es war
+    aber genau einer. Tkinter funktioniert hier; instabil ist der Aufbau.
+  - Damit lösen sich die widersprüchlichen Altstände auf, die diese Aufgabe
+    ausgelöst haben: 38/37/1 und 38/36/2 sind nicht zwei getrennte Readbacks mit
+    eigener Historie, sondern derselbe instabile Test mit unterschiedlicher
+    Trefferzahl. Eine schwankende Testzahl ist ein Befund über die Testinfrastruktur,
+    kein Dokumentationsfehler.
+  - `tests/test_metadata.py` prüft Badges und `llms.txt` jetzt auf **Struktur** statt
+    auf feste Zahlen und Daten: dass es getrennte Suiten-Badges gibt und kein
+    summierendes `Tests-…`-Badge zurückkehrt, und dass `llms.txt` einen
+    wohlgeformten `Last-checked`-Kopf trägt. Die alte Fassung nagelte `70 passed`
+    und `2026-08-20` fest und hätte bei jedem Testzuwachs erneut gebrochen —
+    sie zementierte genau den Zustand, den diese Aufgabe beheben sollte.
+  - Offen und bewusst nicht angefasst: die Ursache der Tk-Instabilität. Ein Eingriff
+    in fremdes Test-Setup gehört nicht in eine Claim-Synchronisation; der Befund ist
+    hier dokumentiert, damit die nächste schwankende Zahl nicht wieder als
+    „zwei Readbacks" gelesen wird.
+  - MSIX, WACK, Signierung und Store-Gates bleiben extern und werden durch keinen
+    dieser Läufe belegt.
+
 ### Hinzugefügt / Added
 - **Discoverability, README-Design, Badges, Security & Metadata Parity (Pfad B Audit 2026-08-20)**:
   - Shields.io Badges in `README.md` und `README_de.md` um GUI (`Python / Tkinter`), Plattform-Matrix (`Windows | macOS | Linux`), 70 verifizierte Tests (38 Pytest + 32 Node.js Companion Tests), Privacy (`100% Offline / Zero-Egress`) und Security (`Local-First`) synchronisiert.

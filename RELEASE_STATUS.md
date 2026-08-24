@@ -33,8 +33,26 @@ hohem Cloud-Lock-Risiko und fremdem Dirty-State weder synchronisiert noch
 
 ## Verifikation
 
-- `python -X utf8 -m pytest -ra`: 38 Tests gesammelt, 37 bestanden und ein
-  erwarteter Tkinter-Skip auf diesem Host ohne vollständige Tcl/ttk-Runtime.
+- `python -X utf8 -m pytest -ra`: 45 Tests gesammelt, 0 fehlgeschlagen, Exit 0.
+  Gemessen 2026-08-24 auf Commit `df41cf8`, Python 3.12.10 (Windows), fünfzehn Läufe.
+- **Die Passed-Zahl schwankt zwischen 44 und 45 - und das ist der eigentliche
+  Befund dieser Prüfung.** In vier von fünfzehn Läufen übersprang
+  `tests/test_ui_accessibility.py` einen Test, in elf lief er durch. Deshalb
+  nennt das README-Badge die gesammelte Zahl und die Fehlerzahl, nicht die
+  bestandene: 45 Tests, 0 fehlgeschlagen. Diese Aussage ist in jedem Lauf wahr.
+- **Der Skip ist sporadisch, nicht umgebungsbedingt.** Er meldet „Tkinter ist in
+  dieser Umgebung nicht stabil verfügbar: Can't find a usable init.tcl". Die
+  Bedingung sitzt im `setUp` und greift, wenn `DokuReader.App()` einen
+  `tk.TclError` wirft. Wäre Tcl auf diesem Host defekt, müsste **jeder** Test
+  dieser Klasse überspringen - es ist aber jedes Mal genau einer, und elfmal
+  keiner. Tkinter funktioniert hier; instabil ist der Aufbau.
+  Damit lösen sich die widersprüchlichen Altstände auf, die diese Prüfung
+  ausgelöst haben: 38/37/1 und 38/36/2 sind nicht zwei Readbacks mit eigener
+  Historie, sondern derselbe instabile Test mit unterschiedlicher Trefferzahl.
+  Eine schwankende Testzahl ist hier ein Befund über die Testinfrastruktur,
+  kein Dokumentationsfehler.
+  (Historisch: 38/37/1 auf Commit `88827cb`; die Testbasis ist seither
+  gewachsen.)
 - `python tests/source_platform_smoke.py`: Exit 0.
 - `npm test` in `web_companion`: 32/32 grün.
 - `python -m py_compile DokuReader.py manage_translations.py translator.py
