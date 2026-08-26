@@ -34,12 +34,26 @@ class SearchUiAccessibilityTests(unittest.TestCase):
         self._second_doc = tmp_path / "Paper_Markierungen.pdf"
         self._second_doc.write_bytes(b"%PDF-1.4\n%%EOF\n")
 
-        try:
-            self.app = DokuReader.App()
-        except tk.TclError as exc:
+        last_error: tk.TclError | None = None
+        for _attempt in range(3):
+            try:
+                self.app = DokuReader.App()
+                break
+            except tk.TclError as exc:
+                last_error = exc
+                partial_root = getattr(tk, "_default_root", None)
+                if partial_root is not None:
+                    try:
+                        partial_root.destroy()
+                    except tk.TclError:
+                        pass
+        else:
             DokuReader.STATE_FILE = self._original_state_file
             self._tmpdir.cleanup()
-            self.skipTest(f"Tkinter ist in dieser Umgebung nicht stabil verfügbar: {exc}")
+            self.skipTest(
+                "Tkinter ist nach drei Initialisierungsversuchen nicht stabil "
+                f"verfügbar: {last_error}"
+            )
         self.app.withdraw()
         self.app.state_model.topics = {
             "Forschung": [
@@ -150,6 +164,27 @@ class SearchUiAccessibilityTests(unittest.TestCase):
 
         self.assertNotIn("disabled", self.app.collection_export_button.state())
         self.assertIn("2 ungelesenen Dokumente", self.app.collection_export_hint_label.cget("text"))
+
+    def test_compact_layout_keeps_topic_and_export_actions_inside_window(self):
+        self.app.geometry("1400x840+60+60")
+        self.app.deiconify()
+        self.app.update()
+        self.app.update_idletasks()
+
+        window_right = self.app.winfo_rootx() + self.app.winfo_width()
+        window_bottom = self.app.winfo_rooty() + self.app.winfo_height()
+        self.assertLessEqual(
+            self.app.delete_topic_button.winfo_rootx()
+            + self.app.delete_topic_button.winfo_width(),
+            window_right,
+        )
+        self.assertLessEqual(
+            self.app.library_export_button.winfo_rooty()
+            + self.app.library_export_button.winfo_height(),
+            window_bottom,
+        )
+        self.assertTrue(self.app.library_export_button.winfo_ismapped())
+        self.app.withdraw()
 
 
 if __name__ == "__main__":

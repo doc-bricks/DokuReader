@@ -1,6 +1,6 @@
 # Konsolidierte Differenzen con2
 
-Stand: 2026-08-11
+Stand: 2026-08-26
 
 ## P1/P2 – offen vor einer echten Veröffentlichung
 
@@ -11,20 +11,24 @@ Stand: 2026-08-11
 3. Partner-Center-/Store-Status mit ausdrücklicher Besitzerfreigabe lesen;
    `STORE_LISTING.md` bleibt bis dahin vorbereitete Copy.
 
-## P2/P3 – offen für vollständige UI-Abnahme
+## Lokal geschlossen: UI-Polish und Visual-Smoke
 
-1. Auf einem vollständigen Windows-Tk/ttk-Host den GUI-Regressionstest und den
-   visuellen Smoke ausführen.
-2. Einen echten Tastatur-/Fokus- und Screenreader-Test mit dem vorgesehenen
+1. Windows-Tk/ttk-GUI-Regression: 46/46 Python-Tests, einschließlich echter
+   Fenstergeometrie und metadata-first Zustände.
+2. Synthetischer Visual-Smoke für Leer-, Drag-and-drop- und Vorschauzustand;
+   Bilder und Hashes stehen in `UI_POLISH_SMOKE.json`.
+
+## P2/P3 – offen für externe UI-/Geräteabnahme
+
+1. Einen echten Tastaturhardware-/Fokus- und Screenreader-Test mit dem vorgesehenen
    Windows-Assistenzstack durchführen; das Ergebnis getrennt vom statischen
    Metadata-Contract protokollieren.
-3. Einen kontrollierten Android-/iOS-/PWA-Gerätesmoke nur mit realem Gerät oder
+2. Einen kontrollierten Android-/iOS-/PWA-Gerätesmoke nur mit realem Gerät oder
    autorisiertem Runner nachholen; `npm test` allein bleibt lokaler Code-Smoke.
 
 ## Bewusst keine Differenzbehebung in diesem Bündel
 
-- Kein Push, Tag, GitHub-Release oder Store-Upload.
+- Kein Tag, GitHub-Release oder Store-Upload.
 - Keine OneDrive-Synchronisierung und keine Übernahme von `WORKSTATION-LG`-
   Kopien, generierten Releases oder fremden Asset-Ständen.
-- Keine Erfindung von Release-, Screenreader-, Geräte- oder visuellen
-  Abnahmedaten.
+- Keine Erfindung von Release-, Screenreader- oder Geräteabnahmedaten.

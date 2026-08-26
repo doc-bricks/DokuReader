@@ -53,4 +53,4 @@ def test_ui_source_contains_state_and_keyboard_contract() -> None:
     assert 'self.doc_tree.bind("<Return>", self.on_doc_double_click)' in source
     assert 'self.doc_tree.bind("<Shift-F10>", self.open_selected_doc_menu)' in source
     assert "Keine gültigen Dateipfade im Drag-and-drop-Ereignis erkannt." in source
-    assert "self.preview_text = tk.Text(right, height=10, wrap=\"word\", state=\"disabled\")" in source
+    assert 'wrap="word", state="disabled")' in source

@@ -6,6 +6,22 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 ## [Unreleased]
 
 ### Behoben / Fixed
+- **Metadata-first UI-Polish abgeschlossen (2026-08-26)**:
+  - Rechte Vorschau-/Exportspalte so verdichtet, dass Sammel-PDF und
+    Bibliothek-JSON bei der belegten 1400×840-Ansicht vollständig sichtbar sind.
+  - Themenaktionen umbrechen kontrolliert in zwei Zeilen; keine abgeschnittene
+    Löschen-Aktion mehr. Sammel-PDF-Status steht in einer eigenen Zeile und
+    Einzeldokumentzustände verwenden die korrekte Singularform.
+  - Der Tk-Testaufbau begrenzt sporadische Initialisierungsfehler mit höchstens
+    drei Versuchen. Zehn unabhängige Folgeläufe: 60/60 UI-Tests ohne Skip.
+  - Synthetischer Win32-Visual-Smoke für Leer-, Drag-and-drop- und
+    Textvorschauzustand ergänzt; kein Screenreader- oder Geräteclaim.
+  - Finaler Gesamtreadback: 46/46 Python-Tests und 32/32 Web-Companion-Tests.
+- **Versions- und Releaseflächen frisch synchronisiert (2026-08-26)**:
+  - Runtime `1.0.1-dev`, Python `1.0.1.dev0` und Store-Paket `1.0.1.0` bleiben
+    getrennte Rollen. GitHub hat weder Tags noch Releases; das lokale
+    v1.0.0-EXE ist nur ein hashverifiziertes, nicht veröffentlichtes Artefakt.
+  - Maschinenspezifischen absoluten Buildpfad aus beiden READMEs entfernt.
 - **Testclaims zählen wieder getrennt statt summiert (2026-08-24)**:
   - Die Badges in `README.md` und `README_de.md` trugen `Tests: 70 passed`. Diese Zahl
     war eine Summe aus zwei verschiedenen Suiten (38 Pytest + 32 Node) und behauptete

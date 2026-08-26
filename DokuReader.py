@@ -424,8 +424,8 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         super().__init__()
         self._a11y_registry: dict[str, dict[str, object]] = {}
         self.title(APP_NAME)
-        self.geometry("1200x700")
-        self.minsize(1000, 600)
+        self.geometry("1400x840")
+        self.minsize(1100, 720)
         self._apply_window_icon()
         self._theme = self._build_theme()
         self.configure(bg=self._theme["window_bg"])
@@ -607,11 +607,13 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         btns = ttk.Frame(left, style="Toolbar.TFrame")
         btns.pack(fill=tk.X, padx=14, pady=(0, 14))
         self.add_topic_button = ttk.Button(btns, text="Neu", command=self.add_topic, style="Accent.TButton")
-        self.add_topic_button.pack(side=tk.LEFT)
+        btns.columnconfigure(0, weight=1)
+        btns.columnconfigure(1, weight=1)
+        self.add_topic_button.grid(row=0, column=0, sticky="ew")
         self.rename_topic_button = ttk.Button(btns, text="Umbenennen", command=self.rename_topic)
-        self.rename_topic_button.pack(side=tk.LEFT, padx=(8, 0))
+        self.rename_topic_button.grid(row=0, column=1, sticky="ew", padx=(8, 0))
         self.delete_topic_button = ttk.Button(btns, text="Löschen", command=self.delete_topic)
-        self.delete_topic_button.pack(side=tk.LEFT, padx=(8, 0))
+        self.delete_topic_button.grid(row=1, column=0, columnspan=2, sticky="ew", pady=(8, 0))
         self._register_accessibility("add_topic", self.add_topic_button, name="Thema neu", description="Legt ein neues Thema an", role="button", focusable=True)
         self._register_accessibility("rename_topic", self.rename_topic_button, name="Thema umbenennen", description="Benennt das ausgewählte Thema um", role="button", focusable=True)
         self._register_accessibility("delete_topic", self.delete_topic_button, name="Thema löschen", description="Löscht das ausgewählte Thema; Originaldateien bleiben erhalten", role="button", focusable=True)
@@ -767,7 +769,7 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         self.preview = tk.Canvas(
             right,
             bg=self._theme["preview_bg"],
-            height=320,
+            height=220,
             borderwidth=0,
             highlightthickness=1,
             highlightbackground=self._theme["border"],
@@ -796,7 +798,7 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
             role="status",
             focusable=False,
         )
-        self.preview_text = tk.Text(right, height=10, wrap="word", state="disabled")
+        self.preview_text = tk.Text(right, height=6, wrap="word", state="disabled")
         self.preview_text.configure(
             bg=self._theme["preview_text_bg"],
             fg=self._theme["text"],
@@ -806,10 +808,10 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
             highlightbackground=self._theme["border"],
             highlightcolor=self._theme["accent"],
             insertbackground=self._theme["text"],
-            padx=10,
-            pady=10,
+            padx=8,
+            pady=8,
         )
-        self.preview_text.pack(fill=tk.BOTH, expand=True, padx=14, pady=(0, 10))
+        self.preview_text.pack(fill=tk.BOTH, expand=True, padx=14, pady=(0, 8))
         self._register_accessibility(
             "preview_text",
             self.preview_text,
@@ -820,7 +822,7 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         )
 
         export_frame = ttk.LabelFrame(right, text="Sammel-PDF", style="Card.TLabelframe")
-        export_frame.pack(fill=tk.X, padx=14, pady=(0, 10))
+        export_frame.pack(fill=tk.X, padx=14, pady=(0, 8))
         self._register_accessibility(
             "collection_export_frame",
             export_frame,
@@ -831,13 +833,15 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         )
         self.filter_var = tk.StringVar(value="alle")
         self.filter_var.trace_add("write", self._on_collection_filter_changed)
+        collection_controls_row = ttk.Frame(export_frame, style="Toolbar.TFrame")
+        collection_controls_row.pack(fill=tk.X)
         self.collection_filter_buttons = [
-            ttk.Radiobutton(export_frame, text="Alle", variable=self.filter_var, value="alle"),
-            ttk.Radiobutton(export_frame, text="Gelesene", variable=self.filter_var, value="gelesene"),
-            ttk.Radiobutton(export_frame, text="Ungelesene", variable=self.filter_var, value="ungelesene"),
+            ttk.Radiobutton(collection_controls_row, text="Alle", variable=self.filter_var, value="alle"),
+            ttk.Radiobutton(collection_controls_row, text="Gelesene", variable=self.filter_var, value="gelesene"),
+            ttk.Radiobutton(collection_controls_row, text="Ungelesene", variable=self.filter_var, value="ungelesene"),
         ]
         for button in self.collection_filter_buttons:
-            button.pack(side=tk.LEFT, padx=6, pady=6)
+            button.pack(side=tk.LEFT, padx=5, pady=4)
         filter_metadata = (
             ("all_documents", "Alle Dokumente", "Exportiert alle Dokumente des Themas", "radio"),
             ("read_documents", "Gelesene Dokumente", "Beschränkt den Export auf gelesene Dokumente", "radio"),
@@ -846,12 +850,12 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         for (key, name, description, role), button in zip(filter_metadata, self.collection_filter_buttons):
             self._register_accessibility(key, button, name=name, description=description, role=role, focusable=True)
         self.collection_export_button = ttk.Button(
-            export_frame,
+            collection_controls_row,
             text="Sammel-PDF erzeugen",
             command=self.create_collection_pdf,
             style="Accent.TButton",
         )
-        self.collection_export_button.pack(side=tk.RIGHT, padx=6, pady=6)
+        self.collection_export_button.pack(side=tk.RIGHT, padx=5, pady=4)
         self._register_accessibility(
             "collection_export",
             self.collection_export_button,
@@ -865,7 +869,7 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
             text="Wähle zuerst ein Thema mit passenden Dokumenten aus.",
             style="SectionSubtitle.TLabel",
         )
-        self.collection_export_hint_label.pack(anchor="w", padx=8, pady=(0, 8))
+        self.collection_export_hint_label.pack(anchor="w", padx=8, pady=(0, 5))
         self._register_accessibility(
             "collection_export_status",
             self.collection_export_hint_label,
@@ -876,7 +880,7 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         )
 
         library_export_frame = ttk.LabelFrame(right, text="Bibliothek (JSON)", style="Card.TLabelframe")
-        library_export_frame.pack(fill=tk.X, padx=14, pady=(0, 14))
+        library_export_frame.pack(fill=tk.X, padx=14, pady=(0, 8))
         self._register_accessibility(
             "library_export_frame",
             library_export_frame,
@@ -891,7 +895,7 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
             wraplength=340,
             justify="left",
         )
-        self.library_export_desc_label.pack(anchor="w", padx=8, pady=(8, 4))
+        self.library_export_desc_label.pack(anchor="w", padx=8, pady=(5, 3))
         self._register_accessibility(
             "library_export_description",
             self.library_export_desc_label,
@@ -906,7 +910,7 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
             command=self.export_library_json,
             style="Accent.TButton",
         )
-        self.library_export_button.pack(anchor="e", padx=8, pady=(0, 8))
+        self.library_export_button.pack(anchor="e", padx=8, pady=(0, 5))
         self._register_accessibility(
             "library_export",
             self.library_export_button,
@@ -982,10 +986,14 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
                     "gelesene": "gelesenen",
                     "ungelesene": "ungelesenen",
                 }
-                hint = (
-                    f"Exportiert {len(matching_docs)} {filter_labels.get(self.filter_var.get(), 'alle')} "
-                    f"Dokumente aus „{topic}“."
-                )
+                if len(matching_docs) == 1:
+                    hint = f"Exportiert 1 Dokument aus „{topic}“."
+                else:
+                    hint = (
+                        f"Exportiert {len(matching_docs)} "
+                        f"{filter_labels.get(self.filter_var.get(), 'alle')} "
+                        f"Dokumente aus „{topic}“."
+                    )
                 enabled = True
             else:
                 empty_labels = {
@@ -1155,8 +1163,13 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         elif not docs and query:
             self._set_document_state(f"Keine Treffer für „{query}“. Drücke Escape, um die Suche zu leeren.")
         else:
+            visible_count = (
+                "1 Dokument sichtbar"
+                if len(docs) == 1
+                else f"{len(docs)} Dokumente sichtbar"
+            )
             self._set_document_state(
-                f"{len(docs)} Dokumente sichtbar. Enter öffnet die Auswahl, Shift+F10 öffnet Aktionen."
+                f"{visible_count}. Enter öffnet die Auswahl, Shift+F10 öffnet Aktionen."
             )
         self.clear_preview()
         self._update_doc_action_controls()

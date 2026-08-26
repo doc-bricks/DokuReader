@@ -2,7 +2,8 @@
 setlocal
 cd /d "%~dp0"
 
-set "BUILD_ROOT=C:\_Local_DEV\codex_build\dokureader"
+if not defined DOKUREADER_BUILD_ROOT set "DOKUREADER_BUILD_ROOT=%LOCALAPPDATA%\DokuReader\build-cache"
+set "BUILD_ROOT=%DOKUREADER_BUILD_ROOT%"
 set "BUILD_DIR=%BUILD_ROOT%\build"
 set "WORK_DIR=%BUILD_ROOT%\work"
 

@@ -11,7 +11,7 @@
 [![Python: 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python)](pyproject.toml)
 [![UI: Python / Tkinter](https://img.shields.io/badge/GUI-Python%20%2F%20Tkinter-blue)](DokuReader.py)
 [![Platform: Windows | macOS | Linux](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-blue?logo=windows)](#start-here)
-[![Pytest: 45 tests, 0 failed](https://img.shields.io/badge/Pytest-45%20tests%2C%200%20failed-success?logo=pytest)](pyproject.toml)
+[![Pytest: 46 tests, 0 failed](https://img.shields.io/badge/Pytest-46%20tests%2C%200%20failed-success?logo=pytest)](pyproject.toml)
 [![Web Companion: 32 passed](https://img.shields.io/badge/Web%20Companion-32%20passed-success?logo=nodedotjs)](web_companion)
 [![Privacy: 100% Offline](https://img.shields.io/badge/Privacy-100%25%20Offline-success)](PRIVACY_POLICY.md)
 [![Security: Local--First](https://img.shields.io/badge/Security-Local--First-blue)](SECURITY.md)
@@ -188,7 +188,7 @@ For companion export, use the `Bibliothek (JSON)` section on the right side of t
 build_exe.bat
 ```
 
-Build output under `build/`, `dist/`, and `releases/` stays local and does not belong in the Git repository. The build uses a local work directory under `C:\_Local_DEV\codex_build\dokureader` and updates `dist\DokuReader.exe`.
+Build output under `build/`, `dist/`, and `releases/` stays local and does not belong in the Git repository. Set `DOKUREADER_BUILD_ROOT` to choose a local build work directory; the default is below `%LOCALAPPDATA%`. Never publish a machine-specific absolute path. A successful local build updates `dist\DokuReader.exe` but is not itself a release.
 
 ## Windows Store Readiness
 

@@ -1,6 +1,6 @@
 # DokuReader
 
-## Last-checked: 2026-08-24
+## Last-checked: 2026-08-26
 
 
 ## Canonical Links
@@ -66,20 +66,16 @@ DokuReader is not a cloud document manager, hosted OCR platform, general note-ta
 
 ## Test And Validation
 
-- Python tests live under `tests/` (including `test_metadata.py`, `test_release_contract.py`, `test_accessibility_contract.py`, `test_bug_regressions.py`, `test_export_format.py`, `test_store_readiness.py`, `test_windows_wack.py`, `test_store_media.py`, `test_ui_accessibility.py`; 44 collected, 43 passed, 1 skipped, exit 0).
+- Python tests live under `tests/` (including `test_metadata.py`, `test_release_contract.py`, `test_accessibility_contract.py`, `test_bug_regressions.py`, `test_export_format.py`, `test_store_readiness.py`, `test_windows_wack.py`, `test_store_media.py`, `test_ui_accessibility.py`; 46 collected, 46 passed, 0 skipped, 0 failed, exit 0).
 - Web Companion tests live under `web_companion/tests/` (32 Node.js tests verified: 100% green).
-- Suites are counted separately, never summed: Python 45 collected / 0 failed
+- Suites are counted separately, never summed: Python 46 collected / 0 failed
   (exit 0); Web Companion 32 passed / 0 failed (exit 0); `ruff check .` clean
   (exit 0); `python tests/source_platform_smoke.py` OK (exit 0). Measured
-  2026-08-24 on commit df41cf8, Python 3.12.10 on Windows, across fifteen runs.
-- The Python passed count fluctuates between 44 and 45, which is why the badge
-  states collected and failed rather than passed - that phrasing is true in every
-  run. One test in `tests/test_ui_accessibility.py` skipped in four of fifteen runs
-  and ran in eleven.
-- That skip is sporadic, not environmental. Its condition lives in `setUp` and
-  fires when `DokuReader.App()` raises `tk.TclError`. A genuinely broken Tcl would
-  skip every test in that class, not exactly one. Treat a fluctuating count as a
-  flaky fixture, not as two histories.
+  2026-08-26 with Python 3.12.10 on Windows.
+- The former sporadic Tk initialization skip is bounded by at most three setup
+  attempts. Ten independent focused runs produced 60/60 UI test passes without
+  a skip. A real Tk visual smoke captured and reviewed empty, drag-and-drop and
+  text-preview states; receipt: `UI_POLISH_SMOKE.json`.
 - MSIX, WACK, signing and Store gates are external and remain unproven by any of
   these runs.
 - Current focused validation: `python -m pytest -q` and `npm test` in `web_companion`.
@@ -94,8 +90,9 @@ DokuReader is not a cloud document manager, hosted OCR platform, general note-ta
 - Windows Store package metadata: `store_package.json` `1.0.1.0`.
 - No public release, signed MSIX, WACK certification, or Store submission is verified.
 - The metadata-first accessibility contract covers semantic names, roles, states,
-  descriptions, focus order, and read-only preview text; it does not claim
-  screen-reader, visual-runner, or device acceptance.
+  descriptions, focus order, and read-only preview text. A controlled Tk visual
+  smoke covers empty, drag-and-drop and preview layout states; it does not claim
+  screen-reader, keyboard-hardware, or device acceptance.
 
 ## Safety Notes
 

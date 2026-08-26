@@ -1,0 +1,69 @@
+{
+  "schema": "dokureader-ui-polish-smoke-v1",
+  "created_at_utc": "2026-08-26T01:11:29.744285+00:00",
+  "environment": {
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.12.10",
+    "tk": "8.6",
+    "pillow": "12.3.0"
+  },
+  "source": {
+    "DokuReader.py": "7094f5c2d55f6de00a59a7645d2405324950a247c4ace1bc085bdcc36baa7baf",
+    "tests/test_ui_accessibility.py": "5c06028cf503b9bdf6bb34f196e9272246b6b091367240b0667f665dc1d24175",
+    "_WARTUNG/capture_ui_polish_smoke.py": "38cf81589ac9272bc7a754999af02a19bd8b881ff10845987bc5816efdbb18cb"
+  },
+  "fixtures": "synthetic temporary state and UTF-8 text document",
+  "states": {
+    "empty": {
+      "document_state": "Wähle zuerst ein Thema; danach kannst du Dateien hinzufügen oder hierher ziehen.",
+      "preview_state": "Keine Datei ausgewählt.",
+      "screenshot": {
+        "path": "README/screenshots/ui-polish-empty.png",
+        "width": 1416,
+        "height": 879,
+        "bytes": 37897,
+        "sha256": "168d55c4d096f8ae421c67de4aa316018998801d0e3f67b52d39accd25c5338a",
+        "capture_method": "Win32 PrintWindow"
+      }
+    },
+    "drag_drop_without_topic": {
+      "document_state": "Wähle zuerst ein Thema, bevor du Dateien per Drag-and-drop hinzufügst.",
+      "screenshot": {
+        "path": "README/screenshots/ui-polish-drag-drop.png",
+        "width": 1416,
+        "height": 879,
+        "bytes": 37958,
+        "sha256": "d1b49dbc50dc37a159de5aa9b2737a77564d39bda9a8ce2d3e232824c4514a1f",
+        "capture_method": "Win32 PrintWindow"
+      }
+    },
+    "text_preview": {
+      "document_state": "1 Dokument sichtbar. Enter öffnet die Auswahl, Shift+F10 öffnet Aktionen.",
+      "preview_state": "Textvorschau geladen: Beispielnotiz.txt",
+      "preview_read_only": true,
+      "screenshot": {
+        "path": "README/screenshots/main.png",
+        "width": 1416,
+        "height": 879,
+        "bytes": 42599,
+        "sha256": "649456cc98de4ce138f72aac5e3da1a097de039ea7871cada551a154434482ed",
+        "capture_method": "Win32 PrintWindow"
+      }
+    }
+  },
+  "accessibility_registry": {
+    "entries": 26,
+    "names_nonempty": true,
+    "descriptions_nonempty": true
+  },
+  "layout_bounds": {
+    "delete_topic_button_inside_window": true,
+    "library_export_button_inside_window": true,
+    "library_export_frame_mapped": true
+  },
+  "claims": {
+    "visual_layout_smoke": "captured for review",
+    "screen_reader_acceptance": "not run",
+    "keyboard_hardware_acceptance": "not run"
+  }
+}
