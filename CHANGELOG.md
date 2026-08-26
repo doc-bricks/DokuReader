@@ -6,6 +6,11 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 ## [Unreleased]
 
 ### Behoben / Fixed
+- **macOS-/Linux-Runner-Beleg geschlossen (2026-08-26)**:
+  - GitHub Actions Run `32918307130` für Commit `dc226c0` ist auf
+    `macos-latest` und `ubuntu-latest` vollständig grün.
+  - Der Portierungsplan trennt diesen Source-/Smoke-Beleg weiterhin klar von
+    nicht geplanten signierten macOS-/Linux-Paketlinien.
 - **Metadata-first UI-Polish abgeschlossen (2026-08-26)**:
   - Rechte Vorschau-/Exportspalte so verdichtet, dass Sammel-PDF und
     Bibliothek-JSON bei der belegten 1400×840-Ansicht vollständig sichtbar sind.

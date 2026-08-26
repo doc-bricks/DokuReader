@@ -7,7 +7,7 @@ Stand: 2026-08-26
 | Ziel | Belegter Umfang | Gate |
 |---|---|---|
 | Windows/Tkinter | autoritative Desktop-App, lokale JSON-State-Datei, Vorschau und PDF-Export | Python-/Source-Smokes und synthetischer Tk-Visual-Smoke grün; Screenreader separat |
-| macOS/Linux | gleiche Python-Quelle als Source-/Smoke-Ziel | echter Runner-Readback offen |
+| macOS/Linux | gleiche Python-Quelle als Source-/Smoke-Ziel | GitHub Actions Run `32918307130` auf `macos-latest` und `ubuntu-latest` grün; keine eigene Paketlinie |
 | Browser/Android/iOS | `web_companion` als PWA mit `dokureader-library-v1` | `npm test` lokal grün; kein Geräte-/Store-Claim |
 | Windows Store | `store_package.json` 1.0.1.0 und Listing-Dokumente | MSIX, Signierung, WACK und Partner Center offen |
 
@@ -23,7 +23,9 @@ ignorierten lokalen `releases/`-Ordner vermischt werden.
 
 ## Gate-Reihenfolge
 
-1. Python-Regressionen, Source-Smoke und PWA-Node-Smoke lokal prüfen.
+1. Python-Regressionen, Source-Smoke und PWA-Node-Smoke lokal prüfen. Der
+   Remote-Readback für Commit `dc226c0` ist durch GitHub Actions Run
+   `32918307130` auf `macos-latest` und `ubuntu-latest` belegt.
 2. A11y-Metadaten, Zustände, Tastatur-/Fokuspfade und erklärende Leer-/Fehler-
    texte prüfen; erst danach visuelle Detailpolitur bewerten. Für den aktuellen
    Slice belegt durch `UI_POLISH_SMOKE.json` und drei synthetische Zustände.

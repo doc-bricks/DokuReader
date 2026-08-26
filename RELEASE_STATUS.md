@@ -2,7 +2,7 @@
 
 Stand: 2026-08-26
 Baseline-Remote-Readback vor diesem Slice: `master`
-`733fff10ee5633914121678e1ec65cbdb5ba92a2`
+`dc226c0beb2a3072eeef7b31d9adf3b2b3d2d63b`
 
 ## Version roles
 
@@ -52,6 +52,9 @@ hohem Cloud-Lock-Risiko und fremdem Dirty-State weder synchronisiert noch
   unteren/rechten Layoutgrenzen liegen innerhalb des Fensters. Beleg:
   `UI_POLISH_SMOKE.json` und `README/screenshots/ui-polish-*.png`.
 - `python tests/source_platform_smoke.py`: Exit 0.
+- GitHub Actions Run `32918307130` für Commit `dc226c0`: Job
+  `Smoke · macos-latest` grün und Job `Smoke · ubuntu-latest` grün. Das belegt
+  die Source-/Smoke-Linie, aber keine signierten macOS-/Linux-Pakete.
 - `npm test` in `web_companion`: 32/32 grün.
 - `python -m py_compile DokuReader.py manage_translations.py translator.py
   _WARTUNG/check_store_readiness.py _WARTUNG/run_windows_wack.py`: Exit 0.
