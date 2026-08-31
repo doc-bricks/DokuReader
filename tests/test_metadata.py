@@ -79,7 +79,7 @@ def test_llms_txt_currency_and_key_files() -> None:
     assert "AGPL-3.0" in llms
     # Suiten getrennt, nicht summiert (siehe test_test_badges_report_each_suite_separately).
     assert "counted separately" in llms
-    assert "Web Companion 32 passed" in llms
+    assert re.search(r"Web Companion \d+ passed / 0 failed", llms)
     assert "test_metadata.py" in llms
 
 

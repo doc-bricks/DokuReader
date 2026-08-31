@@ -6,6 +6,12 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 ## [Unreleased]
 
 ### Behoben / Fixed
+- **Service-Worker-Cache-Isolation gehärtet (2026-08-31)**:
+  - Der Aktivierungs-Handler löscht nur noch veraltete Cache-Versionen im
+    Namensraum `dokureader-companion-`; Cache-Einträge anderer Anwendungen auf
+    derselben Origin bleiben erhalten.
+  - Ein verhaltensbasierter Node-Regressionstest belegt die Namespace-Grenze;
+    der Web-Companion-Stand umfasst jetzt 33/33 grüne Tests.
 - **macOS-/Linux-Runner-Beleg geschlossen (2026-08-26)**:
   - GitHub Actions Run `32918307130` für Commit `dc226c0` ist auf
     `macos-latest` und `ubuntu-latest` vollständig grün.

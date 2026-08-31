@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import vm from "node:vm";
 
 import { readFileSync, existsSync } from "node:fs";
 
@@ -69,6 +70,40 @@ test("service worker caches the full offline shell", async () => {
     /caches\.match\([^)]*ignoreSearch\s*:\s*true/.test(sw),
     "caches.match muss { ignoreSearch: true } nutzen — Offline-Fail bei ?-URLs"
   );
+});
+
+test("service worker activation preserves caches outside the DokuReader namespace", async () => {
+  const source = await read("sw.js");
+  const handlers = new Map();
+  const deleted = [];
+  const cacheApi = {
+    keys: async () => [
+      "other-app-v1",
+      "dokureader-companion-v5",
+      "dokureader-companion-v6"
+    ],
+    delete: async key => {
+      deleted.push(key);
+      return true;
+    }
+  };
+  const serviceWorker = {
+    addEventListener: (name, handler) => handlers.set(name, handler),
+    skipWaiting: () => {},
+    clients: { claim: () => {} }
+  };
+
+  vm.runInNewContext(source, {
+    self: serviceWorker,
+    caches: cacheApi,
+    Promise
+  });
+
+  let activation;
+  handlers.get("activate")({ waitUntil: promise => { activation = promise; } });
+  await activation;
+
+  assert.deepEqual(deleted, ["dokureader-companion-v5"]);
 });
 
 test("app.js FileReader onerror handler vorhanden (Bug #4)", () => {

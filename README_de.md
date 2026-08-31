@@ -12,7 +12,7 @@
 [![UI: Python / Tkinter](https://img.shields.io/badge/GUI-Python%20%2F%20Tkinter-blue)](DokuReader.py)
 [![Plattform: Windows | macOS | Linux](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-blue?logo=windows)](#einstieg)
 [![Pytest: 46 tests, 0 failed](https://img.shields.io/badge/Pytest-46%20tests%2C%200%20failed-success?logo=pytest)](pyproject.toml)
-[![Web Companion: 32 passed](https://img.shields.io/badge/Web%20Companion-32%20passed-success?logo=nodedotjs)](web_companion)
+[![Web Companion: 33 passed](https://img.shields.io/badge/Web%20Companion-33%20passed-success?logo=nodedotjs)](web_companion)
 [![Datenschutz: 100% Offline](https://img.shields.io/badge/Datenschutz-100%25%20Offline-success)](PRIVACY_POLICY.md)
 [![Sicherheit: Local--First](https://img.shields.io/badge/Sicherheit-Local--First-blue)](SECURITY.md)
 [![LLM-Ready: llms.txt](https://img.shields.io/badge/LLM--Ready-llms.txt-success)](llms.txt)
