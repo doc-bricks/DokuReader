@@ -1,6 +1,6 @@
 # DokuReader — Portierungs- und Gate-Plan
 
-Stand: 2026-08-26
+Stand: 2026-09-09
 
 ## Produkt- und Plattformgrenzen
 
@@ -8,7 +8,7 @@ Stand: 2026-08-26
 |---|---|---|
 | Windows/Tkinter | autoritative Desktop-App, lokale JSON-State-Datei, Vorschau und PDF-Export | Python-/Source-Smokes und synthetischer Tk-Visual-Smoke grün; Screenreader separat |
 | macOS/Linux | gleiche Python-Quelle als Source-/Smoke-Ziel | GitHub Actions Run `32918307130` auf `macos-latest` und `ubuntu-latest` grün; keine eigene Paketlinie |
-| Browser/Android/iOS | `web_companion` als PWA mit `dokureader-library-v1` | `npm test` lokal grün; kein Geräte-/Store-Claim |
+| Browser/Android/iOS | `web_companion` als PWA mit `dokureader-library-v1` | `npm test` lokal grün, `PWA_TESTPLAN.md` & `sample_library.json` bereitgestellt (`SNW-DOKUREADER-02`); echter Gerätelauf `TW-DOKUREADER-02` offen |
 | Windows Store | `store_package.json` 1.0.1.0 und Listing-Dokumente | MSIX, Signierung, WACK und Partner Center offen |
 
 ## Versionsentscheidung

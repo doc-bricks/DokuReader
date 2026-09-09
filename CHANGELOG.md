@@ -5,6 +5,12 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+### Hinzugefügt / Added
+- **PWA-Gerätesmoke-Testplan und sichere Testbibliothek bereitgestellt (2026-09-09, SNW-DOKUREADER-02)**:
+  - `web_companion/PWA_TESTPLAN.md` fixiert die verbindliche Testmatrix für Android (Chrome) und iOS (Safari), definierte Viewports (412×915 px und 393×852 px mit Safe-Area-Insets), Offline-Kriterien sowie die Screenshot-Ablagestruktur für das Folgegate `TW-DOKUREADER-02`.
+  - `web_companion/sample_library.json` stellt eine standardisierte, datenschutzsichere synthetische Referenzbibliothek (3 Themen, 7 Dokumente, 1 fehlend) im `dokureader-library-v1`-Format bereit.
+  - Node-Testsuite in `web_companion/tests/pwa_mobile_smoke.test.mjs` um automatisierte Schema- und Testplan-Prüfungen erweitert (35/35 Node-Tests bestanden).
+
 ### Behoben / Fixed
 - **Service-Worker-Cache-Isolation gehärtet (2026-08-31)**:
   - Der Aktivierungs-Handler löscht nur noch veraltete Cache-Versionen im
