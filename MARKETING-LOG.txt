@@ -1,0 +1,160 @@
+================================================================================
+DokuReader -- Marketing, Discoverability & Architecture Audit (Pfad B)
+================================================================================
+Datum: 2026-09-11
+Status: ACTIVE / HARDENED (Pfad B Discoverability & Architecture Verified)
+Repository: https://github.com/doc-bricks/DokuReader
+Organization: doc-bricks | Umbrella Ecosystem: open-bricks
+Canonical Clone: C:\_Local_DEV\repos\REL-PUB_DokuReader-tasksolver-1084-1085
+Active Version: 1.0.1-dev (Runtime: 1.0.1-dev, Python: 1.0.1.dev0, Store: 1.0.1.0)
+License: GNU Affero General Public License v3.0 (AGPL-3.0)
+
+--------------------------------------------------------------------------------
+1. EXECUTIVE SUMMARY & CORE POSITIONING
+--------------------------------------------------------------------------------
+DokuReader is an unprivileged, local-first desktop document library manager and
+topic-based PDF bundling application engineered for privacy-conscious knowledge
+workers, researchers, legal tech analysts, and autonomous AI coding agents.
+
+Key Value Proposition:
+- Original files stay strictly in-place (INV-INPLACE-03): original documents are
+  never copied, moved, modified, or overwritten; only references and read states
+  are indexed.
+- 100% Offline & Zero Network Egress (INV-LOCAL-01): zero external server calls,
+  no telemetry, no analytics, and no cloud dependencies.
+- Dual Export Architecture: produces versioned, machine-readable
+  dokureader-library-v1 JSON metadata exports and consolidated merged PDF bundles
+  filtered deterministically by read/unread status.
+- Mobile PWA Companion: provides an offline-first, installable Web companion
+  (web_companion/) for browsing libraries and toggling read status on mobile
+  devices without native app store friction.
+- Unprivileged Execution (INV-RUNAS-02): operates purely in user mode under
+  RunAsInvoker principles without requiring administrative elevation.
+
+--------------------------------------------------------------------------------
+2. TARGET AUDIENCES & 4 CORE PERSONAS
+--------------------------------------------------------------------------------
+1. Legal Tech & Compliance Analysts:
+   Corporate counsel, compliance auditors, and legal tech professionals managing
+   sensitive discovery documents, contracts, and regulatory filings that legally
+   prohibit cloud upload under GDPR, HIPAA, or strict confidentiality mandates.
+
+2. Academic Researchers & Literature Curators:
+   Scholars, scientists, and PhD candidates organizing thousands of journal preprints,
+   conference papers, and technical whitepapers into thematic reading queues without
+   altering existing directory hierarchies or syncing to proprietary cloud vaults.
+
+3. Offline-First Knowledge Workers & Privacy Advocates:
+   Engineers, journalists, investigative reporters, and privacy officers who demand
+   deterministic desktop reading utilities with zero network egress, transparent local
+   JSON state files (~/.dokubibliothek_state.json), and unprivileged execution.
+
+4. AI Desktop Application Developers & Coding Agents:
+   Autonomous coding agents (Claude Code, Gemini/Antigravity, Codex CLI) and tool
+   builders leveraging structured dokureader-library-v1.json schemas for downstream
+   document processing, automated triage, and metadata extraction.
+
+--------------------------------------------------------------------------------
+3. HIGH-INTENT SEARCH PHRASES & DISCOVERABILITY KEYWORDS
+--------------------------------------------------------------------------------
+Primary Canonical Identifier:
+  doc-bricks/DokuReader
+
+English High-Intent Query Phrases:
+- local first document library desktop app
+- topic based PDF organizer offline
+- document read status tracker Tkinter
+- metadata only document export JSON
+- offline PDF bundling desktop application
+- private reading queue document manager
+- local document manager originals stay in place
+- zero egress PDF viewer and bundler
+- dokureader library v1 schema export
+- open source desktop document reader AGPL
+
+German High-Intent Query Phrases:
+- lokale Dokumentenbibliothek Desktop Anwendung
+- themenbasierter PDF Organizer offline
+- Dokument Lesestatus Tracker Tkinter Python
+- reine Metadaten Dokumenten Export JSON
+- offline PDF Sammelmappe erstellen
+- private Leseablage Dokumente organisieren
+- Originale bleiben unveraendert Dokumentenverwaltung
+- DSGVO-konforme Offline PDF Verwaltung ohne Cloud
+- dokureader library v1 JSON Schema
+- Open Source Dokumentenleser AGPL-3.0
+
+--------------------------------------------------------------------------------
+4. 4-WAY COMPETITIVE MATRIX
+--------------------------------------------------------------------------------
+| Dimension | DokuReader | Cloud Document SaaS (Notion/GDrive) | Heavy PDF Suites (Acrobat Pro) | Raw CLI Tools (Poppler/Pandoc) |
+|:---|:---|:---|:---|:---|
+| **Egress / Privacy** | 100% Local-First / Zero-Egress | Mandatory Cloud Upload | Proprietary Cloud Telemetry | 100% Local / Offline |
+| **Original File Safety** | In-place reference only | Moved or synced to cloud | Direct write to original files | Manual file management |
+| **Topic Organization** | Dynamic non-destructive tagging | Folder/database hierarchy | Document-by-document | Directory hierarchy only |
+| **Read Status Tracking** | Built-in read/unread queues | Manual checklist columns | None / Bookmark only | None |
+| **Multi-Format Export** | Consolidated PDF + Clean JSON | Proprietary export | Proprietary PDF binder | Custom Bash/Python scripts |
+| **Mobile Companion** | Zero-egress offline PWA | Mobile app with cloud account | Heavy mobile app | None |
+| **Privilege Posture** | Standard user mode (RunAsInvoker) | N/A (Web/App) | System-level background daemons | User mode |
+| **License & Freedom** | Open Source (AGPL-3.0) | Proprietary Subscription | Expensive Commercial License | Mixed Open Source |
+
+--------------------------------------------------------------------------------
+5. SIBLING ECOSYSTEM & CROSS-LINKING MATRIX
+--------------------------------------------------------------------------------
+The project is tightly integrated into the doc-bricks, file-bricks, dev-bricks,
+and open-bricks desktop ecosystem:
+
+1.  doc-bricks/LitZentrum           -- Academic citation and literature library manager
+2.  doc-bricks/CleanMarkdown        -- Minimalist Markdown reader and typography cleaner
+3.  doc-bricks/UniversalDocsGrabber -- Automated mail attachment extraction and triage
+4.  doc-bricks/UniversalInvoiceMail -- Deterministic invoice attachment extraction
+5.  doc-bricks/UniversalMailCleaner -- Local mail archive cleaning and deduplication
+6.  doc-bricks/MailProcessor        -- Rule-based local mail routing and document triage
+7.  doc-bricks/PDFtoPDFocr          -- Searchable sandwich PDF creation with local OCR
+8.  doc-bricks/MediaBrain           -- Visual media asset tagging and metadata indexing
+9.  doc-bricks/DokuZen              -- Distraction-free zen document inspection environment
+10. file-bricks/ExplorerPro         -- High-performance multi-pane desktop file manager
+11. file-bricks/ProFiler            -- Deep directory inspector and structural profiler
+12. file-bricks/CloudLockFixer      -- Multi-host cloud synchronization conflict resolver
+13. dev-bricks/DevCenter            -- Central developer dashboard and workspace manager
+14. dev-bricks/CodeBox              -- Offline-first code snippet vault with syntax highlighting
+15. open-bricks/open-bricks         -- Umbrella open-source standards organization
+
+--------------------------------------------------------------------------------
+6. GOVERNANCE & RUNTIME INVARIANTS (10 GUARANTEES)
+--------------------------------------------------------------------------------
+INV-LOCAL-01:  100% Local-First & Zero Network Egress
+INV-RUNAS-02:  Unprivileged Execution / RunAsInvoker Non-Elevation
+INV-INPLACE-03: In-Place Original File Safety (Read-Only Access)
+INV-SCHEMA-04: Deterministic Export Schema (dokureader-library-v1)
+INV-ISOLATION-05: Local State & Cache Isolation (~/.dokubibliothek_state.json)
+INV-SANDBOX-06: Safe Subprocess Execution (Bounded Arguments & Timeouts)
+INV-PARITY-07: Tri-Platform Source Support (Windows, macOS, Linux)
+INV-A11Y-08:   Keyboard & Visual Accessibility (Deterministic UI States)
+INV-DISCOVERY-09: Multimodal Transparency & LLM Ready (Dual Mermaid & llms.txt)
+INV-SLA-10:    48h Security Response & 5-Day Triage SLA
+
+--------------------------------------------------------------------------------
+7. VERIFICATION & METADATA AUDIT CHECKLIST & HISTORY
+--------------------------------------------------------------------------------
+Audit 2026-08-20 (Pfad B Initial Baseline):
+[x] Bilingual Landing Pages (README.md and README_de.md) with language switcher
+[x] Shields.io Badges for Version, Platform, Licenses, Python, Ecosystem
+[x] System architecture diagram and sequence diagram
+[x] Export format specification (EXPORTFORMAT.md)
+[x] Test suites separated (Pytest vs Web Companion)
+
+Audit 2026-09-11 (Pfad B Discoverability, 15-Point Navigation & Parity Upgrade):
+[x] 15-Point Quick Navigation in English and German with 100% working anchor links
+[x] Shields.io Badges expanded: Security SLA (48h/5d), RunAsInvoker, Third-Party
+    Licenses Audited, Marketing Log Active, Audit Date
+[x] Interactive Dual Mermaid Diagrams (flowchart TD Architecture & sequenceDiagram Lifecycle)
+[x] 10 Governance & Runtime Invariants Matrix (INV-LOCAL-01 to INV-SLA-10)
+[x] 4 Target Personas and 4-way competitive matrix documented
+[x] Third-Party Licenses Inventory (THIRD_PARTY_LICENSES.md) with 100% permissive audit
+[x] Extended PEP 621 project URLs in pyproject.toml
+[x] SECURITY.md updated with 48h acknowledgement / 5d triage SLA and official contacts
+[x] CI Workflow hardened with concurrency group and whole-repo compileall check
+[x] llms.txt updated with Last-checked: 2026-09-11 and verified test suite counts
+[x] Automated contract test suite in tests/test_metadata.py verifying all policies
+================================================================================

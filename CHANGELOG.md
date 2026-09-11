@@ -6,6 +6,19 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 ## [Unreleased]
 
 ### Hinzugefügt / Added
+- **Pfad B Discoverability, Marketing & 15-Punkte-Navigations-Upgrade (2026-09-11)**:
+  - Standardisierte 15-Punkte-Schnellnavigation in `README.md` und `README_de.md` mit 100% funktionierender Ankerparität implementiert.
+  - Erweiterte Shields.io Badges integriert: Security SLA (48h/5d), RunAsInvoker Non-Elevation, Drittanbieter-Lizenzen geprüft, Marketing Log aktiv, Audit 2026-09-11.
+  - Interaktive Dual-Mermaid-Diagramme (Systemarchitektur-Flussdiagramm & Dokumenten-Lebenszyklus-Sequenz) mit Isolationsebenen und Invarianten-Referenzen hinzugefügt.
+  - Verbindliche Matrix der 10 Governance- und Laufzeit-Invarianten (INV-LOCAL-01 bis INV-SLA-10) in beiden READMEs verankert.
+  - Umfassendes Drittanbieter-Lizenzinventar `THIRD_PARTY_LICENSES.md` mit vollständigem Abhängigkeits-Audit und Unprivilegiertheits-Nachweisen erstellt.
+  - Zentrales Pfad B Marketing-Dossier `MARKETING-LOG.txt` mit 4 Zielgruppen-Personas, zweisprachigen Suchphrasen, 4-Wege-Vergleichsmatrix und Audit-Historie aufgesetzt.
+  - `pyproject.toml` um standardisierte PEP 621 URLs (`Documentation`, `Changelog`, `Security`, `Third-Party Licenses`, `Marketing Log`, `LLM Context`, `Parent Organization`, `Umbrella Ecosystem`) erweitert.
+  - `SECURITY.md` um verbindliche 48h-Erstreaktionszeit, 5-Tage-Triage-SLA und RunAsInvoker-Unprivilegiertheits-Zusicherung ergänzt.
+  - CI-Workflow `.github/workflows/source-platform-smoke.yml` um `concurrency`-Absicherung und Bytecode-Kompilierung (`compileall`) gehärtet.
+  - `llms.txt` auf Stand 2026-09-11 mit aktuellen Testdaten (46 Pytest, 35 Web Companion) aktualisiert.
+  - Vertragstestsuite `tests/test_metadata.py` um umfassende Validierungen aller neuen Pfad B Artefakte und Invarianten erweitert.
+
 - **PWA-Gerätesmoke-Testplan und sichere Testbibliothek bereitgestellt (2026-09-09, SNW-DOKUREADER-02)**:
   - `web_companion/PWA_TESTPLAN.md` fixiert die verbindliche Testmatrix für Android (Chrome) und iOS (Safari), definierte Viewports (412×915 px und 393×852 px mit Safe-Area-Insets), Offline-Kriterien sowie die Screenshot-Ablagestruktur für das Folgegate `TW-DOKUREADER-02`.
   - `web_companion/sample_library.json` stellt eine standardisierte, datenschutzsichere synthetische Referenzbibliothek (3 Themen, 7 Dokumente, 1 fehlend) im `dokureader-library-v1`-Format bereit.
