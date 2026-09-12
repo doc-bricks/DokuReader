@@ -11,7 +11,7 @@
 [![Python: 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python)](pyproject.toml)
 [![UI: Python / Tkinter](https://img.shields.io/badge/GUI-Python%20%2F%20Tkinter-blue)](DokuReader.py)
 [![Platform: Windows | macOS | Linux](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-blue?logo=windows)](#getting-started--installation)
-[![Pytest: 52 tests, 0 failed](https://img.shields.io/badge/Pytest-52%20tests%2C%200%20failed-success?logo=pytest)](pyproject.toml)
+[![Pytest: 56 tests, 0 failed](https://img.shields.io/badge/Pytest-56%20tests%2C%200%20failed-success?logo=pytest)](pyproject.toml)
 [![Web Companion: 35 passed](https://img.shields.io/badge/Web%20Companion-35%20passed-success?logo=nodedotjs)](web_companion)
 [![Privacy: 100% Offline](https://img.shields.io/badge/Privacy-100%25%20Offline-success)](PRIVACY_POLICY.md)
 [![Security: Local--First](https://img.shields.io/badge/Security-Local--First-blue)](SECURITY.md)
@@ -320,7 +320,7 @@ DokuReader is a core component of the **doc-bricks** family under the **open-bri
 Continuous quality is assured through independent, automated verification gates:
 
 ```bash
-# Run Python unit and metadata contract tests (52 tests)
+# Run Python unit and metadata contract tests (56 tests)
 pytest
 
 # Run static analysis and lint checks

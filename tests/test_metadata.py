@@ -205,3 +205,52 @@ def test_changelog_unreleased_entries() -> None:
     assert "2026-08-20" in changelog
     assert "2026-09-11" in changelog
     assert "Discoverability" in changelog or "Sichtbarkeit" in changelog
+
+
+def test_ci_matrix_workflow() -> None:
+    '''Prüft den vollwertigen Multi-OS CI-Matrix Workflow.'''
+    ci_yaml = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+    assert "name: CI" in ci_yaml
+    assert "concurrency:" in ci_yaml
+    assert "cancel-in-progress: true" in ci_yaml
+    assert "contents: read" in ci_yaml
+    assert "ubuntu-latest" in ci_yaml
+    assert "windows-latest" in ci_yaml
+    assert "macos-latest" in ci_yaml
+    for py_ver in ("3.10", "3.11", "3.12", "3.13"):
+        assert py_ver in ci_yaml
+    assert "python3-tk" in ci_yaml
+    assert "xvfb" in ci_yaml
+    assert "compileall" in ci_yaml
+    assert "ruff check ." in ci_yaml
+    assert "web-companion" in ci_yaml
+
+
+def test_pep621_classifiers_and_keywords() -> None:
+    '''Prüft PEP 621 Metadaten, Keywords und Python 3.13 Classifier.'''
+    pyproj = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
+    assert 'requires = ["setuptools>=77.0"]' in pyproj
+    assert 'license-files = ["LICENSE"]' in pyproj
+    assert "keywords = [" in pyproj
+    assert '"desktop-app"' in pyproj
+    assert '"local-first"' in pyproj
+    assert '"Programming Language :: Python :: 3.13"' in pyproj
+
+
+def test_ruff_configuration() -> None:
+    '''Prüft die formale Ruff-Linter-Konfiguration.'''
+    pyproj = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
+    assert "[tool.ruff]" in pyproj
+    assert "line-length = 100" in pyproj
+    assert 'target-version = "py310"' in pyproj
+    assert "[tool.ruff.lint]" in pyproj
+
+
+def test_gitignore_multihost_conflict_hardening() -> None:
+    '''Prüft den Schutz gegen Multi-Host-Synchronisationskonflikte in .gitignore.'''
+    gi = (ROOT / ".gitignore").read_text(encoding="utf-8")
+    assert "*conflicted copy*" in gi
+    assert "*-WORKSTATION*" in gi
+    assert "*-ASUS*" in gi
+    assert "* (kopie)*" in gi
+    assert "*.orig" in gi

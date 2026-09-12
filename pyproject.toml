@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=77.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -11,7 +11,24 @@ authors = [
     { name = "doc-bricks Team" }
 ]
 license = { text = "AGPL-3.0" }
+license-files = ["LICENSE"]
 requires-python = ">=3.10"
+keywords = [
+    "desktop-app",
+    "document-management",
+    "library",
+    "pdf",
+    "pdf-export",
+    "python",
+    "tkinter",
+    "document-library",
+    "document-preview",
+    "file-management",
+    "local-first",
+    "offline-first",
+    "privacy-first",
+    "windows",
+]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Environment :: Win32 (MS Windows)",
@@ -25,6 +42,7 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Office/Business",
     "Topic :: Utilities",
 ]
@@ -52,3 +70,11 @@ testpaths = [
     "tests",
 ]
 pythonpath = ["."]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W"]
+ignore = ["E501"]

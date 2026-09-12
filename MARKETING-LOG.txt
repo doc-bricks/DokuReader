@@ -157,4 +157,12 @@ Audit 2026-09-11 (Pfad B Discoverability, 15-Point Navigation & Parity Upgrade):
 [x] CI Workflow hardened with concurrency group and whole-repo compileall check
 [x] llms.txt updated with Last-checked: 2026-09-11 and verified test suite counts
 [x] Automated contract test suite in tests/test_metadata.py verifying all policies
+
+Audit 2026-09-12 (Pfad A Repository-Hygiene, CI-Matrix-Härtung & PEP 621 Metadaten):
+[x] Full CI matrix workflow (.github/workflows/ci.yml) across Windows, Ubuntu, macOS and Python 3.10-3.13
+[x] Automated Web Companion node:test runner integrated in CI
+[x] PEP 621 metadata extended with keywords, Python 3.13 classifier, and build-system modernizer
+[x] [tool.ruff] linting configuration formalized in pyproject.toml
+[x] .gitignore hardened against multi-host conflict files (*conflicted copy*, *(kopie)*, etc.)
+[x] Automated contract test expansion in tests/test_metadata.py (56 Pytest, 35 Web Companion)
 ================================================================================

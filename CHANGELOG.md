@@ -6,6 +6,13 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 ## [Unreleased]
 
 ### Hinzugefügt / Added
+- **Pfad A Repository-Hygiene, CI-Matrix-Härtung & PEP 621 Metadaten (2026-09-12)**:
+  - Vollständigen 3-OS-CI-Matrix-Workflow `.github/workflows/ci.yml` für Windows, Linux und macOS über Python 3.10 bis 3.13 inklusive Web-Companion Node-Testrunner und Xvfb-Absicherung eingerichtet.
+  - PEP 621 Metadaten in `pyproject.toml` mit standardisierten `keywords`, Python 3.13 Classifier, `license-files` und modernisiertem Build-System (`setuptools>=77.0`) geschärft.
+  - Formale `[tool.ruff]` Linter-Konfiguration in `pyproject.toml` (Line Length 100, Target Python 3.10) verankert — 100% sauberer Linter-Pass.
+  - `.gitignore` gegen Multi-Host-Synchronisationskonflikte (`*conflicted copy*`, `*(kopie)*`, `*-WORKSTATION*`, etc.) gehärtet.
+  - Vertragstestsuite `tests/test_metadata.py` um 4 neue Contract-Tests für CI-Matrix, PEP 621 Keywords/Classifier, Ruff-Konfiguration und Gitignore-Hygiene erweitert (56 Pytest Tests, 100% bestanden).
+
 - **Pfad B Discoverability, Marketing & 15-Punkte-Navigations-Upgrade (2026-09-11)**:
   - Standardisierte 15-Punkte-Schnellnavigation in `README.md` und `README_de.md` mit 100% funktionierender Ankerparität implementiert.
   - Erweiterte Shields.io Badges integriert: Security SLA (48h/5d), RunAsInvoker Non-Elevation, Drittanbieter-Lizenzen geprüft, Marketing Log aktiv, Audit 2026-09-11.
