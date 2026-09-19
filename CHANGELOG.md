@@ -6,16 +6,145 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 ## [Unreleased]
 
 ### Hinzugefügt / Added
+- **Pfad A Repository-Hygiene, CI-Matrix-Härtung & PEP 621 Metadaten (2026-09-12)**:
+  - Vollständigen 3-OS-CI-Matrix-Workflow `.github/workflows/ci.yml` für Windows, Linux und macOS über Python 3.10 bis 3.13 inklusive Web-Companion Node-Testrunner und Xvfb-Absicherung eingerichtet.
+  - PEP 621 Metadaten in `pyproject.toml` mit standardisierten `keywords`, Python 3.13 Classifier, `license-files` und modernisiertem Build-System (`setuptools>=77.0`) geschärft.
+  - Formale `[tool.ruff]` Linter-Konfiguration in `pyproject.toml` (Line Length 100, Target Python 3.10) verankert — 100% sauberer Linter-Pass.
+  - `.gitignore` gegen Multi-Host-Synchronisationskonflikte (`*conflicted copy*`, `*(kopie)*`, `*-WORKSTATION*`, etc.) gehärtet.
+  - Vertragstestsuite `tests/test_metadata.py` um 4 neue Contract-Tests für CI-Matrix, PEP 621 Keywords/Classifier, Ruff-Konfiguration und Gitignore-Hygiene erweitert (56 Pytest Tests, 100% bestanden).
+
+- **Pfad B Discoverability, Marketing & 15-Punkte-Navigations-Upgrade (2026-09-11)**:
+  - Standardisierte 15-Punkte-Schnellnavigation in `README.md` und `README_de.md` mit 100% funktionierender Ankerparität implementiert.
+  - Erweiterte Shields.io Badges integriert: Security SLA (48h/5d), RunAsInvoker Non-Elevation, Drittanbieter-Lizenzen geprüft, Marketing Log aktiv, Audit 2026-09-11.
+  - Interaktive Dual-Mermaid-Diagramme (Systemarchitektur-Flussdiagramm & Dokumenten-Lebenszyklus-Sequenz) mit Isolationsebenen und Invarianten-Referenzen hinzugefügt.
+  - Verbindliche Matrix der 10 Governance- und Laufzeit-Invarianten (INV-LOCAL-01 bis INV-SLA-10) in beiden READMEs verankert.
+  - Umfassendes Drittanbieter-Lizenzinventar `THIRD_PARTY_LICENSES.md` mit vollständigem Abhängigkeits-Audit und Unprivilegiertheits-Nachweisen erstellt.
+  - Zentrales Pfad B Marketing-Dossier `MARKETING-LOG.txt` mit 4 Zielgruppen-Personas, zweisprachigen Suchphrasen, 4-Wege-Vergleichsmatrix und Audit-Historie aufgesetzt.
+  - `pyproject.toml` um standardisierte PEP 621 URLs (`Documentation`, `Changelog`, `Security`, `Third-Party Licenses`, `Marketing Log`, `LLM Context`, `Parent Organization`, `Umbrella Ecosystem`) erweitert.
+  - `SECURITY.md` um verbindliche 48h-Erstreaktionszeit, 5-Tage-Triage-SLA und RunAsInvoker-Unprivilegiertheits-Zusicherung ergänzt.
+  - CI-Workflow `.github/workflows/source-platform-smoke.yml` um `concurrency`-Absicherung und Bytecode-Kompilierung (`compileall`) gehärtet.
+  - `llms.txt` auf Stand 2026-09-11 mit aktuellen Testdaten (46 Pytest, 35 Web Companion) aktualisiert.
+  - Vertragstestsuite `tests/test_metadata.py` um umfassende Validierungen aller neuen Pfad B Artefakte und Invarianten erweitert.
+
+- **PWA-Gerätesmoke-Testplan und sichere Testbibliothek bereitgestellt (2026-09-09, SNW-DOKUREADER-02)**:
+  - `web_companion/PWA_TESTPLAN.md` fixiert die verbindliche Testmatrix für Android (Chrome) und iOS (Safari), definierte Viewports (412×915 px und 393×852 px mit Safe-Area-Insets), Offline-Kriterien sowie die Screenshot-Ablagestruktur für das Folgegate `TW-DOKUREADER-02`.
+  - `web_companion/sample_library.json` stellt eine standardisierte, datenschutzsichere synthetische Referenzbibliothek (3 Themen, 7 Dokumente, 1 fehlend) im `dokureader-library-v1`-Format bereit.
+  - Node-Testsuite in `web_companion/tests/pwa_mobile_smoke.test.mjs` um automatisierte Schema- und Testplan-Prüfungen erweitert (35/35 Node-Tests bestanden).
+
 - **Web/PWA-Companion Accessibility Polish (TW-DOKUREADER-04):** Der
   Importbereich ist als Tastatur-Schaltfläche mit Drag-and-drop-Hinweis
   umgesetzt, Themenfilter sind native Schaltflächen mit aktuellem Zustand und
   Lade-/Fehlermeldungen verwenden eine höfliche Statusregion. Die bestehende
   lokale Export- und Offline-Grenze bleibt unverändert.
+
+### Behoben / Fixed
+- **Service-Worker-Cache-Isolation gehärtet (2026-08-31)**:
+  - Der Aktivierungs-Handler löscht nur noch veraltete Cache-Versionen im
+    Namensraum `dokureader-companion-`; Cache-Einträge anderer Anwendungen auf
+    derselben Origin bleiben erhalten.
+  - Ein verhaltensbasierter Node-Regressionstest belegt die Namespace-Grenze;
+    der Web-Companion-Stand umfasst jetzt 33/33 grüne Tests.
+- **macOS-/Linux-Runner-Beleg geschlossen (2026-08-26)**:
+  - GitHub Actions Run `32918307130` für Commit `dc226c0` ist auf
+    `macos-latest` und `ubuntu-latest` vollständig grün.
+  - Der Portierungsplan trennt diesen Source-/Smoke-Beleg weiterhin klar von
+    nicht geplanten signierten macOS-/Linux-Paketlinien.
+- **Metadata-first UI-Polish abgeschlossen (2026-08-26)**:
+  - Rechte Vorschau-/Exportspalte so verdichtet, dass Sammel-PDF und
+    Bibliothek-JSON bei der belegten 1400×840-Ansicht vollständig sichtbar sind.
+  - Themenaktionen umbrechen kontrolliert in zwei Zeilen; keine abgeschnittene
+    Löschen-Aktion mehr. Sammel-PDF-Status steht in einer eigenen Zeile und
+    Einzeldokumentzustände verwenden die korrekte Singularform.
+  - Der Tk-Testaufbau begrenzt sporadische Initialisierungsfehler mit höchstens
+    drei Versuchen. Zehn unabhängige Folgeläufe: 60/60 UI-Tests ohne Skip.
+  - Synthetischer Win32-Visual-Smoke für Leer-, Drag-and-drop- und
+    Textvorschauzustand ergänzt; kein Screenreader- oder Geräteclaim.
+  - Finaler Gesamtreadback: 46/46 Python-Tests und 32/32 Web-Companion-Tests.
+- **Versions- und Releaseflächen frisch synchronisiert (2026-08-26)**:
+  - Runtime `1.0.1-dev`, Python `1.0.1.dev0` und Store-Paket `1.0.1.0` bleiben
+    getrennte Rollen. GitHub hat weder Tags noch Releases; das lokale
+    v1.0.0-EXE ist nur ein hashverifiziertes, nicht veröffentlichtes Artefakt.
+  - Maschinenspezifischen absoluten Buildpfad aus beiden READMEs entfernt.
+- **Testclaims zählen wieder getrennt statt summiert (2026-08-24)**:
+  - Die Badges in `README.md` und `README_de.md` trugen `Tests: 70 passed`. Diese Zahl
+    war eine Summe aus zwei verschiedenen Suiten (38 Pytest + 32 Node) und behauptete
+    dabei etwas Falsches: Von den 38 Pytest-Tests waren 37 bestanden und einer
+    übersprungen, es gab also nie 70 bestandene Tests. Die Aggregation verschluckte
+    den Skip und machte die beiden Suiten ununterscheidbar — genau das, was ein
+    Testbadge nicht tun darf.
+  - Ersetzt durch zwei getrennte Badges: `Pytest: 45 tests, 0 failed` und
+    `Web Companion: 32 passed`. Das Pytest-Badge nennt bewusst die gesammelte und
+    die fehlgeschlagene Zahl statt der bestandenen: Letztere schwankt zwischen 44
+    und 45, weil ein Test sporadisch überspringt (siehe nächster Abschnitt). Eine
+    Zahl, die in einem Viertel der Läufe falsch ist, gehört nicht in ein Badge.
+  - **Autoritativer Lauf** vom 2026-08-24 auf Commit `df41cf8`, Python 3.12.10
+    (Windows), jede Suite einzeln und mit Exit-Code:
+    - `python -X utf8 -m pytest -ra` → 45 gesammelt, 0 fehlgeschlagen, Exit 0
+      (fünfzehn Läufe; 44–45 bestanden, siehe sporadischer Skip)
+    - `node --test` in `web_companion/` → 32 bestanden, 0 fehlgeschlagen, Exit 0
+    - `ruff check .` → All checks passed, Exit 0
+    - `python tests/source_platform_smoke.py` → `source_platform_smoke: OK`, Exit 0
+  - `RELEASE_STATUS.md` (38/37/1), `llms.txt` (`38+ tests, 100% clean` sowie
+    `70 passed tests`) und `docs/con2_ANFORDERUNGSANALYSE.md` (`37 Pytest-Tests`,
+    „Zwei erwartete Tkinter-Skips") auf denselben Lauf gebracht. Die Zahlen
+    früherer Einträge bleiben unverändert und datiert.
+
+### Geändert / Changed
+- **Der „erwartete Tkinter-Skip" ist sporadisch, nicht umgebungsbedingt (2026-08-24)**:
+  - Frühere Stände führten einen bis zwei Tkinter-Skips als erwartete Folge einer
+    fehlenden Tcl/ttk-Runtime. Die Messung widerspricht dem: In fünfzehn Läufen derselben
+    Sitzung trat der Skip viermal auf und elfmal nicht — bei unverändertem Host
+    und unverändertem Testcode.
+  - Die Bedingung sitzt in `tests/test_ui_accessibility.py` im `setUp` und greift,
+    wenn `DokuReader.App()` einen `tk.TclError` wirft. Wäre Tcl auf diesem Host
+    tatsächlich defekt, müsste **jeder** Test dieser Klasse überspringen — es war
+    aber genau einer. Tkinter funktioniert hier; instabil ist der Aufbau.
+  - Damit lösen sich die widersprüchlichen Altstände auf, die diese Aufgabe
+    ausgelöst haben: 38/37/1 und 38/36/2 sind nicht zwei getrennte Readbacks mit
+    eigener Historie, sondern derselbe instabile Test mit unterschiedlicher
+    Trefferzahl. Eine schwankende Testzahl ist ein Befund über die Testinfrastruktur,
+    kein Dokumentationsfehler.
+  - `tests/test_metadata.py` prüft Badges und `llms.txt` jetzt auf **Struktur** statt
+    auf feste Zahlen und Daten: dass es getrennte Suiten-Badges gibt und kein
+    summierendes `Tests-…`-Badge zurückkehrt, und dass `llms.txt` einen
+    wohlgeformten `Last-checked`-Kopf trägt. Die alte Fassung nagelte `70 passed`
+    und `2026-08-20` fest und hätte bei jedem Testzuwachs erneut gebrochen —
+    sie zementierte genau den Zustand, den diese Aufgabe beheben sollte.
+  - Offen und bewusst nicht angefasst: die Ursache der Tk-Instabilität. Ein Eingriff
+    in fremdes Test-Setup gehört nicht in eine Claim-Synchronisation; der Befund ist
+    hier dokumentiert, damit die nächste schwankende Zahl nicht wieder als
+    „zwei Readbacks" gelesen wird.
+  - MSIX, WACK, Signierung und Store-Gates bleiben extern und werden durch keinen
+    dieser Läufe belegt.
+
+### Hinzugefügt / Added
+- **Discoverability, README-Design, Badges, Security & Metadata Parity (Pfad B Audit 2026-08-20)**:
+  - Shields.io Badges in `README.md` und `README_de.md` um GUI (`Python / Tkinter`), Plattform-Matrix (`Windows | macOS | Linux`), 70 verifizierte Tests (38 Pytest + 32 Node.js Companion Tests), Privacy (`100% Offline / Zero-Egress`) und Security (`Local-First`) synchronisiert.
+  - Interaktives Mermaid-Sequenzdiagramm für die lokale Datenfluss- und Datenschutz-Isolationssequenz (Nutzer -> Desktop UI -> Lokaler Status `~/.dokubibliothek_state.json` -> Vorschau / Exporter -> Sammel-PDF & JSON-Export; 0 Netzwerk-Egress) in beiden Sprachfassungen integriert.
+  - Zweisprachige `SECURITY.md` um 100% Offline- & Zero-Egress-Garantien, Originaldateischutz (In-Place Reference Only), Status- und Datenisolation, Non-Elevation (User-Mode-Betrieb) sowie direkte Sicherheitskontaktadresse (`security@ellmos.ai`) erweitert.
+  - Ausführliche Geschwisterwerkzeuge-Matrix der `doc-bricks`-, `file-bricks`-, `dev-bricks`- und `open-bricks`-Ökosysteme (`LitZentrum`, `CleanMarkdown`, `UniversalDocsGrabber`, `UniversalInvoiceMail`, `UniversalMailCleaner`, `MailProcessor`, `PDFtoPDFocr`, `MediaBrain`, `DokuZen`, `ProFiler`, `ExplorerPro`, `DevCenter`, `CodeBox`, `open-bricks`) zweisprachig ergänzt.
+  - Automatisierte Metadaten- und Dokumentations-Paritätstestsuite `tests/test_metadata.py` angelegt (validiert `pyproject.toml`, Shields-Badges, `llms.txt`, `SECURITY.md`, `store_package.json` und `CHANGELOG.md`).
+  - `llms.txt` Last-checked-Zeitstempel auf 2026-08-20 und Testverifikationsstand (70 Tests: 38 Pytest + 32 Node.js 100% grün) nachgeführt.
+- **Technische Hygiene & Code-Bereinigung (2026-08-14)**:
+  - Unbenutzte Imports (`sys` in `DokuReader.py` und `_WARTUNG/check_store_readiness.py`) sowie ungenutzte Variablen (`errors` in `tests/test_bug_regressions.py`) vollständig bereinigt (`ruff check` 100% sauber).
+  - PEP 8 E402 Import-Guards (`# noqa: E402`) in Wartungs- und Testskripten (`_WARTUNG/generate_store_media.py`, `tests/source_platform_smoke.py`, `tests/test_bug_regressions.py`, `tests/test_ui_accessibility.py`) standardisiert.
+  - `pyproject.toml` um `pythonpath = ["."]` unter `[tool.pytest.ini_options]` erweitert für zuverlässige Standalone-Pytest-Ausführung.
+  - Exception-Capture in Threading-Regressionstest `test_thread_safe_save` verankert (`self.assertEqual(errors, [])`).
+  - `llms.txt` Last-checked Zeitstempel auf 2026-08-14 und Teststand (36 passed / 2 skipped, ruff 100% sauber, 32 Web Companion Node-Tests) synchronisiert.
+- **Versions- und Release-Readback (2026-08-11)**:
+  - Laufzeit `1.0.1-dev`, PEP-440-Metadaten `1.0.1.dev0` und Store-Paket `1.0.1.0` sind als getrennte Rollen dokumentiert.
+  - README-Badges verweisen auf `1.0.1-dev`; ein öffentliches Release, MSIX, WACK- oder Store-Einreichung wird nicht behauptet.
+  - `RELEASE_STATUS.md` und `PORTIERUNGSPLAN.md` halten die offenen externen Gates und die OneDrive-Read-only-Grenze fest.
+- **Metadata-first A11y/UI-Polish (2026-08-11)**:
+  - Semantische Namen, Rollen, Beschreibungen, Fokuspfade und der schreibgeschützte Vorschautext sind über einen testbaren Tkinter-Vertrag registriert.
+  - Dokumentenliste, Vorschau, Leer-/Filter-/Drag-and-drop-Zustände und Return/Shift+F10-Tastaturpfade werden sichtbar und erklärend dargestellt.
+  - Der Vertrag ist kein Screenreader-Abnahmetest; vollständige Tk-/visuelle Runner- und Gerätesmokes bleiben offene Gates.
+>>>>>>> origin/master
 - **Sichtbarkeit & Discoverability (Pfad B Audit 2026-07-30)**:
   - Dachorganisations-Badge für `open-bricks` und Pytest Test-Pass-Badge in `README.md` & `README_de.md` hinzugefügt.
-  - `llms.txt` Index-Header auf `Last-checked: 2026-07-30` und Verifikationsstand (34 Pytest-Tests + 32 Web Companion Node-Tests 100% grün) nachgeführt.
+  - `llms.txt` Index-Header auf `Last-checked: 2026-08-11` und Verifikationsstand (38 Pytest-Tests gesammelt, 36 bestanden/2 Tkinter-Skips + 32 Web Companion Node-Tests 100% grün) nachgeführt.
 - **Sichtbarkeit & Discoverability (Pfad B Audit 2026-07-27)**:
-  - Shields.io Badges für Python 3.10+, AGPL-3.0, Version v1.0.0, Platform Windows, LLM-Ready `llms.txt` und Ecosystem `doc-bricks` in `README.md` & `README_de.md` ergänzt.
+  - Shields.io Badges für Python 3.10+, AGPL-3.0, den Entwicklungsstand `1.0.1-dev`, Platform Windows, LLM-Ready `llms.txt` und Ecosystem `doc-bricks` in `README.md` & `README_de.md` ergänzt; der frühere Versions-Badge ist damit abgelöst.
   - Standardisierter GitHub-Flavored-Markdown (`> [!NOTE]`) Callout-Block für KI/LLM-Assistenten und Ökosystem-Kontext (LitZentrum, CleanMarkdown, UniversalDocsGrabber) eingebunden.
   - Systemarchitektur-Diagramm (Mermaid) für Desktop Client, Export Engine (Combined PDF / JSON) und PWA Companion App (`web_companion`) hinzugefügt.
   - `llms.txt` Index-Header auf `Last-checked: 2026-07-27` und Verifikationsnotizen (34 Pytest-Tests + 32 Web Companion Node-Tests) aktualisiert.

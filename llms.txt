@@ -1,24 +1,27 @@
 # DokuReader
 
-## Last-checked: 2026-07-30
-
+## Last-checked: 2026-09-12
 
 ## Canonical Links
 
 - Repository: https://github.com/doc-bricks/DokuReader
 - Issues: https://github.com/doc-bricks/DokuReader/issues
+- Documentation: https://github.com/doc-bricks/DokuReader#readme
 - License: AGPL-3.0
+- Third-Party Licenses: https://github.com/doc-bricks/DokuReader/blob/master/THIRD_PARTY_LICENSES.md
+- Marketing Log: https://github.com/doc-bricks/DokuReader/blob/master/MARKETING-LOG.txt
+- Security Policy: https://github.com/doc-bricks/DokuReader/blob/master/SECURITY.md
 
 ## Summary
 
-DokuReader is a local-first Tkinter desktop app for organizing document references by topic, previewing common file formats, tracking read/unread status, and exporting combined PDFs or a metadata-only JSON library.
+DokuReader is an unprivileged, local-first Tkinter desktop application for organizing document references by topic, previewing common file formats, tracking read/unread status, and exporting combined PDFs or a metadata-only JSON library.
 
-## Audience
+## Audience & Personas
 
-- Users who keep private document libraries on a local Windows desktop.
-- Researchers and knowledge workers who sort PDF and Office documents by topic.
-- Maintainers preparing a simple AGPL desktop app for Windows Store distribution.
-- LLM agents that need the project boundary, entrypoints, and export format without reading private user data.
+- Legal Tech & Compliance Analysts: Professionals managing confidential discovery documents that legally prohibit cloud upload under GDPR/HIPAA.
+- Academic Researchers & Literature Curators: Researchers organizing preprints and whitepapers into thematic reading queues without moving originals.
+- Offline-First Knowledge Workers & Privacy Advocates: Users demanding zero-egress, transparent local JSON state, and unprivileged execution.
+- AI Desktop Application Developers & Coding Agents: Autonomous agents using structured `dokureader-library-v1.json` schemas for downstream document analysis.
 
 ## Search Phrases
 
@@ -40,18 +43,13 @@ desktop document library JSON export
 
 DokuReader is not a cloud document manager, hosted OCR platform, general note-taking app, or full citation-management suite. It stores references and read status for local files; LitZentrum covers the broader literature-management workflow in the same doc-bricks family.
 
-## External Discovery Notes
+## Local Data Boundary & Invariants
 
-- GitHub and GitHub Topic pages currently index `doc-bricks/DokuReader` directly for document-library and pdf-tools contexts.
-- Broader web searches still collide with generic document, OCR, and Bricks Builder documentation results, so keep the canonical phrase `doc-bricks/DokuReader` and local-first document-library wording visible in README surfaces.
-- The repo has no external directory listing beyond GitHub surfaces; editorial posts or curated Python/Tkinter desktop-app lists remain manual follow-up work.
-
-## Local Data Boundary
-
-- Original documents remain in their existing filesystem locations.
-- App state is stored locally in `~/.dokubibliothek_state.json`.
-- The `dokureader-library-v1.json` export contains topics, paths, file metadata, and read status.
-- The standard JSON export does not embed document contents, PDFs, images, previews, accounts, tokens, or cloud credentials.
+- Original documents remain in their existing filesystem locations (INV-INPLACE-03).
+- App state is stored locally in `~/.dokubibliothek_state.json` (INV-ISOLATION-05).
+- Zero outbound HTTP/S, telemetry, or cloud connections (INV-LOCAL-01).
+- Unprivileged user-mode execution under RunAsInvoker principles (INV-RUNAS-02).
+- The `dokureader-library-v1.json` export contains topics, paths, file metadata, and read status without embedding private document content.
 
 ## Interfaces
 
@@ -60,20 +58,31 @@ DokuReader is not a cloud document manager, hosted OCR platform, general note-ta
 - Windows build launcher: `build_exe.bat`
 - Export schema docs: `EXPORTFORMAT.md`
 - Store docs: `STORE_LISTING.md`, `PRIVACY_POLICY.md`, `SUPPORT.md`, `store_package.json`
+- Version/release readback: `RELEASE_STATUS.md`, `PORTIERUNGSPLAN.md`
 - Store readiness gate: `python _WARTUNG/check_store_readiness.py --allow-blockers`
 - WACK runner and parser: `python _WARTUNG/run_windows_wack.py --dry-run`
 
 ## Test And Validation
 
-- Python tests live under `tests/` (34 Pytest tests verified: 33 passed, 1 skipped for display-less environments).
-- Web Companion tests live under `web_companion/tests/` (32 Node.js tests verified: 100% green).
-- Current focused validation: `python -m pytest -q` and `npm test` in `web_companion`.
+- Python tests live under `tests/` (including `test_metadata.py`, `test_release_contract.py`, `test_accessibility_contract.py`, `test_bug_regressions.py`, `test_export_format.py`, `test_store_readiness.py`, `test_windows_wack.py`, `test_store_media.py`, `test_ui_accessibility.py`; 56 collected, 56 passed, 0 skipped, 0 failed, exit 0).
+- Web Companion tests live under `web_companion/tests/` (35 Node.js tests verified: 100% green).
+- Suites are counted separately, never summed: Python 56 collected / 0 failed (exit 0); Web Companion 35 passed / 0 failed (exit 0); `ruff check .` clean (exit 0); `python tests/source_platform_smoke.py` OK (exit 0). Measured 2026-09-12 with Python 3.12.10 on Windows.
+- The former sporadic Tk initialization skip is bounded by at most three setup attempts. Ten independent focused runs produced 60/60 UI test passes without a skip. A real Tk visual smoke captured and reviewed empty, drag-and-drop and text-preview states; receipt: `UI_POLISH_SMOKE.json`.
+- MSIX, WACK, signing and Store gates are external and remain unproven by any of these runs.
+- Current focused validation: `python -m pytest -ra -v` and `node --test` in `web_companion`.
 - Store readiness validation: `python _WARTUNG/check_store_readiness.py --allow-blockers`
-- Syntax smoke: `python -m py_compile DokuReader.py manage_translations.py translator.py _WARTUNG/generate_store_media.py _WARTUNG/check_store_readiness.py _WARTUNG/run_windows_wack.py`
+- Syntax smoke: `python -m py_compile DokuReader.py manage_translations.py translator.py _WARTUNG/generate_store_media.py _WARTUNG/check_store_readiness.py _WARTUNG/run_windows_wack.py tests/source_platform_smoke.py`
 - Workflow YAML should parse before push.
+
+## Version And Release Boundary
+
+- Runtime development version: `DokuReader.py` `APP_VERSION=1.0.1-dev`.
+- Python package metadata: `pyproject.toml` `1.0.1.dev0`.
+- Windows Store package metadata: `store_package.json` `1.0.1.0`.
+- No public release, signed MSIX, WACK certification, or Store submission is verified.
+- The metadata-first accessibility contract covers semantic names, roles, states, descriptions, focus order, and read-only preview text. A controlled Tk visual smoke covers empty, drag-and-drop and preview layout states; it does not claim screen-reader, keyboard-hardware, or device acceptance.
 
 ## Safety Notes
 
 - Do not commit local document libraries, generated releases, converted PDFs, credentials, or `~/.dokubibliothek_state.json`.
 - `releases/`, build outputs, local state, SQLite files, tokens, and private/archive folders are ignored.
-- Optional PyMuPDF support keeps the project in AGPL-3.0 territory unless a commercial Artifex license is used.

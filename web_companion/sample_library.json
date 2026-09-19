@@ -1,0 +1,95 @@
+{
+  "schema_version": "dokureader-library-v1",
+  "exported_at": "2026-09-09T10:00:00Z",
+  "app_name": "DokuReader",
+  "app_version": "1.0.1-dev",
+  "current_topic": "Forschung & Wissenschaft",
+  "topics": [
+    {
+      "name": "Forschung & Wissenschaft",
+      "document_count": 3,
+      "documents": [
+        {
+          "path": "C:/Demo/Dokumente/Forschung/KI_Agenten_Architektur_2026.pdf",
+          "filename": "KI_Agenten_Architektur_2026.pdf",
+          "extension": ".pdf",
+          "read": true,
+          "size_bytes": 452819,
+          "mtime": "2026-08-20T14:30:00Z",
+          "missing": false
+        },
+        {
+          "path": "C:/Demo/Dokumente/Forschung/Forschungsnotizen_Entwurf.txt",
+          "filename": "Forschungsnotizen_Entwurf.txt",
+          "extension": ".txt",
+          "read": false,
+          "size_bytes": 12450,
+          "mtime": "2026-09-01T09:15:00Z",
+          "missing": false
+        },
+        {
+          "path": "C:/Demo/Dokumente/Forschung/Literaturuebersicht_Archiv.docx",
+          "filename": "Literaturuebersicht_Archiv.docx",
+          "extension": ".docx",
+          "read": false,
+          "size_bytes": null,
+          "mtime": null,
+          "missing": true
+        }
+      ]
+    },
+    {
+      "name": "Verträge & Vereinbarungen",
+      "document_count": 2,
+      "documents": [
+        {
+          "path": "C:/Demo/Dokumente/Vertraege/Dienstleistungsvereinbarung_Muster.pdf",
+          "filename": "Dienstleistungsvereinbarung_Muster.pdf",
+          "extension": ".pdf",
+          "read": true,
+          "size_bytes": 198420,
+          "mtime": "2026-07-15T11:00:00Z",
+          "missing": false
+        },
+        {
+          "path": "C:/Demo/Dokumente/Vertraege/Geheimhaltungserklaerung_NDA.pdf",
+          "filename": "Geheimhaltungserklaerung_NDA.pdf",
+          "extension": ".pdf",
+          "read": false,
+          "size_bytes": 86400,
+          "mtime": "2026-08-05T16:45:00Z",
+          "missing": false
+        }
+      ]
+    },
+    {
+      "name": "Finanzen & Nachweise",
+      "document_count": 2,
+      "documents": [
+        {
+          "path": "C:/Demo/Dokumente/Finanzen/Jahresabrechnung_2025.pdf",
+          "filename": "Jahresabrechnung_2025.pdf",
+          "extension": ".pdf",
+          "read": true,
+          "size_bytes": 312050,
+          "mtime": "2026-02-28T18:00:00Z",
+          "missing": false
+        },
+        {
+          "path": "C:/Demo/Dokumente/Finanzen/Honorarberechnung_Q2.odt",
+          "filename": "Honorarberechnung_Q2.odt",
+          "extension": ".odt",
+          "read": false,
+          "size_bytes": 45100,
+          "mtime": "2026-07-02T13:20:00Z",
+          "missing": false
+        }
+      ]
+    }
+  ],
+  "totals": {
+    "topic_count": 3,
+    "document_count": 7,
+    "missing_documents": 1
+  }
+}

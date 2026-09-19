@@ -9,8 +9,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(ROOT))
-import DokuReader as app
-import manage_translations as mt
+import DokuReader as app  # noqa: E402
+import manage_translations as mt  # noqa: E402
 
 
 class TestD3WorkstationTimeout(unittest.TestCase):
@@ -130,9 +130,13 @@ class TestThreadSafetyHaertung(unittest.TestCase):
             try:
                 # Parallel: viele list_docs-Reads während save() läuft
                 errors = []
+
                 def _reader():
-                    for _ in range(50):
-                        s.list_docs("Thema")
+                    try:
+                        for _ in range(50):
+                            s.list_docs("Thema")
+                    except Exception as exc:
+                        errors.append(exc)
 
                 threads = [threading.Thread(target=_reader) for _ in range(4)]
                 for t in threads:
@@ -140,6 +144,7 @@ class TestThreadSafetyHaertung(unittest.TestCase):
                 s.save()
                 for t in threads:
                     t.join()
+                self.assertEqual(errors, [])
                 raw = Path(app.STATE_FILE).read_text(encoding="utf-8")
                 data = json.loads(raw)
                 self.assertIn("Thema", data.get("topics", {}))

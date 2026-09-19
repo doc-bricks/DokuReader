@@ -41,12 +41,13 @@ Dann im Browser öffnen:
 
 ## Android/iOS-PWA-Smoke
 
-1. Companion lokal per HTTP bereitstellen.
-2. `?demo=1` oder eine echte `dokureader-library-v1.json` laden.
-3. Android: in Chrome "Zum Startbildschirm hinzufügen" prüfen.
-4. iOS: in Safari "Zum Home-Bildschirm" prüfen.
-5. Offline erneut öffnen und Demo-/Shell-Ladepfad gegen den Service Worker
-   validieren.
+1. Companion lokal per HTTP bereitstellen (`python -m http.server 4173`).
+2. `?demo=1`, die synthetische `sample_library.json` oder eine eigene `dokureader-library-v1.json` laden.
+3. Android: in Chrome "Zum Startbildschirm hinzufügen" prüfen (412 × 915 px).
+4. iOS: in Safari "Zum Home-Bildschirm" prüfen (393 × 852 px mit Safe Area).
+5. Offline erneut öffnen und Demo-/Shell-Ladepfad gegen den Service Worker validieren.
+6. Ausführliche Testmatrix und Screenshot-Kriterien: siehe [PWA_TESTPLAN.md](PWA_TESTPLAN.md).
+
 
 ## Grenzen
 

@@ -1,5 +1,13 @@
 # Store Listing - DokuReader
 
+## Readback status (2026-08-11)
+
+This copy is prepared metadata, not a submitted or published Store listing.
+The development/runtime role is `1.0.1-dev`, the Python package metadata is
+`1.0.1.dev0`, and the Store package metadata is `1.0.1.0`. A signed MSIX,
+WACK result, Partner Center submission, and public release are still open
+external gates; this document must not be read as proof of availability.
+
 ## Deutsch
 
 ### Kurzbeschreibung (max 100 Zeichen)
@@ -27,7 +35,7 @@ DokuReader ist eine lokale Desktop-App für persönliche Dokumentenbibliotheken,
 
 **Lizenz- und Open-Source-Hinweis**
 
-DokuReader wird als kostenloser Open-Source-Release für den Windows Store vorbereitet. Das Projekt steht unter AGPL-3.0. Optionale PDF-Vorschau über PyMuPDF bleibt deshalb ebenfalls im AGPL-Kontext und ist in Repository, Privacy-Doku und Drittanbieter-Lizenzübersicht offengelegt.
+DokuReader wird als kostenloser Open-Source-Release für den Windows Store vorbereitet; eine Einreichung oder Veröffentlichung ist derzeit nicht belegt. Das Projekt steht unter AGPL-3.0. Optionale PDF-Vorschau über PyMuPDF bleibt deshalb ebenfalls im AGPL-Kontext und ist in Repository, Privacy-Doku und Drittanbieter-Lizenzübersicht offengelegt.
 
 ### Schlüsselwörter
 Dokumente, PDF, Vorschau, Bibliothek, Leseliste, Forschung, Sammel-PDF, JSON-Export, lokal, Datenschutz
@@ -64,7 +72,7 @@ DokuReader is a local desktop application for personal document libraries, resea
 
 **License and open-source note**
 
-DokuReader is being prepared as a free open-source Windows Store release. The project is licensed under AGPL-3.0. Optional PDF preview through PyMuPDF therefore remains within the AGPL context and is documented in the repository, privacy policy, and third-party license summary.
+DokuReader is being prepared as a free open-source Windows Store release; no submission or publication is verified yet. The project is licensed under AGPL-3.0. Optional PDF preview through PyMuPDF therefore remains within the AGPL context and is documented in the repository, privacy policy, and third-party license summary.
 
 ### Keywords
 documents, PDF, preview, library, reading list, research, bundle PDF, JSON export, local, privacy

@@ -3,10 +3,11 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import vm from "node:vm";
 
 import { readFileSync, existsSync } from "node:fs";
 
-import { buildDemoLibrary, SCHEMA } from "../library.js";
+import { parseLibrary, serializeLibrary, buildDemoLibrary, SCHEMA } from "../library.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -83,6 +84,40 @@ test("service worker caches the full offline shell", async () => {
     /caches\.match\([^)]*ignoreSearch\s*:\s*true/.test(sw),
     "caches.match muss { ignoreSearch: true } nutzen — Offline-Fail bei ?-URLs"
   );
+});
+
+test("service worker activation preserves caches outside the DokuReader namespace", async () => {
+  const source = await read("sw.js");
+  const handlers = new Map();
+  const deleted = [];
+  const cacheApi = {
+    keys: async () => [
+      "other-app-v1",
+      "dokureader-companion-v5",
+      "dokureader-companion-v6"
+    ],
+    delete: async key => {
+      deleted.push(key);
+      return true;
+    }
+  };
+  const serviceWorker = {
+    addEventListener: (name, handler) => handlers.set(name, handler),
+    skipWaiting: () => {},
+    clients: { claim: () => {} }
+  };
+
+  vm.runInNewContext(source, {
+    self: serviceWorker,
+    caches: cacheApi,
+    Promise
+  });
+
+  let activation;
+  handlers.get("activate")({ waitUntil: promise => { activation = promise; } });
+  await activation;
+
+  assert.deepEqual(deleted, ["dokureader-companion-v5"]);
 });
 
 test("app.js FileReader onerror handler vorhanden (Bug #4)", () => {
@@ -165,3 +200,29 @@ test("demo library stays compatible with the production schema", () => {
   );
   assert.equal(SCHEMA, "dokureader-library-v1");
 });
+
+test("PWA_TESTPLAN.md exists and specifies required test matrices, viewports, and screenshot paths", async () => {
+  const plan = await read("PWA_TESTPLAN.md");
+  assert.match(plan, /# PWA-Testplan — DokuReader Web\/PWA Companion/);
+  assert.match(plan, /SNW-DOKUREADER-02/);
+  assert.match(plan, /TW-DOKUREADER-02/);
+  assert.match(plan, /sample_library\.json/);
+  assert.match(plan, /412\s*×\s*915/);
+  assert.match(plan, /393\s*×\s*852/);
+  assert.match(plan, /pwa-android-library\.png/);
+  assert.match(plan, /pwa-ios-library\.png/);
+});
+
+test("sample_library.json is valid dokureader-library-v1 schema and round-trips correctly", async () => {
+  const raw = JSON.parse(await read("sample_library.json"));
+  assert.equal(raw.schema_version, SCHEMA);
+  const parsed = parseLibrary(raw);
+  assert.equal(parsed.topics.length, 3);
+  assert.equal(parsed.currentTopic, "Forschung & Wissenschaft");
+  const roundtrip = serializeLibrary(parsed);
+  assert.equal(roundtrip.schema_version, SCHEMA);
+  assert.equal(roundtrip.totals.topic_count, 3);
+  assert.equal(roundtrip.totals.document_count, 7);
+  assert.equal(roundtrip.totals.missing_documents, 1);
+});
+

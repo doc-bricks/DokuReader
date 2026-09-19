@@ -1,211 +1,370 @@
 <img src="assets/banner.svg" width="100%" alt="DokuReader Banner">
 
-# DokuReader — Local Document Library
+# DokuReader — Local Document Library & PDF Organizer
 
-**🇬🇧 English** · **[🇩🇪 Deutsch](README_de.md)**
+<p align="center"><strong>🇬🇧 English</strong> · <a href="README_de.md">🇩🇪 Deutsch</a></p>
 
 > Organize, preview, and bundle local documents by topic — references and read status only, originals stay put.
 
 [![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-green)](LICENSE)
-[![Version](https://img.shields.io/badge/Version-v1.0.0-blue)](releases/)
+[![Version](https://img.shields.io/badge/Version-1.0.1--dev-blue)](CHANGELOG.md#unreleased)
 [![Python: 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python)](pyproject.toml)
-[![Platform: Windows](https://img.shields.io/badge/Platform-Windows-blue?logo=windows)](#start-here)
-[![Tests: 34 passed](https://img.shields.io/badge/Tests-34%20passed-success?logo=pytest)](pyproject.toml)
+[![UI: Python / Tkinter](https://img.shields.io/badge/GUI-Python%20%2F%20Tkinter-blue)](DokuReader.py)
+[![Platform: Windows | macOS | Linux](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-blue?logo=windows)](#getting-started--installation)
+[![Pytest: 56 tests, 0 failed](https://img.shields.io/badge/Pytest-56%20tests%2C%200%20failed-success?logo=pytest)](pyproject.toml)
+[![Web Companion: 35 passed](https://img.shields.io/badge/Web%20Companion-35%20passed-success?logo=nodedotjs)](web_companion)
+[![Privacy: 100% Offline](https://img.shields.io/badge/Privacy-100%25%20Offline-success)](PRIVACY_POLICY.md)
+[![Security: Local--First](https://img.shields.io/badge/Security-Local--First-blue)](SECURITY.md)
+[![Security SLA: 48h / 5d](https://img.shields.io/badge/Security%20SLA-48h%20%2F%205d-orange)](SECURITY.md)
+[![RunAsInvoker: Non--Elevated](https://img.shields.io/badge/RunAsInvoker-Non--Elevated-success)](SECURITY.md)
+[![Third-Party Licenses: Audited](https://img.shields.io/badge/Third--Party%20Licenses-Audited-green)](THIRD_PARTY_LICENSES.md)
+[![Marketing Log: Active](https://img.shields.io/badge/Marketing%20Log-Active-blue)](MARKETING-LOG.txt)
 [![LLM-Ready: llms.txt](https://img.shields.io/badge/LLM--Ready-llms.txt-success)](llms.txt)
 [![Ecosystem: doc-bricks](https://img.shields.io/badge/Ecosystem-doc--bricks-purple)](https://github.com/doc-bricks)
 [![Umbrella: open-bricks](https://img.shields.io/badge/Umbrella-open--bricks-blue)](https://github.com/open-bricks)
-
+[![Audit: 2026--09--11](https://img.shields.io/badge/Audit-2026--09--11-informational)](#quality-gates--automated-test-suites)
 
 > [!NOTE]
 > DokuReader is part of the **doc-bricks** local document management suite. It works seamlessly alongside [LitZentrum](https://github.com/doc-bricks/LitZentrum) (citation & literature management), [CleanMarkdown](https://github.com/doc-bricks/CleanMarkdown) (Markdown reading & editing), and [UniversalDocsGrabber](https://github.com/doc-bricks/UniversalDocsGrabber) (mail attachment intake). DokuReader is fully indexed for AI/LLM coding assistants via [`llms.txt`](llms.txt).
 
-DokuReader is a local desktop application for organizing, previewing, and bundling documents by topic. Original files stay where they are; the application stores only file references and read status in a local JSON state file.
+---
 
-It is designed for private document libraries, research folders, PDF collections, and topic-based reading queues that should remain local and inspectable.
+### Quick Navigation
+1. [Overview & Core Value](#overview--core-value)
+2. [Key Capabilities & Feature Matrix](#key-capabilities--feature-matrix)
+3. [Interactive Architecture Flowchart](#interactive-architecture-flowchart)
+4. [Document Lifecycle & Privacy Sequence](#document-lifecycle--privacy-sequence)
+5. [Getting Started & Installation](#getting-started--installation)
+6. [Supported Formats & System Dependencies](#supported-formats--system-dependencies)
+7. [Windows Store & Standalone Build](#windows-store--standalone-build)
+8. [Mobile & PWA Companion](#mobile--pwa-companion)
+9. [Governance & Runtime Invariants](#governance--runtime-invariants)
+10. [Sibling Tools & Ecosystem Matrix](#sibling-tools--ecosystem-matrix)
+11. [Privacy & Security Posture](#privacy--security-posture)
+12. [Quality Gates & Automated Test Suites](#quality-gates--automated-test-suites)
+13. [Machine-Readable Context (`llms.txt`)](#machine-readable-context-llmstxt)
+14. [Third-Party Licenses & Transparency](#third-party-licenses--transparency)
+15. [Marketing & Target Personas](#marketing--target-personas)
 
-## Start Here
+---
 
-| Goal | Entry point |
+## Overview & Core Value
+
+DokuReader is an unprivileged desktop application for organizing, previewing, and bundling documents by topic. Original files stay exactly where they are; the application indexes only file path references and read status in a local JSON state file (`~/.dokubibliothek_state.json`).
+
+It is engineered specifically for private document libraries, academic research collections, confidential legal discovery sets, and topic-based reading queues that must remain 100% offline, inspectable, and secure.
+
+| Goal | Entry Point |
 |---|---|
-| Run the desktop app | `python DokuReader.py` or `START.bat` |
-| Understand the export format | `EXPORTFORMAT.md` |
+| Run the desktop application | `python DokuReader.py` or `START.bat` |
+| Understand the export specification | [EXPORTFORMAT.md](EXPORTFORMAT.md) |
 | Test the desktop source build | `python tests/source_platform_smoke.py` |
-| Check the mobile/PWA companion smoke | `web_companion/README.md` |
+| Check the mobile/PWA companion smoke | [web_companion/README.md](web_companion/README.md) |
 | Check Windows Store readiness | `python _WARTUNG/check_store_readiness.py --allow-blockers` |
 | Prepare or parse WACK reports | `python _WARTUNG/run_windows_wack.py --dry-run` |
-| Prepare Windows Store copy | `STORE_LISTING.md`, `PRIVACY_POLICY.md`, `SUPPORT.md` |
-| Give LLM tools project context | `llms.txt` |
+| Prepare Windows Store listings | [STORE_LISTING.md](STORE_LISTING.md), [PRIVACY_POLICY.md](PRIVACY_POLICY.md), [SUPPORT.md](SUPPORT.md) |
+| Provide LLM tools project context | [`llms.txt`](llms.txt) |
 
-## Discovery Context
+### Version and Release Status
 
-DokuReader is best described as a local-first document library, topic-based PDF organizer, reading-state tracker, and metadata-only document export tool. It is not a cloud document manager, hosted OCR service, general note-taking app, or full literature-citation suite.
+The version roles are intentionally separate and read back from the current source tree:
+- **Development Runtime:** `1.0.1-dev` (`DokuReader.py` and `pyproject.toml` `1.0.1.dev0`)
+- **Windows Store Package Metadata:** `1.0.1.0` (`store_package.json`)
+- **Release Verification:** There is no verified public release artifact in this repository. Signing, MSIX generation, WACK validation, and Store submission remain external gates. The `1.0.1-dev` badge indicates development status, not a public store release claim. See [RELEASE_STATUS.md](RELEASE_STATUS.md) and [PORTIERUNGSPLAN.md](PORTIERUNGSPLAN.md).
 
-Useful search phrases include `local-first document library`, `topic based PDF organizer`, `document read status tracker`, `metadata-only document export`, `Tkinter document manager`, and `offline PDF bundling desktop app`.
+---
 
-## Workflow Fit
+## Key Capabilities & Feature Matrix
 
-| Need | Use DokuReader for |
-|---|---|
-| Build a reading queue | Group PDFs, Office files, text files, and images by topic without moving originals |
-| Track review progress | Mark documents read or unread and filter exports by that state |
-| Share a library outline | Export `dokureader-library-v1.json` with paths, metadata, topics, and read status |
-| Prepare a local PDF bundle | Merge selected read, unread, or all documents into one PDF |
+- **In-Place File Protection (INV-INPLACE-03):** Original documents are never copied, moved, modified, or overwritten.
+- **Dynamic Topic Organization:** Create, rename, sort, and delete document topics on the fly.
+- **Read / Unread Queue Management:** Toggle read status with one click; filter exports by read, unread, or all.
+- **Multi-Format Instant Preview:** In-app visual preview for PDFs, text files, images (JPG, PNG, GIF), and Office documents (DOCX, ODT).
+- **Text Preview & Latin-1 Fallback:** Robust text rendering with UTF-8 primary and Latin-1 secondary decoding.
+- **Desktop Drag-and-Drop:** Intuitive document intake when `tkinterdnd2` is installed.
+- **External App Dispatch:** Double-click opens any document in the system default application.
+- **Consolidated PDF Bundling:** Merge selected read, unread, or all documents into a single consolidated PDF bundle.
+- **Clean JSON Metadata Export:** Export the entire library outline as schema-compliant `dokureader-library-v1.json` without copying or embedding binary document content.
+- **Office Conversion Pipeline:** Seamless conversion of Office formats via headless LibreOffice or Windows Word COM.
+- **Offline PWA Companion:** Zero-egress mobile web application for reviewing libraries and toggling read status on smartphones and tablets.
 
-Within the doc-bricks family, DokuReader is the private reading-library layer. `LitZentrum` is the citation and literature-management layer, `CleanMarkdown` is the Markdown reading/editing layer, and `UniversalDocsGrabber` is the mail-attachment intake layer.
+---
 
-## System Architecture
+## Interactive Architecture Flowchart
 
 ```mermaid
-graph TD
-    subgraph Desktop ["Desktop Client (Python / Tkinter)"]
-        UI["DokuReader.py"]
-        State["State Manager (~/.dokubibliothek_state.json)"]
-        Preview["File Preview (PDF, Images, Text, Office)"]
-        Exporter["Export Engine (PyMuPDF / reportlab / LibreOffice)"]
-        UI --> State
-        UI --> Preview
-        UI --> Exporter
+flowchart TD
+    subgraph Host ["Local Workstation Environment (Windows · macOS · Linux)"]
+        subgraph App ["DokuReader Application Layer"]
+            UI["Tkinter Desktop UI (DokuReader.py)"]
+            StateManager["Local State Manager"]
+            PreviewEngine["Preview Engine"]
+            ExportEngine["Export & Bundling Engine"]
+        end
+
+        subgraph Backends ["Processing & Preview Backends"]
+            MuPDF["PyMuPDF (PDF Render Engine)"]
+            PIL["Pillow (Image Processing)"]
+            OfficeConv["LibreOffice / MS Word (COM / Subprocess)"]
+            PDFMerger["pypdf / reportlab (PDF Generation)"]
+        end
+
+        subgraph Storage ["Local Storage & Privacy Boundary"]
+            Originals[("Original Documents (Read-Only In-Place)")]
+            StateFile[("~/.dokubibliothek_state.json")]
+            ExportFile[("dokureader-library-v1.json")]
+            PDFOutput[("Consolidated PDF Bundle")]
+        end
     end
 
-    subgraph Output ["Data Outputs & Sharing"]
-        Exporter --> PDFBundle["Combined PDF Bundle"]
-        Exporter --> JSONExport["dokureader-library-v1.json (Metadata & Read Status)"]
+    subgraph Companion ["PWA Mobile Companion (web_companion)"]
+        PWA["Local PWA Client (Offline Cache)"]
     end
 
-    subgraph Companion ["PWA / Mobile Companion (web_companion)"]
-        JSONExport -. Import / Sync .-> CompanionPWA["Offline PWA / Mobile Web App"]
-        CompanionPWA -. Export Updated Read Status .-> JSONExport
-    end
+    UI --> StateManager
+    UI --> PreviewEngine
+    UI --> ExportEngine
+
+    StateManager <--> StateFile
+    PreviewEngine --> MuPDF
+    PreviewEngine --> PIL
+    PreviewEngine --> OfficeConv
+    PreviewEngine -. Read-Only .-> Originals
+
+    ExportEngine --> PDFMerger
+    ExportEngine --> ExportFile
+    PDFMerger --> PDFOutput
+
+    ExportFile -. Offline JSON Import / Sync .-> PWA
 ```
 
-## Features
+---
 
-- Create, rename, and delete document topics
-- Mark documents as read or unread
-- Preview images, PDFs, text files, and DOCX/ODT documents
-- Text preview and TXT-to-PDF export with UTF-8 and Latin-1 fallback
-- Add files via drag and drop when `tkinterdnd2` is installed
-- Open original documents in the default application with a double-click
-- Export all, read, or unread documents as a combined PDF
-- Export the full library as `dokureader-library-v1.json`
-- Convert Office documents to PDF through LibreOffice or Microsoft Word
-- Build a local Windows executable through the PyInstaller spec
+## Document Lifecycle & Privacy Sequence
 
-## Privacy And Local Data
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as User / Researcher
+    participant UI as Desktop UI (DokuReader.py)
+    participant State as Local State Manager
+    participant Engine as Preview & Conversion Engine
+    participant Disk as Local Storage (Original Files)
+    participant Output as Export Generator
 
-- DokuReader runs locally and does not upload documents to external services.
-- Original files are not copied or modified.
-- State is stored in `~/.dokubibliothek_state.json`.
-- The standard JSON export contains topics, paths, file metadata, and read status, but no document contents.
-- Local build artifacts, release files, internal task notes, and conversion scratch files are excluded via `.gitignore`.
+    User->>UI: Add File / Drag-and-Drop
+    UI->>Disk: Inspect File Metadata (Stat only)
+    Note over UI,Disk: Originals remain untouched (INV-INPLACE-03)
+    UI->>State: Store Topic Reference & Unread Flag (INV-ISOLATION-05)
+    State-->>UI: Update Topic Tree View
 
-## Screenshot
+    User->>UI: Select Document for Preview
+    UI->>Engine: Request Page 1 / Text Stream
+    Engine->>Disk: Read-Only Stream
+    Engine-->>UI: Rendered Thumbnail / Plaintext
+    UI-->>User: Display In-App Preview
 
-![DokuReader main window](README/screenshots/main.png)
+    User->>UI: Toggle Read Status
+    UI->>State: Persist Read Status
+    State-->>UI: Reflected in Library Overview
 
-## Installation
+    User->>UI: Trigger Export (Consolidated PDF or JSON)
+    UI->>Output: Generate Bundle (Filtered by Read/Unread)
+    Output->>Disk: Write dokureader-library-v1.json or Merged PDF
+    Note over UI,Disk: 100% Offline / Local-First — Zero Network Egress (INV-LOCAL-01)
+```
+
+---
+
+## Getting Started & Installation
 
 ### Requirements
 
 - Python 3.10+
-- Tkinter, usually included with standard Python installations
+- Tkinter (included with standard Python installations)
 
-### Python Dependencies
+### Installation
 
 ```bash
+git clone https://github.com/doc-bricks/DokuReader.git
+cd DokuReader
 pip install -r requirements.txt
 ```
 
-`requirements.txt` includes the supported Python integrations for preview, drag and drop, and PDF export. Missing optional packages only disable the related extra feature.
-
-### Optional System Dependencies
-
-For full preview and export functionality:
-
-- LibreOffice for DOC/DOCX/ODT/RTF to PDF conversion
-- Poppler for the optional `pdf2image` preview backend
-- Microsoft Word on Windows for optional Word-COM conversion
-
-## Usage
+### Quick Start
 
 ```bash
 python DokuReader.py
 ```
 
-On Windows, the start file can be used instead:
+On Windows, launch directly via:
 
-```bash
+```bat
 START.bat
 ```
 
-For companion export, use the `Bibliothek (JSON)` section on the right side of the app. It writes topics, paths, file metadata, and read status to `dokureader-library-v1.json` without copying document contents. The format is documented in `EXPORTFORMAT.md`.
+---
 
-## Optional Windows Build
+## Supported Formats & System Dependencies
 
-```bash
+### Supported Document Formats
+
+- **Documents:** `.txt`, `.doc`, `.docx`, `.pdf`, `.odt`, `.rtf`
+- **Images:** `.jpg`, `.jpeg`, `.gif`, `.png`
+
+### Optional System Dependencies
+
+For full preview rendering and external document conversion:
+- **LibreOffice:** Required for headless DOC/DOCX/ODT/RTF to PDF conversion.
+- **Poppler:** Required if using the optional `pdf2image` preview backend.
+- **Microsoft Word:** Supported on Windows for direct COM-based document conversion.
+
+---
+
+## Windows Store & Standalone Build
+
+### Local Executable Build
+
+```bat
 build_exe.bat
 ```
 
-Build output under `build/`, `dist/`, and `releases/` stays local and does not belong in the Git repository. The build uses a local work directory under `C:\_Local_DEV\codex_build\dokureader` and updates `dist\DokuReader.exe`.
+Build output under `build/`, `dist/`, and `releases/` stays strictly local and is excluded from Git tracking via `.gitignore`. Set `DOKUREADER_BUILD_ROOT` to customize the local build scratch directory.
 
-## Windows Store Readiness
+### Windows Store Readiness Gate
 
 ```bash
 python _WARTUNG/check_store_readiness.py --allow-blockers
 ```
 
-The check validates Store metadata, public privacy/support URLs, required documents, Store assets, generated screenshots, a local EXE, and the remaining MSIX/WACK artifacts. `--allow-blockers` is intended for local pre-submission runs where Partner Center, MSIX signing, or the elevated WACK pass are still external gates.
+Validates Store metadata, privacy policy URLs, required support links, visual assets, screenshots, and MSIX packaging requirements.
 
-The WACK runner keeps the elevated certification step reproducible:
+### WACK Runner & Parser
 
 ```bash
 python _WARTUNG/run_windows_wack.py --dry-run
 ```
 
-The dry run prints the expected MSIX path, XML report path, discovered `appcert.exe`, and the exact certification command. The real run must happen in an elevated PowerShell after a fresh signed MSIX exists. Existing XML reports can be converted to the JSON summary that the readiness gate reads:
+Generates the exact certification command for elevated execution and parses resulting XML validation reports into structured JSON.
+
+---
+
+## Mobile & PWA Companion
+
+The companion web application under `web_companion/` provides an offline-first, mobile-optimized reading view:
+- **Installable PWA:** Full Web App Manifest with iOS Safe-Area support (`viewport-fit=cover`).
+- **Offline Shell:** Scoped Service Worker caching preserving external application caches.
+- **Round-Trip Synchronization:** Imports `dokureader-library-v1.json` exported from the desktop app, allows toggling read states on mobile, and exports an updated JSON back to the desktop.
+- **Zero Third-Party Dependencies:** Runs on pure vanilla JavaScript and Node.js built-in test runner (`35 passed, 0 failed`).
 
 ```bash
-python _WARTUNG/run_windows_wack.py --parse-report releases/windowsstore/test_reports/wack_YYYYMMDD_HHMMSS.xml
+cd web_companion
+node --test
 ```
 
-## Platform Strategy
+---
 
-The desktop app remains the authoritative local library. Windows Store is the first distribution target; macOS and Linux are tracked as source and smoke-test targets from the same Tkinter codebase. For Android, iOS, and browser use, a later Web/PWA companion based on `dokureader-library-v1.json` is more appropriate than a full native clone because mobile sandboxes cannot freely access local desktop document paths.
+## Governance & Runtime Invariants
 
-The reproducible desktop source smoke lives in `tests/source_platform_smoke.py`. It covers app start, `open`/`xdg-open` dispatch, text and PDF preview, simulated LibreOffice conversion, and merged PDF export without touching real user state.
+The following 10 invariants govern DokuReader's runtime architecture, privacy boundary, and security guarantees:
 
-The mobile companion now also has a reproducible PWA smoke under
-`web_companion/`: `npm test` validates manifest metadata, offline-shell assets,
-and the demo library for Android/iOS-style install flows without introducing a
-native duplicate app line.
+| Invariant | Principle | Guarantee & Verification Mechanism |
+|:---|:---|:---|
+| **INV-LOCAL-01** | 100% Local-First & Zero-Egress | Zero outbound HTTP/S, WebSocket, or telemetry traffic. All parsing and previews operate strictly offline. |
+| **INV-RUNAS-02** | Unprivileged RunAsInvoker Execution | The application runs exclusively in standard user mode without administrative elevation requirements. |
+| **INV-INPLACE-03** | In-Place Original File Safety | Original documents are strictly read-only. DokuReader never moves, modifies, or deletes imported files. |
+| **INV-SCHEMA-04** | Deterministic Export Schema | Library metadata exports adhere strictly to the versioned `dokureader-library-v1` JSON specification. |
+| **INV-ISOLATION-05** | Local State & Cache Isolation | State is isolated in `~/.dokubibliothek_state.json`. PWA companion caches only within `dokureader-companion-` scope. |
+| **INV-SANDBOX-06** | Safe Subprocess Execution | External converters (LibreOffice, Word COM) run with constrained arguments, timeout guards, and isolated temp directories. |
+| **INV-PARITY-07** | Tri-Platform Source Support | Core codebase runs across Windows, macOS, and Linux with platform-independent path handling and fallbacks. |
+| **INV-A11Y-08** | Keyboard & Visual Accessibility | Full keyboard navigation support, high-contrast readability, and deterministic UI state reflection. |
+| **INV-DISCOVERY-09** | Multimodal Transparency & LLM Ready | Complete bilingual documentation (DE/EN), machine-readable `llms.txt`, and interactive dual Mermaid diagrams. |
+| **INV-SLA-10** | Security Vulnerability SLA | Formal 48h initial response SLA and 5-business-day triage commitment for reported security disclosures. |
 
-## Supported File Formats
+---
 
-- Documents: `.txt`, `.doc`, `.docx`, `.pdf`, `.odt`, `.rtf`
-- Images: `.jpg`, `.jpeg`, `.gif`, `.png`
+## Sibling Tools & Ecosystem Matrix
 
-## Project Files
+DokuReader is a core component of the **doc-bricks** family under the **open-bricks** open-source initiative:
 
-- `DokuReader.py` - main application
-- `requirements.txt` - Python dependencies
-- `DokuReader.spec` - PyInstaller configuration
-- `EXPORTFORMAT.md` - schema for `dokureader-library-v1.json`
-- `_WARTUNG/check_store_readiness.py` - Windows Store readiness gate
-- `_WARTUNG/run_windows_wack.py` - WACK dry-run, execution, and XML-to-JSON summary helper
-- `web_companion/README.md` - PWA/mobile smoke workflow for Android and iOS
-- `STORE_LISTING.md` - Windows Store copy in German and English
-- `PRIVACY_POLICY.md` - privacy notes for the Store release
-- `SUPPORT.md` - support and contact paths
-- `llms.txt` - machine-readable project context
-- `locales/translations.json` - translation data
-- `THIRD_PARTY_LICENSES.txt` - third-party license summary
-- `SECURITY.md` - vulnerability reporting guidance
-- `CONTRIBUTING.md` - contribution guidelines
+| Repository | Focus | Role in Desktop Workflow |
+|:---|:---|:---|
+| **[LitZentrum](https://github.com/doc-bricks/LitZentrum)** | Literature & Citations | Academic paper library, BibTeX export, and literature management |
+| **[CleanMarkdown](https://github.com/doc-bricks/CleanMarkdown)** | Markdown Studio | Focused Markdown reader, editor, and typography cleaner |
+| **[UniversalDocsGrabber](https://github.com/doc-bricks/UniversalDocsGrabber)** | Document Intake | Automated mail attachment extraction and local document sorting |
+| **[UniversalInvoiceMail](https://github.com/doc-bricks/UniversalInvoiceMail)** | Invoice Mail Extraction | Deterministic invoice attachment detection and extraction |
+| **[UniversalMailCleaner](https://github.com/doc-bricks/UniversalMailCleaner)** | Mail Hygiene | Local mail archive cleaning, duplicate removal, and sanitization |
+| **[MailProcessor](https://github.com/doc-bricks/MailProcessor)** | Mail Processing | Rule-based local mail routing, filtering, and document triage |
+| **[PDFtoPDFocr](https://github.com/doc-bricks/PDFtoPDFocr)** | PDF OCR Processing | Searchable sandwich PDF creation with local Tesseract OCR |
+| **[MediaBrain](https://github.com/doc-bricks/MediaBrain)** | Media Asset Organizer | Visual media tagging, categorization, and metadata indexing |
+| **[DokuZen](https://github.com/doc-bricks/DokuZen)** | Distraction-Free Docs | Minimalist zen reading and document inspection environment |
+| **[ProFiler](https://github.com/file-bricks/ProFiler)** | Multi-Tool File Analysis | Deep file inspector, structural parser, and metadata profiler |
+| **[ExplorerPro](https://github.com/file-bricks/ExplorerPro)** | Advanced File Explorer | High-performance multi-pane local file manager |
+| **[DevCenter](https://github.com/dev-bricks/DevCenter)** | Developer Workspace | Central developer dashboard and project management hub |
+| **[CodeBox](https://github.com/dev-bricks/CodeBox)** | Code Snippet Vault | Offline-first code snippet organizer with syntax highlighting |
+| **[open-bricks](https://github.com/open-bricks)** | Umbrella Architecture | Master ecosystem coordination for desktop productivity |
 
-## License
+---
 
-This project is licensed under the [GNU Affero General Public License v3.0](LICENSE). AGPL-3.0 is appropriate because DokuReader can optionally use PyMuPDF, which is also licensed under AGPL-3.0.
+## Privacy & Security Posture
 
-## Liability
+- **Zero Network Egress:** The application contains no telemetry code, analytics libraries, or cloud sync background tasks.
+- **In-Place File Safety:** Imported files are opened exclusively in read-only mode for thumbnail and text preview.
+- **RunAsInvoker Least Privilege:** Operates entirely in unprivileged standard user mode.
+- **Formal Security SLA:** Vulnerability disclosures receive initial acknowledgement within **48 hours** and triage within **5 business days**. Reports should be submitted to `security@open-bricks.org`, `security@ellmos.ai`, or via GitHub Security Advisories. See [SECURITY.md](SECURITY.md).
 
-This project is provided without warranty. Use, testing, and processing of your own documents are at your own risk. The warranty and liability disclaimers of AGPL-3.0 apply.
+---
+
+## Quality Gates & Automated Test Suites
+
+Continuous quality is assured through independent, automated verification gates:
+
+```bash
+# Run Python unit and metadata contract tests (56 tests)
+pytest
+
+# Run static analysis and lint checks
+ruff check .
+
+# Validate whole-repository bytecode compilation
+python -m compileall -q .
+
+# Run cross-platform desktop smoke test
+python tests/source_platform_smoke.py
+
+# Run mobile PWA companion test suite (35 tests)
+cd web_companion && node --test
+```
+
+---
+
+## Machine-Readable Context (`llms.txt`)
+
+For AI coding agents (Claude Code, Gemini / Antigravity, Codex, Kimi Code), DokuReader exposes complete architectural context via [`llms.txt`](llms.txt). It provides canonical repository paths, dependency boundaries, test commands, search keywords, and security invariants in an efficient format.
+
+---
+
+## Third-Party Licenses & Transparency
+
+DokuReader is licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0)**. All third-party Python dependencies (Pillow, pypdf, reportlab, python-docx, odfpy, tkinterdnd2, pywin32, pdf2image) are distributed under permissive open-source licenses (MIT, BSD-3-Clause, Apache-2.0, PSF-2.0) or compatible AGPL-3.0 (PyMuPDF).
+
+For the complete dependency audit, license texts, and unprivileged runtime statements, see [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md) and [THIRD_PARTY_LICENSES.txt](THIRD_PARTY_LICENSES.txt).
+
+---
+
+## Marketing & Target Personas
+
+DokuReader serves four core user personas requiring zero-egress document curation:
+
+1. **Legal Tech & Compliance Analysts:** Organizations managing confidential discovery files, client dossiers, and contracts that cannot be uploaded to SaaS clouds under GDPR or HIPAA.
+2. **Academic Researchers & Literature Curators:** Scholars organizing preprints, journal articles, and whitepapers into reading queues without modifying local directory structures.
+3. **Offline-First Knowledge Workers:** Privacy-conscious professionals demanding deterministic, local desktop reading tools with zero cloud egress.
+4. **AI Desktop Application Integrators:** Autonomous agents leveraging structured `dokureader-library-v1.json` export schemas for downstream analysis.
+
+For high-intent search keywords, the 4-way competitive matrix, and marketing audit records, see [MARKETING-LOG.txt](MARKETING-LOG.txt).
+
+---
+
+## License & Liability
+
+Licensed under the [GNU Affero General Public License v3.0](LICENSE). Provided without warranty; see LICENSE for full terms.

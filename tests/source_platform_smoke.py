@@ -9,7 +9,7 @@ from unittest import mock
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT))
 
-import DokuReader
+import DokuReader  # noqa: E402
 
 
 class SmokeFailure(RuntimeError):

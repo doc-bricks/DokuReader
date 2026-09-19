@@ -1,4 +1,4 @@
-﻿# Python
+# Python
 __pycache__/
 *.py[cod]
 *.pyo
@@ -94,9 +94,21 @@ DokuReader_konvert.txt
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+.nyc_output/
 .coverage
 htmlcov/
 DECISIONS.md
 PORTIERUNGSPLAN.md
 TODO.md
 DONE.md
+
+# Multi-host sync conflicts (OneDrive / Cloud)
+* (kopie)*
+* (Kopie)*
+* (copy)*
+* (Copy)*
+*conflicted copy*
+*-WORKSTATION*
+*-ASUS*
+*.orig
+*.rej
