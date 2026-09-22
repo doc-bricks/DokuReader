@@ -53,7 +53,12 @@ desktop.ini
 *.bak
 
 # Releases
-releases/
+releases/*
+!releases/windowsstore/
+releases/windowsstore/*.msix
+releases/windowsstore/*.appx
+releases/windowsstore/test_reports/*.log
+releases/windowsstore/test_reports/*.xml
 *.exe
 *.zip
 

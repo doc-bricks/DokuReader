@@ -38,7 +38,7 @@ DokuReader ist eine lokale Desktop-App für persönliche Dokumentenbibliotheken,
 DokuReader wird als kostenloser Open-Source-Release für den Windows Store vorbereitet; eine Einreichung oder Veröffentlichung ist derzeit nicht belegt. Das Projekt steht unter AGPL-3.0. Optionale PDF-Vorschau über PyMuPDF bleibt deshalb ebenfalls im AGPL-Kontext und ist in Repository, Privacy-Doku und Drittanbieter-Lizenzübersicht offengelegt.
 
 ### Schlüsselwörter
-Dokumente, PDF, Vorschau, Bibliothek, Leseliste, Forschung, Sammel-PDF, JSON-Export, lokal, Datenschutz
+Dokumente, PDF, Vorschau, Bibliothek, Leseliste, Sammel-PDF, Datenschutz
 
 ### Kategorie
 Productivity
@@ -75,7 +75,7 @@ DokuReader is a local desktop application for personal document libraries, resea
 DokuReader is being prepared as a free open-source Windows Store release; no submission or publication is verified yet. The project is licensed under AGPL-3.0. Optional PDF preview through PyMuPDF therefore remains within the AGPL context and is documented in the repository, privacy policy, and third-party license summary.
 
 ### Keywords
-documents, PDF, preview, library, reading list, research, bundle PDF, JSON export, local, privacy
+documents, PDF, preview, library, reading list, bundle PDF, privacy
 
 ### Category
 Productivity

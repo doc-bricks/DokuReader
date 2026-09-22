@@ -1,0 +1,25 @@
+{
+  "schema": "ellmos-repo-pointer-v1",
+  "repo_id": "doc-bricks/DokuReader",
+  "profile": "plan-d-code",
+  "remote": "https://github.com/doc-bricks/DokuReader.git",
+  "default_branch": "master",
+  "local_locator": {
+    "slot_manifest": ".SYNC/{slot}/repos.json",
+    "repo_name": "DokuReader",
+    "windows_default": "C:\\_Local_DEV\\repos\\DokuReader"
+  },
+  "onedrive_mirror": {
+    "mode": "tracked-files-no-git",
+    "relative_root": ".",
+    "source_commit": "45ba5288f50ab517884e2cee92e7962859763dbb",
+    "generated_at": "2026-09-22T18:18:00+02:00",
+    "delete_policy": "no-delete",
+    "migration_state": "active-mirrored"
+  },
+  "authority": {
+    "git": "local-checkout-plus-github",
+    "planning": "onedrive",
+    "mirror": "derived-read-surface"
+  }
+}

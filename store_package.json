@@ -6,9 +6,16 @@
   "version": "1.0.1.0",
   "description": "Lokale Dokumentenbibliothek mit Vorschau, Lesestatus, Sammel-PDF und Companion-JSON-Export.",
   "executable": "DokuReader.exe",
+  "execution_alias": "dokureader.exe",
   "capabilities": "runFullTrust",
   "category": "Productivity",
   "age_rating": "3+",
+  "license": "AGPL-3.0-or-later",
+  "languages": [
+    "de-DE",
+    "en-US"
+  ],
   "privacy_url": "https://github.com/doc-bricks/DokuReader/blob/master/README.md#privacy-and-local-data",
-  "support_url": "https://github.com/doc-bricks/DokuReader/issues"
+  "support_url": "https://github.com/doc-bricks/DokuReader/issues",
+  "store_id": "TBD"
 }

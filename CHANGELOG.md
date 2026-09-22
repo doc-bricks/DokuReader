@@ -6,6 +6,14 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 ## [Unreleased]
 
 ### Hinzugefügt / Added
+- **Windows Store Readiness & Packaging-Härtung (2026-09-22)**:
+  - Vollständiges Store-Asset-Inventar um `StoreLogo.png` (50x50 PNG) in `store_assets/` und `releases/windowsstore/` erweitert.
+  - Staging-Verzeichnis `releases/windowsstore/` mit `BUILD.md`, `store_listing_de.md` und `store_listing_en.md` (jeweils mit genau 7 Store-Policy-10.1.3-konformen Suchbegriffen) ausgestattet.
+  - `store_package.json` mit `license`, `languages`, `store_id` und `execution_alias` geschärft.
+  - `_WARTUNG/check_store_readiness.py` und `_WARTUNG/generate_store_media.py` auf `StoreLogo.png` und WACK-Preflight harmonisiert (23 OK / 0 WARN / 0 BLOCKER).
+  - `.gitignore` für Release-Staging-Metadaten freigegeben unter Ausschluss von Binärdateien und Logs.
+  - `REPO.pointer.json` für saubere Plan-D-Koppelung hinterlegt.
+
 - **Pfad A Repository-Hygiene, CI-Timeout-Guardrails, Lock-Schutz & Vertragstest-Erweiterung (2026-09-22)**:
   - Kanonische `NOTICE`-Attributionsdatei für Open-Bricks-Dachorganisation und doc-bricks-Team erstellt.
   - CI-Workflows gehärtet: `timeout-minutes: 10` für `stale.yml`, `timeout-minutes: 5` und `concurrency`-Gruppe (`cancel-in-progress: true`) für `welcome.yml`, `timeout-minutes: 15` für `source-platform-smoke.yml`.

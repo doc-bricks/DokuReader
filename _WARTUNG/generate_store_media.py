@@ -23,6 +23,7 @@ SCREENSHOTS = (
 
 STORE_ASSETS = {
     "Square44x44Logo.png": (44, 44),
+    "StoreLogo.png": (50, 50),
     "Square150x150Logo.png": (150, 150),
     "Wide310x150Logo.png": (310, 150),
     "Square310x310Logo.png": (310, 310),
