@@ -48,7 +48,8 @@ def test_readme_badges_and_links_parity() -> None:
     assert "RunAsInvoker-Non--Elevated-success" in readme_en
     assert "Third--Party%20Licenses-Audited-green" in readme_en
     assert "Marketing%20Log-Active-blue" in readme_en
-    assert "Audit-2026--09--11-informational" in readme_en
+    assert "Audit-2026--09--22-informational" in readme_en
+    assert "Attribution-NOTICE-blue" in readme_en
 
     assert "License-AGPL--3.0-green" in readme_de
     assert "Version-1.0.1--dev-blue" in readme_de
@@ -60,7 +61,8 @@ def test_readme_badges_and_links_parity() -> None:
     assert "Sicherheits--SLA-48h%20%2F%205d-orange" in readme_de
     assert "RunAsInvoker-Unprivilegiert-success" in readme_de
     assert "Marketing%20Log-Aktiv-blue" in readme_de
-    assert "Audit-2026--09--11-informational" in readme_de
+    assert "Audit-2026--09--22-informational" in readme_de
+    assert "Attribution-NOTICE-blue" in readme_de
 
     for readme in (readme_en, readme_de):
         assert "https://github.com/doc-bricks/LitZentrum" in readme
@@ -230,7 +232,7 @@ def test_pep621_classifiers_and_keywords() -> None:
     '''Prüft PEP 621 Metadaten, Keywords und Python 3.13 Classifier.'''
     pyproj = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
     assert 'requires = ["setuptools>=77.0"]' in pyproj
-    assert 'license-files = ["LICENSE"]' in pyproj
+    assert 'license-files = ["LICENSE", "NOTICE", "THIRD_PARTY_LICENSES.md", "THIRD_PARTY_LICENSES.txt"]' in pyproj
     assert "keywords = [" in pyproj
     assert '"desktop-app"' in pyproj
     assert '"local-first"' in pyproj
@@ -254,3 +256,86 @@ def test_gitignore_multihost_conflict_hardening() -> None:
     assert "*-ASUS*" in gi
     assert "* (kopie)*" in gi
     assert "*.orig" in gi
+
+
+def test_notice_attribution_contract() -> None:
+    '''Prüft die kanonische NOTICE-Attributionsdatei auf Urheber, Lizenz und Open-Bricks-Bezug.'''
+    notice_file = ROOT / "NOTICE"
+    assert notice_file.is_file(), "NOTICE-Datei fehlt im Repository-Root"
+    notice = notice_file.read_text(encoding="utf-8")
+    assert "DokuReader" in notice
+    assert "Copyright (c) 2026 Lukas Geiger, doc-bricks Team" in notice
+    assert "doc-bricks family under the open-bricks open-source umbrella" in notice
+    assert "AGPL-3.0" in notice
+    assert "THIRD_PARTY_LICENSES.md" in notice
+
+
+def test_ci_timeout_and_concurrency_guardrails() -> None:
+    '''Prüft, dass alle CI-Workflows Timeout-Guardrails und Concurrency-Schutz besitzen.'''
+    stale = (ROOT / ".github/workflows/stale.yml").read_text(encoding="utf-8")
+    assert "timeout-minutes: 10" in stale
+
+    welcome = (ROOT / ".github/workflows/welcome.yml").read_text(encoding="utf-8")
+    assert "timeout-minutes: 5" in welcome
+    assert "concurrency:" in welcome
+    assert "cancel-in-progress: true" in welcome
+
+    smoke = (ROOT / ".github/workflows/source-platform-smoke.yml").read_text(encoding="utf-8")
+    assert "timeout-minutes: 15" in smoke
+    assert "concurrency:" in smoke
+    assert "cancel-in-progress: true" in smoke
+
+    ci = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+    assert "timeout-minutes: 15" in ci
+    assert "timeout-minutes: 10" in ci
+
+
+def test_extended_lock_and_multihost_defense() -> None:
+    '''Prüft Fail-Closed Canonical Lock System und erweiterte Multi-Host-Patterns in .gitignore.'''
+    gi = (ROOT / ".gitignore").read_text(encoding="utf-8")
+    for pattern in (
+        "LOCK.user.*",
+        "LOCK.until.*",
+        "LOCK.condition.*",
+        "LOCK.permissions.json",
+        ".automation-lock",
+        "*-WORKSTATION-LG*",
+        "*-ASUS-GEI*",
+        "*-LAPTOP*",
+        "*-Mac Studio*",
+        "*-MacBook*",
+        "uv.lock",
+        "!package-lock.json",
+        ".hypothesis/",
+        ".turbo/",
+        ".tox/",
+    ):
+        assert pattern in gi, f"{pattern} fehlt in .gitignore"
+
+
+def test_pyproject_pep621_hardening() -> None:
+    '''Prüft PEP 621 Standardisierung, Versionsfreeze und Pytest-Norecursedirs in pyproject.toml.'''
+    pyproj = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
+    assert 'version = "1.0.1.dev0"' in pyproj, "Versionsnummer darf im Pfad A/B nicht geändert werden (T-20260920-167562623)"
+    assert 'Notice = "https://github.com/doc-bricks/DokuReader/blob/master/NOTICE"' in pyproj
+    assert 'norecursedirs = [".git", ".pytest_cache", "__pycache__", "build", "dist", ".venv"]' in pyproj
+
+
+def test_third_party_licenses_audit_recency() -> None:
+    '''Prüft Aktualität und NOTICE-Verlinkung im Drittanbieter-Lizenzinventar.'''
+    tpl = (ROOT / "THIRD_PARTY_LICENSES.md").read_text(encoding="utf-8")
+    assert "2026-09-22" in tpl
+    assert "[NOTICE](NOTICE)" in tpl
+    assert "INV-LOCAL-01" in tpl
+    assert "INV-RUNAS-02" in tpl
+
+
+def test_web_companion_badge_and_test_count_parity() -> None:
+    '''Prüft, dass Web Companion Badges und llms.txt die 37 Node-Tests getrennt und konsistent abbilden.'''
+    readme_en = (ROOT / "README.md").read_text(encoding="utf-8")
+    readme_de = (ROOT / "README_de.md").read_text(encoding="utf-8")
+    llms = (ROOT / "llms.txt").read_text(encoding="utf-8")
+
+    assert "Web%20Companion-37%20passed-success" in readme_en
+    assert "Web%20Companion-37%20passed-success" in readme_de
+    assert "37 Node.js tests verified" in llms or "Web Companion 37 passed" in llms

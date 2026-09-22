@@ -165,4 +165,14 @@ Audit 2026-09-12 (Pfad A Repository-Hygiene, CI-Matrix-Härtung & PEP 621 Metada
 [x] [tool.ruff] linting configuration formalized in pyproject.toml
 [x] .gitignore hardened against multi-host conflict files (*conflicted copy*, *(kopie)*, etc.)
 [x] Automated contract test expansion in tests/test_metadata.py (56 Pytest, 35 Web Companion)
+
+Audit 2026-09-22 (Pfad A Repository-Hygiene, CI-Timeout-Guardrails, Lock-Schutz & Vertragstest-Erweiterung):
+[x] Canonical NOTICE attribution file created for doc-bricks and open-bricks
+[x] CI workflows hardened with timeout-minutes (stale 10m, welcome 5m, smoke 15m) and welcome concurrency
+[x] .gitignore hardened with canonical lock defense (LOCK.user.*, .automation-lock) and multi-host tokens
+[x] PEP 621 metadata standardized with license-files, Notice URL, pytest norecursedirs (version frozen per T-20260920-167562623)
+[x] THIRD_PARTY_LICENSES.md re-audited for 2026-09-22 with NOTICE linking and zero-egress invariants
+[x] README badges synchronized (Pytest 62 tests, Web Companion 37 passed, Audit 2026-09-22, NOTICE)
+[x] llms.txt updated with Last-checked 2026-09-22, Notice link, and verified test counts
+[x] Contract test expansion in tests/test_metadata.py with 6 new tests (62 Pytest, 37 Web Companion, 100% green)
 ================================================================================

@@ -1,8 +1,8 @@
 # DokuReader — Third-Party Dependency & License Audit
 
-**Status:** Audited & Verified (Pfad B Compliance)  
-**Date:** 2026-09-11  
-**Project License:** [GNU Affero General Public License v3.0 (AGPL-3.0)](LICENSE)  
+**Status:** Audited & Verified (Pfad A Repository Hygiene & Compliance Re-Audit)  
+**Date:** 2026-09-22  
+**Project License:** [GNU Affero General Public License v3.0 (AGPL-3.0)](LICENSE) · [NOTICE](NOTICE)  
 **Security & Isolation Model:** 100% Local-First · Zero-Egress · RunAsInvoker Non-Elevation  
 
 ---
@@ -11,6 +11,7 @@
 
 DokuReader is engineered as a local-first, offline document management and topic-based PDF bundling desktop application.
 
+- **Attribution & Notice:** Canonical project attribution, authors, and open-source umbrella relations are declared in the [NOTICE](NOTICE) file in the repository root.
 - **Zero Network Egress (INV-LOCAL-01):** None of the runtime dependencies bundle background telemetry, analytics collectors, or cloud update dispatchers. All parsing and preview operations execute entirely within the local host environment.
 - **Unprivileged Execution (INV-RUNAS-02):** All dependencies operate safely within standard user privilege mode (`RunAsInvoker`). No administrative elevation, root daemon execution, or privileged OS hooks are required or requested.
 - **License Compatibility (INV-LIC-03):** The project is licensed under AGPL-3.0. Runtime and development dependencies are distributed under permissive open-source licenses (MIT, BSD-3-Clause, Apache-2.0, PSF-2.0) or compatible reciprocal licenses (PyMuPDF AGPL-3.0), ensuring 100% OSI compliance without proprietary lock-in.

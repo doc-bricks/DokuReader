@@ -11,7 +11,7 @@ authors = [
     { name = "doc-bricks Team" }
 ]
 license = { text = "AGPL-3.0" }
-license-files = ["LICENSE"]
+license-files = ["LICENSE", "NOTICE", "THIRD_PARTY_LICENSES.md", "THIRD_PARTY_LICENSES.txt"]
 requires-python = ">=3.10"
 keywords = [
     "desktop-app",
@@ -58,6 +58,7 @@ Issues = "https://github.com/doc-bricks/DokuReader/issues"
 Changelog = "https://github.com/doc-bricks/DokuReader/blob/master/CHANGELOG.md"
 Security = "https://github.com/doc-bricks/DokuReader/blob/master/SECURITY.md"
 "Third-Party Licenses" = "https://github.com/doc-bricks/DokuReader/blob/master/THIRD_PARTY_LICENSES.md"
+Notice = "https://github.com/doc-bricks/DokuReader/blob/master/NOTICE"
 "Marketing Log" = "https://github.com/doc-bricks/DokuReader/blob/master/MARKETING-LOG.txt"
 "LLM Context" = "https://github.com/doc-bricks/DokuReader/blob/master/llms.txt"
 "Parent Organization" = "https://github.com/doc-bricks"
@@ -70,6 +71,7 @@ testpaths = [
     "tests",
 ]
 pythonpath = ["."]
+norecursedirs = [".git", ".pytest_cache", "__pycache__", "build", "dist", ".venv"]
 
 [tool.ruff]
 line-length = 100

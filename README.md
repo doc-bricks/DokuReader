@@ -11,8 +11,8 @@
 [![Python: 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python)](pyproject.toml)
 [![UI: Python / Tkinter](https://img.shields.io/badge/GUI-Python%20%2F%20Tkinter-blue)](DokuReader.py)
 [![Platform: Windows | macOS | Linux](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-blue?logo=windows)](#getting-started--installation)
-[![Pytest: 56 tests, 0 failed](https://img.shields.io/badge/Pytest-56%20tests%2C%200%20failed-success?logo=pytest)](pyproject.toml)
-[![Web Companion: 35 passed](https://img.shields.io/badge/Web%20Companion-35%20passed-success?logo=nodedotjs)](web_companion)
+[![Pytest: 62 tests, 0 failed](https://img.shields.io/badge/Pytest-62%20tests%2C%200%20failed-success?logo=pytest)](pyproject.toml)
+[![Web Companion: 37 passed](https://img.shields.io/badge/Web%20Companion-37%20passed-success?logo=nodedotjs)](web_companion)
 [![Privacy: 100% Offline](https://img.shields.io/badge/Privacy-100%25%20Offline-success)](PRIVACY_POLICY.md)
 [![Security: Local--First](https://img.shields.io/badge/Security-Local--First-blue)](SECURITY.md)
 [![Security SLA: 48h / 5d](https://img.shields.io/badge/Security%20SLA-48h%20%2F%205d-orange)](SECURITY.md)
@@ -22,7 +22,8 @@
 [![LLM-Ready: llms.txt](https://img.shields.io/badge/LLM--Ready-llms.txt-success)](llms.txt)
 [![Ecosystem: doc-bricks](https://img.shields.io/badge/Ecosystem-doc--bricks-purple)](https://github.com/doc-bricks)
 [![Umbrella: open-bricks](https://img.shields.io/badge/Umbrella-open--bricks-blue)](https://github.com/open-bricks)
-[![Audit: 2026--09--11](https://img.shields.io/badge/Audit-2026--09--11-informational)](#quality-gates--automated-test-suites)
+[![Audit: 2026--09--22](https://img.shields.io/badge/Audit-2026--09--22-informational)](#quality-gates--automated-test-suites)
+[![Attribution: NOTICE](https://img.shields.io/badge/Attribution-NOTICE-blue)](NOTICE)
 
 > [!NOTE]
 > DokuReader is part of the **doc-bricks** local document management suite. It works seamlessly alongside [LitZentrum](https://github.com/doc-bricks/LitZentrum) (citation & literature management), [CleanMarkdown](https://github.com/doc-bricks/CleanMarkdown) (Markdown reading & editing), and [UniversalDocsGrabber](https://github.com/doc-bricks/UniversalDocsGrabber) (mail attachment intake). DokuReader is fully indexed for AI/LLM coding assistants via [`llms.txt`](llms.txt).
@@ -332,7 +333,7 @@ python -m compileall -q .
 # Run cross-platform desktop smoke test
 python tests/source_platform_smoke.py
 
-# Run mobile PWA companion test suite (35 tests)
+# Run mobile PWA companion test suite (37 tests)
 cd web_companion && node --test
 ```
 
@@ -348,7 +349,7 @@ For AI coding agents (Claude Code, Gemini / Antigravity, Codex, Kimi Code), Doku
 
 DokuReader is licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0)**. All third-party Python dependencies (Pillow, pypdf, reportlab, python-docx, odfpy, tkinterdnd2, pywin32, pdf2image) are distributed under permissive open-source licenses (MIT, BSD-3-Clause, Apache-2.0, PSF-2.0) or compatible AGPL-3.0 (PyMuPDF).
 
-For the complete dependency audit, license texts, and unprivileged runtime statements, see [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md) and [THIRD_PARTY_LICENSES.txt](THIRD_PARTY_LICENSES.txt).
+For the complete dependency audit, license texts, and unprivileged runtime statements, see [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md), [THIRD_PARTY_LICENSES.txt](THIRD_PARTY_LICENSES.txt), and [NOTICE](NOTICE).
 
 ---
 

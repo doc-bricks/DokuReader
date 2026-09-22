@@ -6,6 +6,16 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 ## [Unreleased]
 
 ### Hinzugefügt / Added
+- **Pfad A Repository-Hygiene, CI-Timeout-Guardrails, Lock-Schutz & Vertragstest-Erweiterung (2026-09-22)**:
+  - Kanonische `NOTICE`-Attributionsdatei für Open-Bricks-Dachorganisation und doc-bricks-Team erstellt.
+  - CI-Workflows gehärtet: `timeout-minutes: 10` für `stale.yml`, `timeout-minutes: 5` und `concurrency`-Gruppe (`cancel-in-progress: true`) für `welcome.yml`, `timeout-minutes: 15` für `source-platform-smoke.yml`.
+  - `.gitignore` um kanonische Lock-Muster (`LOCK.user.*`, `LOCK.until.*`, `LOCK.condition.*`, `LOCK.permissions.json`, `.automation-lock`), Host-Tokens (`*-WORKSTATION-LG*`, `*-ASUS-GEI*`, `*-LAPTOP*`, `*-Mac Studio*`, `*-MacBook*`), Package-Lock-Schutz (`uv.lock`, `!package-lock.json`) und Test-Caches (`.hypothesis/`, `.turbo/`, `.tox/`) gehärtet.
+  - PEP 621 Metadaten in `pyproject.toml` mit standardisierten `license-files` (inkl. `NOTICE`), Notice-URL in `[project.urls]` und `norecursedirs` in `[tool.pytest.ini_options]` geschärft; Versionsnummer `1.0.1.dev0` gemäß T-20260920-167562623 strikt eingefroren.
+  - `THIRD_PARTY_LICENSES.md` Re-Audit auf Stand 2026-09-22 mit `NOTICE`-Verlinkung und Unprivilegiertheits-Prüfung durchgeführt.
+  - `README.md` und `README_de.md` Badges synchronisiert: Pytest (62 Tests, 0 failed), Web Companion (37 passed), Audit 2026-09-22 und Attribution NOTICE.
+  - `llms.txt` auf Stand 2026-09-22 mit Notice-Link und getrennten Testmetriken aktualisiert.
+  - Vertragstestsuite in `tests/test_metadata.py` um 6 neue Contract-Tests (`test_notice_attribution_contract`, `test_ci_timeout_and_concurrency_guardrails`, `test_extended_lock_and_multihost_defense`, `test_pyproject_pep621_hardening`, `test_third_party_licenses_audit_recency`, `test_web_companion_badge_and_test_count_parity`) erweitert (62 Pytest Tests, 100% bestanden).
+
 - **Pfad A Repository-Hygiene, CI-Matrix-Härtung & PEP 621 Metadaten (2026-09-12)**:
   - Vollständigen 3-OS-CI-Matrix-Workflow `.github/workflows/ci.yml` für Windows, Linux und macOS über Python 3.10 bis 3.13 inklusive Web-Companion Node-Testrunner und Xvfb-Absicherung eingerichtet.
   - PEP 621 Metadaten in `pyproject.toml` mit standardisierten `keywords`, Python 3.13 Classifier, `license-files` und modernisiertem Build-System (`setuptools>=77.0`) geschärft.
