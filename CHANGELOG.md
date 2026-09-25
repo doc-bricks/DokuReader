@@ -5,7 +5,17 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
-### Hinzugefügt / Added
+- **Pfad B Discoverability, 18-Punkte-Navigationsparität, 10-Dimensionen-Vergleichsmatrix & § 521 BGB Haftungsausschluss (2026-09-25)**:
+  - 18-Punkte-Schnellnavigation in `README.md` und `README_de.md` mit 100% reziproken dualen HTML-Ankern (`<a id="sec-01"></a>` bis `<a id="sec-18"></a>`) und GitHub-Slug-Parität implementiert.
+  - Section 4: Ziel-Personas & High-Intent-Suchanfragen (`[PERSONA-01]` bis `[PERSONA-04]`) mit zweisprachigen SEO-Queries für Forscher, Juristen, Redakteure und KI-Agenten verankert.
+  - Section 5: 10-Dimensionen-Vergleichsmatrix gegen Calibre, Zotero, DEVONthink und Ad-Hoc-Ordnerstrukturen gemappt auf Invarianten `INV-LOCAL-01` bis `INV-SLA-10` integriert.
+  - Section 18: Gesetzlicher Haftungsausschluss nach deutschem Gefälligkeitsrecht (§ 521 BGB) und verbindliche 48h-Erstreaktionszeit / 5-Werktage-Triage SLA für gemeldete Sicherheitshinweise verankert.
+  - `THIRD_PARTY_LICENSES.md` Re-Audit auf Stand 2026-09-25 mit Level 1 SBOM Invarianten-Kreuztabelle (`INV-LOCAL-01` bis `INV-SLA-10`) und Unprivilegiertheits-Zusicherung (`RunAsInvoker`) aktualisiert.
+  - `llms.txt` auf Stand 2026-09-25 mit 18-Punkte-Gliederung und Testsuite-Parität synchronisiert.
+  - `MARKETING-LOG.txt` um Audit 2026-09-25 erweitert.
+  - Vertragstestsuite `tests/test_metadata.py` um Validierungen für 18-Punkte-Navigation, Dual-HTML-Anker, Personas, 10-Dimensionen-Vergleichsmatrix und § 521 BGB Haftungsausschluss erweitert.
+  - Version `1.0.1-dev` (`1.0.1.dev0`) gemäß T-20260920-167562623 strikt unverändert beibehalten.
+
 - **Windows Store Readiness & Packaging-Härtung (2026-09-22)**:
   - Vollständiges Store-Asset-Inventar um `StoreLogo.png` (50x50 PNG) in `store_assets/` und `releases/windowsstore/` erweitert.
   - Staging-Verzeichnis `releases/windowsstore/` mit `BUILD.md`, `store_listing_de.md` und `store_listing_en.md` (jeweils mit genau 7 Store-Policy-10.1.3-konformen Suchbegriffen) ausgestattet.

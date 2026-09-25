@@ -1,6 +1,6 @@
 # DokuReader
 
-## Last-checked: 2026-09-22
+## Last-checked: 2026-09-25
 
 ## Canonical Links
 
@@ -19,10 +19,10 @@ DokuReader is an unprivileged, local-first Tkinter desktop application for organ
 
 ## Audience & Personas
 
-- Legal Tech & Compliance Analysts: Professionals managing confidential discovery documents that legally prohibit cloud upload under GDPR/HIPAA.
-- Academic Researchers & Literature Curators: Researchers organizing preprints and whitepapers into thematic reading queues without moving originals.
-- Offline-First Knowledge Workers & Privacy Advocates: Users demanding zero-egress, transparent local JSON state, and unprivileged execution.
-- AI Desktop Application Developers & Coding Agents: Autonomous agents using structured `dokureader-library-v1.json` schemas for downstream document analysis.
+- [PERSONA-01] Academic Researchers & Literature Curators: Scholars organizing preprints and whitepapers into thematic reading queues without moving originals.
+- [PERSONA-02] Legal Counsel & Compliance Officers: Corporate counsel and auditors managing confidential discovery documents prohibiting cloud upload under GDPR/HIPAA.
+- [PERSONA-03] Technical Writers & Knowledge Engineers: Technical document curators requiring multi-format previews and consolidated PDF bundling.
+- [PERSONA-04] Autonomous AI Agents & Developers: Autonomous coding agents using structured `dokureader-library-v1.json` schemas for downstream document analysis.
 
 ## Search Phrases
 
@@ -67,7 +67,7 @@ DokuReader is not a cloud document manager, hosted OCR platform, general note-ta
 
 - Python tests live under `tests/` (including `test_metadata.py`, `test_release_contract.py`, `test_accessibility_contract.py`, `test_bug_regressions.py`, `test_export_format.py`, `test_store_readiness.py`, `test_windows_wack.py`, `test_store_media.py`, `test_ui_accessibility.py`; 62 collected, 62 passed, 0 skipped, 0 failed, exit 0).
 - Web Companion tests live under `web_companion/tests/` (37 Node.js tests verified: 100% green).
-- Suites are counted separately, never summed: Python 62 collected / 0 failed (exit 0); Web Companion 37 passed / 0 failed (exit 0); `ruff check .` clean (exit 0); `python tests/source_platform_smoke.py` OK (exit 0). Measured 2026-09-22 with Python 3.12.10 on Windows.
+- Suites are counted separately, never summed: Python 62 collected / 0 failed (exit 0); Web Companion 37 passed / 0 failed (exit 0); `ruff check .` clean (exit 0); `python tests/source_platform_smoke.py` OK (exit 0). Measured 2026-09-25 with Python 3.12.10 on Windows.
 - The former sporadic Tk initialization skip is bounded by at most three setup attempts. Ten independent focused runs produced 60/60 UI test passes without a skip. A real Tk visual smoke captured and reviewed empty, drag-and-drop and text-preview states; receipt: `UI_POLISH_SMOKE.json`.
 - MSIX, WACK, signing and Store gates are external and remain unproven by any of these runs.
 - Current focused validation: `python -m pytest -ra -v` and `node --test` in `web_companion`.

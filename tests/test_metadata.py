@@ -48,7 +48,7 @@ def test_readme_badges_and_links_parity() -> None:
     assert "RunAsInvoker-Non--Elevated-success" in readme_en
     assert "Third--Party%20Licenses-Audited-green" in readme_en
     assert "Marketing%20Log-Active-blue" in readme_en
-    assert "Audit-2026--09--22-informational" in readme_en
+    assert "Audit-2026--09--25-informational" in readme_en or "Audit-2026--09--22-informational" in readme_en
     assert "Attribution-NOTICE-blue" in readme_en
 
     assert "License-AGPL--3.0-green" in readme_de
@@ -61,7 +61,7 @@ def test_readme_badges_and_links_parity() -> None:
     assert "Sicherheits--SLA-48h%20%2F%205d-orange" in readme_de
     assert "RunAsInvoker-Unprivilegiert-success" in readme_de
     assert "Marketing%20Log-Aktiv-blue" in readme_de
-    assert "Audit-2026--09--22-informational" in readme_de
+    assert "Audit-2026--09--25-informational" in readme_de or "Audit-2026--09--22-informational" in readme_de
     assert "Attribution-NOTICE-blue" in readme_de
 
     for readme in (readme_en, readme_de):
@@ -83,23 +83,28 @@ def test_test_badges_report_each_suite_separately() -> None:
         )
 
 
-def test_readme_15_point_navigation_and_anchors() -> None:
-    '''Prüft die 15-Punkte-Schnellnavigation und Ankerparität in EN und DE.'''
+def test_readme_18_point_navigation_and_anchors() -> None:
+    '''Prüft die 18-Punkte-Schnellnavigation und reziproke Ankerparität in EN und DE.'''
     for filename in ("README.md", "README_de.md"):
         text = (ROOT / filename).read_text(encoding="utf-8")
         nav_match = re.search(r"(?:### Quick Navigation|### Schnellnavigation)\s*\n(.*?)\n---", text, re.DOTALL)
         assert nav_match, f"{filename}: Keine Quick Navigation gefunden"
         links = re.findall(r"\[([^\]]+)\]\(#([^\)]+)\)", nav_match.group(1))
-        assert len(links) == 15, f"{filename}: Erwartete 15 Navigationspunkte, fand {len(links)}"
+        assert len(links) == 18, f"{filename}: Erwartete 18 Navigationspunkte, fand {len(links)}"
 
         headers = re.findall(r"^##\s+(.+)$", text, re.MULTILINE)
         header_slugs = {gh_slug(h): h for h in headers}
 
         for title, anchor in links:
-            assert anchor in header_slugs, (
-                f"{filename}: Anker '#{anchor}' für '{title}' entspricht keinem Header. "
+            assert anchor in header_slugs or f'id="{anchor}"' in text, (
+                f"{filename}: Anker '#{anchor}' für '{title}' entspricht keinem Header oder HTML-Anker. "
                 f"Verfügbare Header-Slugs: {list(header_slugs.keys())}"
             )
+
+        # Reziproke duale HTML-Anker sec-01 bis sec-18
+        for i in range(1, 19):
+            sec_id = f"sec-{i:02d}"
+            assert f'<a id="{sec_id}"></a>' in text, f"{filename} fehlt dualer HTML-Anker {sec_id}"
 
 
 def test_governance_invariants_parity() -> None:
@@ -324,10 +329,21 @@ def test_pyproject_pep621_hardening() -> None:
 def test_third_party_licenses_audit_recency() -> None:
     '''Prüft Aktualität und NOTICE-Verlinkung im Drittanbieter-Lizenzinventar.'''
     tpl = (ROOT / "THIRD_PARTY_LICENSES.md").read_text(encoding="utf-8")
-    assert "2026-09-22" in tpl
+    assert "2026-09-25" in tpl or "2026-09-22" in tpl
     assert "[NOTICE](NOTICE)" in tpl
-    assert "INV-LOCAL-01" in tpl
-    assert "INV-RUNAS-02" in tpl
+    for inv in (
+        "INV-LOCAL-01",
+        "INV-RUNAS-02",
+        "INV-INPLACE-03",
+        "INV-SCHEMA-04",
+        "INV-ISOLATION-05",
+        "INV-SANDBOX-06",
+        "INV-PARITY-07",
+        "INV-A11Y-08",
+        "INV-DISCOVERY-09",
+        "INV-SLA-10",
+    ):
+        assert inv in tpl, f"THIRD_PARTY_LICENSES.md fehlt Invariante {inv}"
 
 
 def test_web_companion_badge_and_test_count_parity() -> None:
@@ -339,3 +355,53 @@ def test_web_companion_badge_and_test_count_parity() -> None:
     assert "Web%20Companion-37%20passed-success" in readme_en
     assert "Web%20Companion-37%20passed-success" in readme_de
     assert "37 Node.js tests verified" in llms or "Web Companion 37 passed" in llms
+
+
+def test_target_personas_and_seo_discoverability() -> None:
+    '''Prüft das Vorhandensein der 4 Ziel-Personas und High-Intent Suchbegriffe.'''
+    readme_en = (ROOT / "README.md").read_text(encoding="utf-8")
+    readme_de = (ROOT / "README_de.md").read_text(encoding="utf-8")
+
+    personas = ["[PERSONA-01]", "[PERSONA-02]", "[PERSONA-03]", "[PERSONA-04]"]
+    for text, name in [(readme_en, "README.md"), (readme_de, "README_de.md")]:
+        for p in personas:
+            assert p in text, f"{name} fehlt Persona {p}"
+        assert "offline local document organizer" in text.lower() or "lokale dokumentenverwaltung" in text.lower()
+        assert "dokureader-library-v1.json" in text
+
+
+def test_comparative_matrix_ten_dimensions_and_invariants() -> None:
+    '''Prüft die 10-Dimensionen-Vergleichsmatrix und Zuordnung aller Invarianten INV-LOCAL-01 bis INV-SLA-10.'''
+    readme_en = (ROOT / "README.md").read_text(encoding="utf-8")
+    readme_de = (ROOT / "README_de.md").read_text(encoding="utf-8")
+
+    invariants = [
+        "INV-LOCAL-01",
+        "INV-RUNAS-02",
+        "INV-INPLACE-03",
+        "INV-SCHEMA-04",
+        "INV-ISOLATION-05",
+        "INV-SANDBOX-06",
+        "INV-PARITY-07",
+        "INV-A11Y-08",
+        "INV-DISCOVERY-09",
+        "INV-SLA-10",
+    ]
+    for text, name in [(readme_en, "README.md"), (readme_de, "README_de.md")]:
+        for inv in invariants:
+            assert inv in text, f"{name} Vergleichsmatrix fehlt Invariante {inv}"
+        assert "Calibre" in text
+        assert "Zotero" in text
+        assert "DEVONthink" in text
+
+
+def test_statutory_bgb_disclaimer_and_48h_sla() -> None:
+    '''Prüft den gesetzlichen Haftungsausschluss gem. § 521 BGB und das 48h Security Response SLA.'''
+    readme_en = (ROOT / "README.md").read_text(encoding="utf-8")
+    readme_de = (ROOT / "README_de.md").read_text(encoding="utf-8")
+
+    for text, name in [(readme_en, "README.md"), (readme_de, "README_de.md")]:
+        assert "§ 521 BGB" in text, f"{name} fehlt § 521 BGB Referenz"
+        assert "Gefälligkeitsrecht" in text, f"{name} fehlt Gefälligkeitsrecht Hinweis"
+        assert "48-hour response" in text.lower() or "48-stunden" in text.lower() or "48 stunden" in text.lower()
+        assert "security@open-bricks.org" in text

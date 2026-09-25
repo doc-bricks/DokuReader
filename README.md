@@ -11,7 +11,7 @@
 [![Python: 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python)](pyproject.toml)
 [![UI: Python / Tkinter](https://img.shields.io/badge/GUI-Python%20%2F%20Tkinter-blue)](DokuReader.py)
 [![Platform: Windows | macOS | Linux](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-blue?logo=windows)](#getting-started--installation)
-[![Pytest: 62 tests, 0 failed](https://img.shields.io/badge/Pytest-62%20tests%2C%200%20failed-success?logo=pytest)](pyproject.toml)
+[![Pytest: 65 tests, 0 failed](https://img.shields.io/badge/Pytest-65%20tests%2C%200%20failed-success?logo=pytest)](pyproject.toml)
 [![Web Companion: 37 passed](https://img.shields.io/badge/Web%20Companion-37%20passed-success?logo=nodedotjs)](web_companion)
 [![Privacy: 100% Offline](https://img.shields.io/badge/Privacy-100%25%20Offline-success)](PRIVACY_POLICY.md)
 [![Security: Local--First](https://img.shields.io/badge/Security-Local--First-blue)](SECURITY.md)
@@ -22,7 +22,7 @@
 [![LLM-Ready: llms.txt](https://img.shields.io/badge/LLM--Ready-llms.txt-success)](llms.txt)
 [![Ecosystem: doc-bricks](https://img.shields.io/badge/Ecosystem-doc--bricks-purple)](https://github.com/doc-bricks)
 [![Umbrella: open-bricks](https://img.shields.io/badge/Umbrella-open--bricks-blue)](https://github.com/open-bricks)
-[![Audit: 2026--09--22](https://img.shields.io/badge/Audit-2026--09--22-informational)](#quality-gates--automated-test-suites)
+[![Audit: 2026--09--25](https://img.shields.io/badge/Audit-2026--09--25-informational)](#quality-gates--automated-test-suites)
 [![Attribution: NOTICE](https://img.shields.io/badge/Attribution-NOTICE-blue)](NOTICE)
 
 > [!NOTE]
@@ -34,22 +34,28 @@
 1. [Overview & Core Value](#overview--core-value)
 2. [Key Capabilities & Feature Matrix](#key-capabilities--feature-matrix)
 3. [Interactive Architecture Flowchart](#interactive-architecture-flowchart)
-4. [Document Lifecycle & Privacy Sequence](#document-lifecycle--privacy-sequence)
-5. [Getting Started & Installation](#getting-started--installation)
-6. [Supported Formats & System Dependencies](#supported-formats--system-dependencies)
-7. [Windows Store & Standalone Build](#windows-store--standalone-build)
-8. [Mobile & PWA Companion](#mobile--pwa-companion)
-9. [Governance & Runtime Invariants](#governance--runtime-invariants)
-10. [Sibling Tools & Ecosystem Matrix](#sibling-tools--ecosystem-matrix)
-11. [Privacy & Security Posture](#privacy--security-posture)
-12. [Quality Gates & Automated Test Suites](#quality-gates--automated-test-suites)
-13. [Machine-Readable Context (`llms.txt`)](#machine-readable-context-llmstxt)
-14. [Third-Party Licenses & Transparency](#third-party-licenses--transparency)
-15. [Marketing & Target Personas](#marketing--target-personas)
+4. [Target Personas & High-Intent Discoverability Queries](#target-personas--high-intent-discoverability-queries)
+5. [Comparative Matrix vs. Alternatives](#comparative-matrix-vs-alternatives)
+6. [Document Lifecycle & Privacy Sequence](#document-lifecycle--privacy-sequence)
+7. [Getting Started & Installation](#getting-started--installation)
+8. [Supported Formats & System Dependencies](#supported-formats--system-dependencies)
+9. [Windows Store & Standalone Build](#windows-store--standalone-build)
+10. [Mobile & PWA Companion](#mobile--pwa-companion)
+11. [Governance & Runtime Invariants](#governance--runtime-invariants)
+12. [Sibling Tools & Ecosystem Matrix](#sibling-tools--ecosystem-matrix)
+13. [Privacy & Security Posture](#privacy--security-posture)
+14. [Quality Gates & Automated Test Suites](#quality-gates--automated-test-suites)
+15. [Machine-Readable Context (`llms.txt`)](#machine-readable-context-llmstxt)
+16. [Third-Party Licenses & Transparency](#third-party-licenses--transparency)
+17. [Marketing & Discoverability Strategies / Log](#marketing--discoverability-strategies--log)
+18. [Statutory Notice, Liability Limitation & License](#statutory-notice-liability-limitation--license)
 
 ---
 
 ## Overview & Core Value
+<a id="sec-01"></a>
+<a id="overview--core-value"></a>
+<a id="overview"></a>
 
 DokuReader is an unprivileged desktop application for organizing, previewing, and bundling documents by topic. Original files stay exactly where they are; the application indexes only file path references and read status in a local JSON state file (`~/.dokubibliothek_state.json`).
 
@@ -76,6 +82,9 @@ The version roles are intentionally separate and read back from the current sour
 ---
 
 ## Key Capabilities & Feature Matrix
+<a id="sec-02"></a>
+<a id="key-capabilities--feature-matrix"></a>
+<a id="key-capabilities"></a>
 
 - **In-Place File Protection (INV-INPLACE-03):** Original documents are never copied, moved, modified, or overwritten.
 - **Dynamic Topic Organization:** Create, rename, sort, and delete document topics on the fly.
@@ -92,6 +101,9 @@ The version roles are intentionally separate and read back from the current sour
 ---
 
 ## Interactive Architecture Flowchart
+<a id="sec-03"></a>
+<a id="interactive-architecture-flowchart"></a>
+<a id="architecture"></a>
 
 ```mermaid
 flowchart TD
@@ -141,7 +153,61 @@ flowchart TD
 
 ---
 
+## Target Personas & High-Intent Discoverability Queries
+<a id="sec-04"></a>
+<a id="target-personas--high-intent-discoverability-queries"></a>
+<a id="target-personas"></a>
+
+DokuReader serves four distinct user personas requiring deterministic, local-first document curation:
+
+- **`[PERSONA-01]` Academic Researchers & Literature Curators:**
+  - *Need:* Curation of preprints, journal PDFs, whitepapers into topic-based reading queues without duplicating or modifying local filesystem storage.
+  - *High-Intent Queries (EN):* "offline local document organizer pdf research library", "desktop pdf manager read status topics", "academic paper queue local first python"
+  - *High-Intent Queries (DE):* "lokale dokumentenverwaltung pdf forschungsbibliothek", "desktop pdf organizer lesestatus themen", "wissenschaftliche artikel offline lesen"
+
+- **`[PERSONA-02]` Legal Counsel & Compliance Officers:**
+  - *Need:* Confidential discovery dossier organization, litigation case reading, zero cloud egress under GDPR/HIPAA/professional secrecy mandates.
+  - *High-Intent Queries (EN):* "confidential legal discovery document viewer offline", "zero egress local pdf bundle case management", "gdpr compliant document organizer desktop"
+  - *High-Intent Queries (DE):* "vertrauliche aktenverwaltung anwalt offline", "zero egress dokumentenleser bündeln datenschutz", "dsgvo konforme dokumentenbibliothek lokal"
+
+- **`[PERSONA-03]` Technical Writers & Knowledge Engineers:**
+  - *Need:* Multi-format document inspection (Markdown, PDF, DOCX, ODT, images), in-place topic indexing, consolidated PDF bundling for handbook reviews.
+  - *High-Intent Queries (EN):* "multi format document preview bundling tool", "markdown docx pdf reading list desktop", "technical documentation bundle generator local"
+  - *High-Intent Queries (DE):* "multi format dokumenten vorschau sammlung", "markdown docx pdf leseliste desktop", "technische dokumentation bündeln offline"
+
+- **`[PERSONA-04]` Autonomous AI Agents & Developers:**
+  - *Need:* Clean schema-compliant `dokureader-library-v1.json` metadata exports for agentic indexing and local RAG pipelines without file copying.
+  - *High-Intent Queries (EN):* "local document library metadata json export schema", "clean json document catalogue ai agents", "offline document reader llm ready"
+  - *High-Intent Queries (DE):* "lokale dokumentenbibliothek json export schema", "metadaten katalog dokumente llm agenten", "offline dokumentenleser llms txt"
+
+---
+
+## Comparative Matrix vs. Alternatives
+<a id="sec-05"></a>
+<a id="comparative-matrix-vs-alternatives"></a>
+<a id="comparative-matrix"></a>
+
+Evaluation of DokuReader against common alternative approaches across 10 architectural and operational dimensions:
+
+| Dimension / Requirement | DokuReader | Calibre (E-Book Manager) | Zotero (Reference Manager) | DEVONthink / Commercial DMS | Ad-Hoc Filesystem Folders |
+|:---|:---|:---|:---|:---|:---|
+| **D1: In-Place Safety (`INV-INPLACE-03`)** | **Strictly in-place** (Zero file moves or modifications) | ❌ Copies all files into rigid internal directory structure | ⚠️ Copies files by default (linked files complex) | ⚠️ Proprietary database vault ingestion | ✅ Files remain in place |
+| **D2: Zero-Egress Privacy (`INV-LOCAL-01`)** | **100% Offline** (Zero outbound network traffic) | ⚠️ Integrates web content scraping and server daemons | ⚠️ Cloud sync account prompts and web integrations | ❌ Proprietary cloud sync & license verification | ✅ Local only |
+| **D3: Unprivileged Execution (`INV-RUNAS-02`)** | **RunAsInvoker User Mode** (No admin elevation) | ⚠️ Installer often prompts for UAC elevation | ⚠️ Administrative install requirements | ❌ System kernel/driver extensions on macOS | ✅ Standard user mode |
+| **D4: Deterministic Schema (`INV-SCHEMA-04`)** | **`dokureader-library-v1`** clean JSON export | ❌ Complex SQLite schema with heavy metadata blobs | ❌ Complex SQLite / CSL JSON exports | ❌ Proprietary binary database formats | ❌ No structured metadata schema |
+| **D5: Multi-Format Preview (`INV-SANDBOX-06`)** | **PDF, TXT, DOCX, ODT, PNG, JPG** via safe bridges | ✅ Broad e-book format support | ⚠️ PDF focused; limited office format previews | ✅ Broad format support | ❌ Relies entirely on external OS apps |
+| **D6: Consolidated PDF Bundling** | **One-click merged PDF** with read/unread filters | ❌ No native topic PDF merging workflow | ❌ Requires external plugins or PDF editors | ⚠️ Complex scripting required | ❌ Requires manual external PDF stitching |
+| **D7: Mobile PWA Companion (`INV-ISOLATION-05`)** | **Offline PWA** with round-trip JSON sync | ⚠️ Built-in web server exposes open HTTP port | ⚠️ Proprietary iOS/Android mobile apps | ⚠️ Proprietary sync server and mobile apps | ❌ Manual file sync required |
+| **D8: Tri-Platform Source Support (`INV-PARITY-07`)** | **Windows, Linux & macOS** native Python/Tkinter | ✅ Cross-platform desktop | ✅ Cross-platform desktop | ❌ Apple macOS/iOS proprietary lock-in | ✅ Universal |
+| **D9: Automated Test Quality Gates** | **62+ Pytest + 37 Node tests** (100% green) | ⚠️ Large monolithic codebase | ⚠️ Complex integration harness | ❌ Closed-source proprietary verification | ❌ No test harness |
+| **D10: Open Governance & SLA (`INV-SLA-10`)** | **AGPL-3.0, § 521 BGB disclaimer, 48h SLA** | ⚠️ GPL-3.0, no formal vulnerability SLA | ⚠️ AGPL-3.0, community forum triage | ❌ Closed-source commercial EULA | ❌ None |
+
+---
+
 ## Document Lifecycle & Privacy Sequence
+<a id="sec-06"></a>
+<a id="document-lifecycle--privacy-sequence"></a>
+<a id="document-lifecycle"></a>
 
 ```mermaid
 sequenceDiagram
@@ -178,6 +244,9 @@ sequenceDiagram
 ---
 
 ## Getting Started & Installation
+<a id="sec-07"></a>
+<a id="getting-started--installation"></a>
+<a id="installation"></a>
 
 ### Requirements
 
@@ -207,6 +276,9 @@ START.bat
 ---
 
 ## Supported Formats & System Dependencies
+<a id="sec-08"></a>
+<a id="supported-formats--system-dependencies"></a>
+<a id="supported-formats"></a>
 
 ### Supported Document Formats
 
@@ -223,6 +295,9 @@ For full preview rendering and external document conversion:
 ---
 
 ## Windows Store & Standalone Build
+<a id="sec-09"></a>
+<a id="windows-store--standalone-build"></a>
+<a id="windows-store"></a>
 
 ### Local Executable Build
 
@@ -251,12 +326,15 @@ Generates the exact certification command for elevated execution and parses resu
 ---
 
 ## Mobile & PWA Companion
+<a id="sec-10"></a>
+<a id="mobile--pwa-companion"></a>
+<a id="pwa-companion"></a>
 
 The companion web application under `web_companion/` provides an offline-first, mobile-optimized reading view:
 - **Installable PWA:** Full Web App Manifest with iOS Safe-Area support (`viewport-fit=cover`).
 - **Offline Shell:** Scoped Service Worker caching preserving external application caches.
 - **Round-Trip Synchronization:** Imports `dokureader-library-v1.json` exported from the desktop app, allows toggling read states on mobile, and exports an updated JSON back to the desktop.
-- **Zero Third-Party Dependencies:** Runs on pure vanilla JavaScript and Node.js built-in test runner (`35 passed, 0 failed`).
+- **Zero Third-Party Dependencies:** Runs on pure vanilla JavaScript and Node.js built-in test runner (`37 passed, 0 failed`).
 
 ```bash
 cd web_companion
@@ -266,6 +344,9 @@ node --test
 ---
 
 ## Governance & Runtime Invariants
+<a id="sec-11"></a>
+<a id="governance--runtime-invariants"></a>
+<a id="governance"></a>
 
 The following 10 invariants govern DokuReader's runtime architecture, privacy boundary, and security guarantees:
 
@@ -285,6 +366,9 @@ The following 10 invariants govern DokuReader's runtime architecture, privacy bo
 ---
 
 ## Sibling Tools & Ecosystem Matrix
+<a id="sec-12"></a>
+<a id="sibling-tools--ecosystem-matrix"></a>
+<a id="ecosystem"></a>
 
 DokuReader is a core component of the **doc-bricks** family under the **open-bricks** open-source initiative:
 
@@ -308,6 +392,9 @@ DokuReader is a core component of the **doc-bricks** family under the **open-bri
 ---
 
 ## Privacy & Security Posture
+<a id="sec-13"></a>
+<a id="privacy--security-posture"></a>
+<a id="privacy--security"></a>
 
 - **Zero Network Egress:** The application contains no telemetry code, analytics libraries, or cloud sync background tasks.
 - **In-Place File Safety:** Imported files are opened exclusively in read-only mode for thumbnail and text preview.
@@ -317,11 +404,14 @@ DokuReader is a core component of the **doc-bricks** family under the **open-bri
 ---
 
 ## Quality Gates & Automated Test Suites
+<a id="sec-14"></a>
+<a id="quality-gates--automated-test-suites"></a>
+<a id="testing"></a>
 
 Continuous quality is assured through independent, automated verification gates:
 
 ```bash
-# Run Python unit and metadata contract tests (56 tests)
+# Run Python unit and metadata contract tests (65 tests)
 pytest
 
 # Run static analysis and lint checks
@@ -340,32 +430,53 @@ cd web_companion && node --test
 ---
 
 ## Machine-Readable Context (`llms.txt`)
+<a id="sec-15"></a>
+<a id="machine-readable-context-llmstxt"></a>
+<a id="llm-context"></a>
 
 For AI coding agents (Claude Code, Gemini / Antigravity, Codex, Kimi Code), DokuReader exposes complete architectural context via [`llms.txt`](llms.txt). It provides canonical repository paths, dependency boundaries, test commands, search keywords, and security invariants in an efficient format.
 
 ---
 
 ## Third-Party Licenses & Transparency
+<a id="sec-16"></a>
+<a id="third-party-licenses--transparency"></a>
+<a id="third-party-licenses"></a>
 
 DokuReader is licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0)**. All third-party Python dependencies (Pillow, pypdf, reportlab, python-docx, odfpy, tkinterdnd2, pywin32, pdf2image) are distributed under permissive open-source licenses (MIT, BSD-3-Clause, Apache-2.0, PSF-2.0) or compatible AGPL-3.0 (PyMuPDF).
 
-For the complete dependency audit, license texts, and unprivileged runtime statements, see [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md), [THIRD_PARTY_LICENSES.txt](THIRD_PARTY_LICENSES.txt), and [NOTICE](NOTICE).
+For the complete dependency audit, Level 1 SBOM invariant cross-reference matrix, and unprivileged runtime statements, see [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md), [THIRD_PARTY_LICENSES.txt](THIRD_PARTY_LICENSES.txt), and [NOTICE](NOTICE).
 
 ---
 
-## Marketing & Target Personas
+## Marketing & Discoverability Strategies / Log
+<a id="sec-17"></a>
+<a id="marketing--discoverability-strategies--log"></a>
+<a id="marketing-log"></a>
 
-DokuReader serves four core user personas requiring zero-egress document curation:
+DokuReader maintains an active, traceable marketing, discoverability, and architecture audit log in [MARKETING-LOG.txt](MARKETING-LOG.txt).
 
-1. **Legal Tech & Compliance Analysts:** Organizations managing confidential discovery files, client dossiers, and contracts that cannot be uploaded to SaaS clouds under GDPR or HIPAA.
-2. **Academic Researchers & Literature Curators:** Scholars organizing preprints, journal articles, and whitepapers into reading queues without modifying local directory structures.
-3. **Offline-First Knowledge Workers:** Privacy-conscious professionals demanding deterministic, local desktop reading tools with zero cloud egress.
-4. **AI Desktop Application Integrators:** Autonomous agents leveraging structured `dokureader-library-v1.json` export schemas for downstream analysis.
-
-For high-intent search keywords, the 4-way competitive matrix, and marketing audit records, see [MARKETING-LOG.txt](MARKETING-LOG.txt).
+Key discoverability pillars:
+1. **GitHub Ecosystem Satiation:** Full 20/20 topics populated with high-intent keywords (`desktop-app`, `document-management`, `library`, `pdf`, `pdf-export`, `python`, `tkinter`, `local-first`, `privacy-first`, `reading-state`).
+2. **LLM Context Integration:** Indexed via [`llms.txt`](llms.txt) for AI developer agents and search engines.
+3. **Cross-Project Linkage:** Deep integration with doc-bricks sibling tools ([LitZentrum](https://github.com/doc-bricks/LitZentrum), [CleanMarkdown](https://github.com/doc-bricks/CleanMarkdown), [UniversalDocsGrabber](https://github.com/doc-bricks/UniversalDocsGrabber)).
+4. **Bilingual Parity:** 100% documentation alignment between English ([README.md](README.md)) and German ([README_de.md](README_de.md)).
 
 ---
 
-## License & Liability
+## Statutory Notice, Liability Limitation & License
+<a id="sec-18"></a>
+<a id="statutory-notice-liability-limitation--license"></a>
+<a id="license--liability"></a>
 
-Licensed under the [GNU Affero General Public License v3.0](LICENSE). Provided without warranty; see LICENSE for full terms.
+### License & Attribution
+DokuReader is licensed under the **[GNU Affero General Public License v3.0 (AGPL-3.0)](LICENSE)**. Full author and open-source umbrella attribution is declared in [`NOTICE`](NOTICE).
+
+### Gesetzlicher Haftungsausschluss gem. § 521 BGB (Gefälligkeitsrecht)
+> **Statutory Disclaimer pursuant to § 521 German Civil Code (BGB):**<br>
+> Da diese Software und sämtliche zugehörigen Vorlagen unentgeltlich zur Verfügung gestellt werden, haften die Urheber, die Organisation `doc-bricks` sowie der Dachverband `open-bricks` nach den gesetzlichen Bestimmungen des deutschen Gefälligkeitsrechts (§ 521 BGB) ausschließlich für Vorsatz und grobe Fahrlässigkeit. Eine Gewährleistung für Sach- oder Rechtsmängel ist ausgeschlossen.<br>
+> <br>
+> *As this software and related templates are provided free of charge, the authors, the `doc-bricks` organization, and the `open-bricks` umbrella collective shall only be liable for intent and gross negligence in accordance with § 521 of the German Civil Code (BGB). Any warranty for defects of quality or title is excluded.*
+
+### Binding 48-Hour Security Response SLA
+> The maintainers commit to a **48-hour response SLA** for incoming security advisories and vulnerability notifications sent to **[security@open-bricks.org](mailto:security@open-bricks.org)**, **[security@ellmos.ai](mailto:security@ellmos.ai)**, or reported via [GitHub Security Advisories](https://github.com/doc-bricks/DokuReader/security/advisories/new). Initial triage is completed within **5 business days**. For details, see [SECURITY.md](SECURITY.md).
