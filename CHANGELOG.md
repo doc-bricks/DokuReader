@@ -5,6 +5,17 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+- **Pfad B Discoverability, 20/20 PEP 621 Topics-Sättigung, Plain-Text-Lizenzbegleiter & Vertragstest-Härtung (2026-09-28)**:
+  - PEP 621 Metadaten in `pyproject.toml` vollständig gesättigt mit allen 20 GitHub-Repository-Topics (`desktop-app`, `document-management`, `library`, `pdf`, `pdf-export`, `python`, `tkinter`, `document-library`, `document-preview`, `file-management`, `local-first`, `pdf-preview`, `pdf-tools`, `personal-knowledge-management`, `json-export`, `offline-first`, `privacy-first`, `reading-list`, `windows`, `reading-state`).
+  - Plain-Text-Lizenzbegleiter `THIRD_PARTY_LICENSES.txt` re-auditiert (Stand 2026-09-28) und in `[project.urls]` als `Third-Party Licenses (Text)` registriert.
+  - `NOTICE` Attributionsdatei und `THIRD_PARTY_LICENSES.md` Re-Audit auf Stand 2026-09-28 harmonisiert mit Querverweis auf den Plain-Text-Begleiter und Bestätigung aller 10 Governance-Invarianten `INV-LOCAL-01` bis `INV-SLA-10`.
+  - Pytest-Konfiguration mit `addopts = "-ra -v --basetemp=.pytest_temp"` und `.gitignore`-Absicherung gegen temporäre Testverzeichnisse und Desktop-Artefakte (`Desktop.ini`) gehärtet.
+  - `README.md` und `README_de.md` Badges synchronisiert auf Audit `2026-09-28` und 68 Pytest Tests (100% grün, 0 failed).
+  - `llms.txt` auf Stand 2026-09-28 mit 68 Python-Tests und 37 Web-Companion-Tests synchronisiert.
+  - `MARKETING-LOG.txt` um Audit 2026-09-28 mit PEP 621 Topics-Sättigung und Metadaten-Härtung erweitert.
+  - Vertragstestsuite `tests/test_metadata.py` um 3 neue Contract-Tests für PEP 621 Topics-Sättigung, Plain-Text Lizenzbegleiter und Marketing-Log-Aktualität erweitert (68 Pytest-Tests, 100% bestanden).
+  - Versionsnummer `1.0.1-dev` (`1.0.1.dev0` / Store: `1.0.1.0`) gemäß T-20260920-167562623 strikt unverändert beibehalten.
+
 - **Pfad B Discoverability, 18-Punkte-Navigationsparität, 10-Dimensionen-Vergleichsmatrix & § 521 BGB Haftungsausschluss (2026-09-25)**:
   - 18-Punkte-Schnellnavigation in `README.md` und `README_de.md` mit 100% reziproken dualen HTML-Ankern (`<a id="sec-01"></a>` bis `<a id="sec-18"></a>`) und GitHub-Slug-Parität implementiert.
   - Section 4: Ziel-Personas & High-Intent-Suchanfragen (`[PERSONA-01]` bis `[PERSONA-04]`) mit zweisprachigen SEO-Queries für Forscher, Juristen, Redakteure und KI-Agenten verankert.

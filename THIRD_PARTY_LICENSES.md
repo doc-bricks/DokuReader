@@ -1,8 +1,8 @@
 # DokuReader — Third-Party Dependency & License Audit
 
-**Status:** Audited & Verified (Pfad B Discoverability & Compliance Re-Audit)<br>
-**Date:** 2026-09-25<br>
-**Project License:** [GNU Affero General Public License v3.0 (AGPL-3.0)](LICENSE) · [NOTICE](NOTICE)<br>
+**Status:** Audited & Verified (Pfad B Discoverability, Metadata & Compliance Re-Audit)<br>
+**Date:** 2026-09-28<br>
+**Project License:** [GNU Affero General Public License v3.0 (AGPL-3.0)](LICENSE) · [NOTICE](NOTICE) · [THIRD_PARTY_LICENSES.txt](THIRD_PARTY_LICENSES.txt)<br>
 **Security & Isolation Model:** 100% Local-First · Zero-Egress · RunAsInvoker Non-Elevation  
 
 ---

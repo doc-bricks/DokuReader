@@ -185,5 +185,14 @@ Audit 2026-09-25 (Pfad B Discoverability, 18-Punkte-Navigationsparität, 10-Dime
 [x] llms.txt updated to 2026-09-25 with 18-point structure and verified test suite counts (62 Pytest, 37 Web Companion)
 [x] CHANGELOG.md updated under ## [Unreleased] with Pfad B discoverability and marketing overhaul
 [x] Contract tests in tests/test_metadata.py expanded with dedicated tests for 18-point navigation, personas, 10 dimensions, and statutory disclaimer
-[x] Version 1.0.1-dev strictly preserved per T-20260920-167562623 without unauthorized release bump
+Audit 2026-09-28 (Pfad B Discoverability, 20/20 PEP 621 Topics Saturation, Level 1 SBOM Text Companion & Contract Hardening):
+[x] Full PEP 621 keywords saturation in pyproject.toml with all 20 GitHub repository topics (desktop-app, document-management, library, pdf, pdf-export, python, tkinter, document-library, document-preview, file-management, local-first, pdf-preview, pdf-tools, personal-knowledge-management, json-export, offline-first, privacy-first, reading-list, windows, reading-state)
+[x] Plain-text license companion transparency: THIRD_PARTY_LICENSES.txt re-audited and registered under [project.urls] in pyproject.toml
+[x] Level 1 SBOM compliance & NOTICE attribution cross-referenced in THIRD_PARTY_LICENSES.md (Stand 2026-09-28)
+[x] Pytest configuration hardened with --basetemp=.pytest_temp and .gitignore defense for temporary test directories and Desktop.ini
+[x] README.md and README_de.md badges synchronized: Audit-2026--09--28, Pytest 68 tests / 100% green, Web Companion 37 passed
+[x] llms.txt synchronized to 2026-09-28 with exact test baselines and plain-text license companion URL
+[x] CHANGELOG.md updated under ## [Unreleased] with Pfad B discoverability and metadata release notes
+[x] Contract test suite expanded to 68 tests in tests/test_metadata.py with automated verification of PEP 621 topic saturation, plain-text companion, and log currency
+[x] Version 1.0.1-dev (1.0.1.dev0 / 1.0.1.0) strictly preserved per T-20260920-167562623 without version bump
 ================================================================================

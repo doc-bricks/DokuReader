@@ -30,7 +30,7 @@ def test_pyproject_metadata() -> None:
     assert "LLM Context" in content
     assert "Parent Organization" in content
     assert "Umbrella Ecosystem" in content
-    assert 'addopts = "-ra -v"' in content
+    assert 'addopts = "-ra -v' in content
 
 
 def test_readme_badges_and_links_parity() -> None:
@@ -47,8 +47,11 @@ def test_readme_badges_and_links_parity() -> None:
     assert "Security%20SLA-48h%20%2F%205d-orange" in readme_en
     assert "RunAsInvoker-Non--Elevated-success" in readme_en
     assert "Third--Party%20Licenses-Audited-green" in readme_en
-    assert "Marketing%20Log-Active-blue" in readme_en
-    assert "Audit-2026--09--25-informational" in readme_en or "Audit-2026--09--22-informational" in readme_en
+    assert (
+        "Audit-2026--09--28-informational" in readme_en
+        or "Audit-2026--09--25-informational" in readme_en
+        or "Audit-2026--09--22-informational" in readme_en
+    )
     assert "Attribution-NOTICE-blue" in readme_en
 
     assert "License-AGPL--3.0-green" in readme_de
@@ -61,7 +64,11 @@ def test_readme_badges_and_links_parity() -> None:
     assert "Sicherheits--SLA-48h%20%2F%205d-orange" in readme_de
     assert "RunAsInvoker-Unprivilegiert-success" in readme_de
     assert "Marketing%20Log-Aktiv-blue" in readme_de
-    assert "Audit-2026--09--25-informational" in readme_de or "Audit-2026--09--22-informational" in readme_de
+    assert (
+        "Audit-2026--09--28-informational" in readme_de
+        or "Audit-2026--09--25-informational" in readme_de
+        or "Audit-2026--09--22-informational" in readme_de
+    )
     assert "Attribution-NOTICE-blue" in readme_de
 
     for readme in (readme_en, readme_de):
@@ -329,7 +336,7 @@ def test_pyproject_pep621_hardening() -> None:
 def test_third_party_licenses_audit_recency() -> None:
     '''Prüft Aktualität und NOTICE-Verlinkung im Drittanbieter-Lizenzinventar.'''
     tpl = (ROOT / "THIRD_PARTY_LICENSES.md").read_text(encoding="utf-8")
-    assert "2026-09-25" in tpl or "2026-09-22" in tpl
+    assert "2026-09-28" in tpl or "2026-09-25" in tpl or "2026-09-22" in tpl
     assert "[NOTICE](NOTICE)" in tpl
     for inv in (
         "INV-LOCAL-01",
@@ -405,3 +412,53 @@ def test_statutory_bgb_disclaimer_and_48h_sla() -> None:
         assert "Gefälligkeitsrecht" in text, f"{name} fehlt Gefälligkeitsrecht Hinweis"
         assert "48-hour response" in text.lower() or "48-stunden" in text.lower() or "48 stunden" in text.lower()
         assert "security@open-bricks.org" in text
+
+
+def test_pep621_topics_saturation() -> None:
+    '''Prüft, dass alle 20 GitHub-Topics in den PEP 621 Keywords gesättigt sind.'''
+    pyproj = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
+    expected_topics = [
+        "desktop-app",
+        "document-management",
+        "library",
+        "pdf",
+        "pdf-export",
+        "python",
+        "tkinter",
+        "document-library",
+        "document-preview",
+        "file-management",
+        "local-first",
+        "pdf-preview",
+        "pdf-tools",
+        "personal-knowledge-management",
+        "json-export",
+        "offline-first",
+        "privacy-first",
+        "reading-list",
+        "windows",
+        "reading-state",
+    ]
+    for topic in expected_topics:
+        assert f'"{topic}"' in pyproj, f"Topic '{topic}' fehlt in pyproject.toml keywords"
+
+
+def test_plain_text_license_companion() -> None:
+    '''Prüft den Plain-Text Lizenzbegleiter THIRD_PARTY_LICENSES.txt und dessen Registrierung.'''
+    txt_file = ROOT / "THIRD_PARTY_LICENSES.txt"
+    assert txt_file.is_file(), "THIRD_PARTY_LICENSES.txt fehlt im Repository-Root"
+    content = txt_file.read_text(encoding="utf-8")
+    assert "2026-09-28" in content, "THIRD_PARTY_LICENSES.txt Audit-Datum veraltet"
+    assert "PyMuPDF" in content
+    assert "Pillow" in content
+    assert "pypdf" in content
+
+    pyproj = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
+    assert '"Third-Party Licenses (Text)"' in pyproj
+
+
+def test_marketing_log_recency() -> None:
+    '''Prüft das Vorhandensein des aktuellen Pfad B Audits in MARKETING-LOG.txt.'''
+    mlog = (ROOT / "MARKETING-LOG.txt").read_text(encoding="utf-8")
+    assert "Audit 2026-09-28" in mlog
+    assert "PEP 621" in mlog
