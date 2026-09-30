@@ -6,6 +6,12 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 ## [Unreleased]
 
 ### Behoben / Fixed
+- Bibliothekszustände werden über eine eigene temporäre Datei atomar ersetzt.
+  Schreibfehler, ungültiger UTF-8-Text oder eine gesperrte Zieldatei erhalten die
+  bisherige Bibliothek. Vier Regressionstests prüfen den Fehlerschutz sowie
+  Umlaute und Lesestatus. Die Zustandsverriegelung gilt bis zur Veröffentlichung.
+- Library saves now replace a complete temporary file atomically, preserving the
+  previous library on write, encoding, or replacement failures.
 - Themen können beim Umbenennen keine vorhandene Dokumentliste mehr überschreiben.
   Die Zustandsverwaltung prüft den Zielnamen atomar; der Dialog speichert nur nach
   erfolgreicher Umbenennung. Vier Regressionstests decken Namenskollisionen,

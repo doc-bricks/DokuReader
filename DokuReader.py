@@ -290,20 +290,39 @@ class State:
     def save(self):
         """Speichert den aktuellen Zustand in die JSON-Datei (thread-sicher).
 
-        Der JSON-String wird innerhalb des Locks serialisiert, damit kein anderer Thread
-        self.topics mutieren kann, während json.dumps läuft.
+        Erst eine vollständige temporäre Datei schreiben, dann atomar ersetzen.
+        Der Lock schützt den Zustand bis zur Veröffentlichung des Schnappschusses.
         """
         with self._lock:
-            serialized = json.dumps(
-                {"topics": self.topics, "current_topic": self.current_topic},
-                ensure_ascii=False,
-                indent=2,
-            )
-        try:
-            with open(STATE_FILE, "w", encoding="utf-8") as f:
-                f.write(serialized)
-        except (OSError, TypeError):
-            pass
+            temporary_path = None
+            descriptor = None
+            try:
+                serialized = json.dumps(
+                    {"topics": self.topics, "current_topic": self.current_topic},
+                    ensure_ascii=False,
+                    indent=2,
+                )
+                serialized.encode("utf-8")
+                destination = os.path.abspath(STATE_FILE)
+                descriptor, temporary_path = tempfile.mkstemp(
+                    prefix=".dokureader-state-", suffix=".tmp",
+                    dir=os.path.dirname(destination),
+                )
+                stream = os.fdopen(descriptor, "w", encoding="utf-8")
+                descriptor = None  # Der Stream übernimmt den Dateideskriptor.
+                with stream as f:
+                    f.write(serialized)
+                os.replace(temporary_path, destination)
+            except (OSError, TypeError, ValueError):
+                pass
+            finally:
+                if descriptor is not None:
+                    os.close(descriptor)
+                if temporary_path is not None:
+                    try:
+                        os.unlink(temporary_path)
+                    except OSError:
+                        pass
 
     def ensure_topic(self, topic: str):
         """
