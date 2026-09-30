@@ -6,6 +6,12 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 ## [Unreleased]
 
 ### Behoben / Fixed
+- PDF-Merges ersetzen bestehende Ausgaben erst nach vollständigem Schreiben und
+  Freigabe der Quelldateien. Unlesbare Quellen werden nicht mehr still ausgelassen;
+  leere Ergebnisse, Schreib- und Ersetzungsfehler veröffentlichen keine Ausgabe.
+  Acht Regressionen prüfen Fehlerschutz, Seitenreihenfolge und temporäre Dateien.
+- PDF merges now publish atomically only after every input has been read and the
+  nonempty output has been written successfully; existing output survives failures.
 - Beschädigte Bibliotheken werden vor späterem Speichern mit ihren Originalbytes
   in einer eindeutigen `.bak`-Datei gesichert. Der Start zeigt den Sicherungspfad.
   Scheitert die Sicherung, bleibt Speichern gesperrt; bei einem Speicherfehler

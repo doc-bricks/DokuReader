@@ -127,6 +127,16 @@ def main() -> None:
                  mock.patch.object(DokuReader.messagebox, "showinfo", side_effect=lambda title, msg: messages.append((title, msg))), \
                  mock.patch.object(app, "after", side_effect=run_after):
                 app._create_collection_pdf_worker("Ärzte", "alle")
+                previous_pdf = (tmpdir / "Ärzte_alle.pdf").read_bytes()
+                previous_successes = sum(title == "Erfolg" for title, _msg in messages)
+                damaged_pdf = tmpdir / "beschädigt.pdf"
+                damaged_pdf.write_bytes(b"not a PDF")
+                app.state_model.topics["Ärzte"].append({"path": str(damaged_pdf), "read": False})
+                app._create_collection_pdf_worker("Ärzte", "alle")
+                _assert((tmpdir / "Ärzte_alle.pdf").read_bytes() == previous_pdf,
+                        "Fehlgeschlagener Merge hat die vorhandene Ausgabe verändert.")
+                _assert(sum(title == "Erfolg" for title, _msg in messages) == previous_successes,
+                        "Fehlgeschlagener Merge hat Erfolg gemeldet.")
 
             merged_pdf = tmpdir / "Ärzte_alle.pdf"
             _assert(merged_pdf.exists(), "Sammel-PDF wurde nicht erzeugt.")

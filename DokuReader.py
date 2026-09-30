@@ -1602,7 +1602,10 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
                     return
 
                 if not self._merge_pdfs(pdf_parts, out_path):
-                    self.status_info("Konnte Sammel-PDF nicht erstellen (PDF-Merge-Bibliothek fehlt?).")
+                    self.status_info(
+                        "Konnte Sammel-PDF nicht vollständig erstellen. Prüfen Sie Quelldateien, "
+                        "Schreibrechte und PDF-Merge-Bibliothek. Eine vorhandene Ausgabe bleibt erhalten."
+                    )
                     return
 
                 summary = "Sammel-PDF erstellt:\n" + str(out_path)
@@ -1798,7 +1801,7 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         return None
 
     def _merge_pdfs(self, pdf_paths: list[str], out_path: Path) -> bool:
-        """Merged mehrere PDFs zu einer Ausgabedatei via pypdf oder PyPDF2.
+        """Führt alle PDFs vollständig zusammen und ersetzt die Ausgabe atomar.
 
         Args:
             pdf_paths: Liste von Pfaden zu den Einzel-PDFs
@@ -1809,24 +1812,50 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         """
         if not _PdfWriter:
             return False
-        writer = _PdfWriter()
+        writer = None
+        temporary_path = None
+        descriptor = None
         try:
+            writer = _PdfWriter()
+            if not pdf_paths:
+                return False
             for p in pdf_paths:
-                try:
-                    writer.append(p)
-                except (OSError, ValueError):
-                    # Ignoriere defekte Einzel-PDFs
-                    continue
-            with open(out_path, "wb") as f:
+                writer.append(p)
+            if not writer.pages:
+                return False
+            destination = os.path.abspath(out_path)
+            descriptor, temporary_path = tempfile.mkstemp(
+                prefix=".dokureader-pdf-", suffix=".tmp",
+                dir=os.path.dirname(destination),
+            )
+            stream = os.fdopen(descriptor, "wb")
+            descriptor = None
+            with stream as f:
                 writer.write(f)
+                f.flush()
+                os.fsync(f.fileno())
+            # Auch unter Windows müssen die Quelldateien vor dem Ersetzen frei sein.
+            writer.close()
+            writer = None
+            os.replace(temporary_path, destination)
             return True
-        except (OSError, ValueError, RuntimeError):
+        except Exception:
+            # Die optionalen PDF-Backends haben eigene Fehlerklassen. Ein Fehler
+            # darf weder eine Teilausgabe veröffentlichen noch den Worker abbrechen.
             return False
         finally:
-            try:
-                writer.close()
-            except (OSError, ValueError):
-                pass
+            if writer is not None:
+                try:
+                    writer.close()
+                except Exception:
+                    pass
+            if descriptor is not None:
+                os.close(descriptor)
+            if temporary_path is not None:
+                try:
+                    os.unlink(temporary_path)
+                except OSError:
+                    pass
 
     def on_close(self):
         """Callback beim Schließen des Fensters: State speichern und App beenden."""
