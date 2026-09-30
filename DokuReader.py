@@ -1587,26 +1587,29 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
                 pdf_parts: list[str] = []
                 skipped: list[str] = []
 
-                for d in docs:
+                for index, d in enumerate(docs):
                     src = d["path"]
                     ext = Path(src).suffix.lower()
                     try:
+                        conversion_dir = tmpdir / f"document-{index}"
+                        if ext not in PDF_EXTS:
+                            conversion_dir.mkdir()
                         if ext in PDF_EXTS:
                             pdf_parts.append(src)
                         elif ext in TXT_EXTS:
-                            pdfp = self._txt_to_pdf(src, tmpdir)
+                            pdfp = self._txt_to_pdf(src, conversion_dir)
                             if pdfp:
                                 pdf_parts.append(pdfp)
                             else:
                                 skipped.append(f"TXT-Konvertierung fehlgeschlagen (ReportLab erforderlich): {src}")
                         elif ext in IMAGE_EXTS:
-                            pdfp = self._image_to_pdf(src, tmpdir)
+                            pdfp = self._image_to_pdf(src, conversion_dir)
                             if pdfp:
                                 pdf_parts.append(pdfp)
                             else:
                                 skipped.append(f"Bild-Konvertierung fehlgeschlagen (ReportLab/Pillow erforderlich): {src}")
                         elif ext in WORD_EXTS:
-                            pdfp = self._office_to_pdf(src, tmpdir)
+                            pdfp = self._office_to_pdf(src, conversion_dir)
                             if pdfp:
                                 pdf_parts.append(pdfp)
                             else:

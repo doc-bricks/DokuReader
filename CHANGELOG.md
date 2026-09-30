@@ -6,6 +6,12 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 ## [Unreleased]
 
 ### Behoben / Fixed
+- Gleichnamige Dokumente aus verschiedenen Ordnern erhalten bei Sammel-PDFs
+  getrennte Konvertierungsverzeichnisse. TXT-, Bild- und Office-Zwischenergebnisse
+  überschreiben sich nicht mehr; Inhalte und Reihenfolge bleiben erhalten.
+  Vier Regressionen prüfen die Kollisionen, einschließlich echter TXT-Konvertierung.
+- Same-name collection documents now use separate conversion directories,
+  preserving distinct content and order instead of duplicating the last source.
 - Sammel-PDFs mit ausgelassenen Konvertierungen zeigen eine Warnung mit Umfang,
   Dateipfaden und Fehlerhinweisen. Auch bei vollständigem Konvertierungs- oder
   Merge-Fehlschlag bleiben Auslassungen sichtbar; Lesestatus-Filter zählen nicht
