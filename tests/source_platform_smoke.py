@@ -141,6 +141,19 @@ def main() -> None:
             merged_pdf = tmpdir / "Ärzte_alle.pdf"
             _assert(merged_pdf.exists(), "Sammel-PDF wurde nicht erzeugt.")
             _assert(any("Sammel-PDF erstellt" in msg for _title, msg in messages), "Erfolgsmeldung für Sammel-PDF fehlt.")
+            json_export = tmpdir / "bibliothek.json"
+            with mock.patch.object(DokuReader.filedialog, "asksaveasfilename", return_value=str(json_export)), \
+                 mock.patch.object(DokuReader.messagebox, "showinfo") as export_success, \
+                 mock.patch.object(DokuReader.messagebox, "showerror") as export_error:
+                app.export_library_json()
+                export_success.assert_called_once()
+                previous_json = json_export.read_bytes()
+                with mock.patch.object(DokuReader.os, "replace", side_effect=PermissionError("Zieldatei gesperrt")):
+                    app.export_library_json()
+                export_success.assert_called_once()
+                export_error.assert_called_once()
+                _assert(json_export.read_bytes() == previous_json,
+                        "Fehlgeschlagener JSON-Export hat die vorherige Ausgabe verändert.")
         finally:
             app.destroy()
             DokuReader.STATE_FILE = original_state_file

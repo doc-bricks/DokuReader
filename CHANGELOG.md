@@ -6,6 +6,12 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 ## [Unreleased]
 
 ### Behoben / Fixed
+- JSON-Exporte ersetzen die Zieldatei atomar nach vollständigem UTF-8-Schreiben.
+  Schreib-, Encoding- und Ersetzungsfehler erhalten bestehende Exporte. Fehler
+  beim Erstellen der Metadaten werden ebenfalls im Dialog angezeigt; zehn neue
+  Regressionen prüfen Fehlerschutz, Erfolgsmeldungen und Formatkompatibilität.
+- JSON exports now publish atomically and preserve existing files on write,
+  encoding, or replacement errors; metadata and export failures reach the dialog.
 - PDF-Merges ersetzen bestehende Ausgaben erst nach vollständigem Schreiben und
   Freigabe der Quelldateien. Unlesbare Quellen werden nicht mehr still ausgelassen;
   leere Ergebnisse, Schreib- und Ersetzungsfehler veröffentlichen keine Ausgabe.

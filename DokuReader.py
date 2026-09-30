@@ -255,9 +255,32 @@ def build_library_export_payload(topics: dict[str, list[dict]], current_topic: s
 
 
 def write_library_export(path: str | os.PathLike[str], payload: dict) -> None:
-    """Schreibt den Bibliotheksexport als UTF-8-JSON-Datei."""
-    out_path = Path(path)
-    out_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    """Ersetzt den UTF-8-JSON-Export erst nach vollständigem Schreiben atomar."""
+    serialized = json.dumps(payload, ensure_ascii=False, indent=2) + "\n"
+    serialized.encode("utf-8")
+    destination = os.path.abspath(path)
+    temporary_path = None
+    descriptor = None
+    try:
+        descriptor, temporary_path = tempfile.mkstemp(
+            prefix=".dokureader-export-", suffix=".tmp",
+            dir=os.path.dirname(destination),
+        )
+        stream = os.fdopen(descriptor, "w", encoding="utf-8")
+        descriptor = None
+        with stream as f:
+            f.write(serialized)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(temporary_path, destination)
+    finally:
+        if descriptor is not None:
+            os.close(descriptor)
+        if temporary_path is not None:
+            try:
+                os.unlink(temporary_path)
+            except OSError:
+                pass
 
 
 class State:
@@ -1645,13 +1668,13 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         )
         if not out_path:
             return
-        payload = build_library_export_payload(
-            self.state_model.topics,
-            current_topic=self.state_model.current_topic,
-        )
         try:
+            payload = build_library_export_payload(
+                self.state_model.topics,
+                current_topic=self.state_model.current_topic,
+            )
             write_library_export(out_path, payload)
-        except OSError as exc:
+        except (OSError, ValueError, TypeError) as exc:
             messagebox.showerror("Fehler", f"JSON-Export fehlgeschlagen:\n{exc}")
             return
         messagebox.showinfo("Erfolg", f"Bibliothek exportiert:\n{out_path}")
