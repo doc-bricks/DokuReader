@@ -6,6 +6,12 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 ## [Unreleased]
 
 ### Behoben / Fixed
+- Themen mit Pfadtrennern, ungültigen Windows-Zeichen oder überlangen Namen
+  erhalten portable Sammel-PDF-Dateinamen. Ein kurzer Hash trennt bereinigte
+  Themenbezeichnungen; normale deutsche Namen behalten ihre echten Umlaute.
+  Themen können die Ausgabe nicht mehr über `..` aus dem Desktop herausleiten.
+- Collection PDF filenames now contain no topic-derived path components, preserve
+  ordinary German names, and distinguish sanitized names with a stable suffix.
 - Gleichnamige Dokumente aus verschiedenen Ordnern erhalten bei Sammel-PDFs
   getrennte Konvertierungsverzeichnisse. TXT-, Bild- und Office-Zwischenergebnisse
   überschreiben sich nicht mehr; Inhalte und Reihenfolge bleiben erhalten.

@@ -31,6 +31,7 @@ import subprocess
 import tempfile
 import platform
 import threading
+import hashlib
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -174,6 +175,22 @@ def human_size(num_bytes: int) -> str:
 def desktop_path() -> Path:
     p = Path.home() / "Desktop"
     return p if p.exists() else Path.home()
+
+
+def collection_pdf_filename(topic: str, filter_mode: str) -> str:
+    """Erstellt einen kurzen Dateinamen ohne Pfadanteile und erhält echte Umlaute."""
+    if filter_mode not in {"alle", "gelesene", "ungelesene"}:
+        raise ValueError("Unbekannter Lesestatus-Filter")
+    invalid = '<>:"/\\|?*'
+    clean = "".join(
+        "_" if char in invalid or ord(char) < 32 or 0xD800 <= ord(char) <= 0xDFFF else char
+        for char in topic
+    ).strip(" .")
+    clean = clean[:100].rstrip(" .") or "Thema"
+    if clean != topic:
+        digest = hashlib.sha256(topic.encode("utf-8", errors="surrogatepass")).hexdigest()[:12]
+        clean += "_" + digest
+    return f"{clean}_{filter_mode}.pdf"
 
 
 def isoformat_utc(timestamp: float) -> str:
@@ -1580,7 +1597,11 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
                 self.status_info("Keine passenden Dokumente für das Sammel-PDF.")
                 return
 
-            out_path = desktop_path() / f"{topic}_{filter_mode}.pdf"
+            try:
+                out_path = desktop_path() / collection_pdf_filename(topic, filter_mode)
+            except ValueError as exc:
+                self.status_info(str(exc))
+                return
 
             with tempfile.TemporaryDirectory() as tmpdir:
                 tmpdir = Path(tmpdir)
