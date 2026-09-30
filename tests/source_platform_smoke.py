@@ -49,6 +49,17 @@ def main() -> None:
 
         original_state_file = DokuReader.STATE_FILE
         DokuReader.STATE_FILE = str(tmpdir / "state.json")
+        for damaged_state in (b"null", b"\xffinvalid", b'{"topics": {"Broken": [null]}}'):
+            Path(DokuReader.STATE_FILE).write_bytes(damaged_state)
+            startup_app = DokuReader.App()
+            try:
+                startup_app.update()
+                _assert(startup_app.state_model.topics == {}, "Ungültige Bibliothek wurde übernommen.")
+                _assert(Path(DokuReader.STATE_FILE).read_bytes() == damaged_state,
+                        "Der Start hat die beschädigte Bibliotheksdatei verändert.")
+            finally:
+                startup_app.destroy()
+        Path(DokuReader.STATE_FILE).write_text('{"topics": {}}', encoding="utf-8")
         app = DokuReader.App()
         app.update()
         app.update_idletasks()

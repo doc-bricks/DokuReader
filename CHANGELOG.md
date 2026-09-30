@@ -6,6 +6,12 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 ## [Unreleased]
 
 ### Behoben / Fixed
+- Beim Laden werden JSON-Struktur, Dokumentpfade und Lesestatus vollständig
+  geprüft, bevor der vorhandene Zustand ersetzt wird. Ungültiges JSON oder UTF-8
+  bricht den Start nicht mehr ab. Ältere Dokumenteinträge ohne Lesestatus bleiben
+  kompatibel; Verweise auf derzeit fehlende Dateien bleiben erhalten.
+- Library loading validates the complete state before applying it, handles invalid
+  JSON and UTF-8, and keeps legacy documents without read status compatible.
 - Bibliothekszustände werden über eine eigene temporäre Datei atomar ersetzt.
   Schreibfehler, ungültiger UTF-8-Text oder eine gesperrte Zieldatei erhalten die
   bisherige Bibliothek. Vier Regressionstests prüfen den Fehlerschutz sowie

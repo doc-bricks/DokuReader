@@ -274,18 +274,33 @@ class State:
         self._lock = threading.Lock()
 
     def load(self):
-        """Lädt den Zustand aus der JSON-Datei (~/.dokubibliothek_state.json)."""
-        if os.path.isfile(STATE_FILE):
+        """Übernimmt nur vollständig gültige Bibliotheken aus der JSON-Datei."""
+        with self._lock:
             try:
                 with open(STATE_FILE, "r", encoding="utf-8") as f:
                     data = json.load(f)
-                    loaded_topics = data.get("topics")
-                    self.topics = loaded_topics if isinstance(loaded_topics, dict) else {}
-                    ct = data.get("current_topic")
-                    self.current_topic = ct if isinstance(ct, str) else None
-            except (OSError, json.JSONDecodeError):
-                # Ignorieren, falls Zustand nicht gelesen werden kann
-                pass
+                if not isinstance(data, dict) or not isinstance(data.get("topics"), dict):
+                    return
+                loaded_topics = {}
+                for topic, docs in data["topics"].items():
+                    if not isinstance(docs, list):
+                        return
+                    loaded_docs = []
+                    for doc in docs:
+                        if not isinstance(doc, dict):
+                            return
+                        path = doc.get("path")
+                        read = doc.get("read", False)
+                        if not isinstance(path, str) or not path or not isinstance(read, bool):
+                            return
+                        loaded_docs.append({**doc, "read": read})
+                    loaded_topics[topic] = loaded_docs
+                ct = data.get("current_topic")
+                self.topics = loaded_topics
+                self.current_topic = ct if isinstance(ct, str) and ct in loaded_topics else None
+            except (OSError, ValueError):
+                # Auch ungültiges UTF-8 darf die vorhandene Bibliothek nicht ersetzen.
+                return
 
     def save(self):
         """Speichert den aktuellen Zustand in die JSON-Datei (thread-sicher).
