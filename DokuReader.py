@@ -386,10 +386,15 @@ class State:
             new: Neuer Themenname
 
         Returns:
-            True bei Erfolg, False wenn old nicht existiert
+            True bei Erfolg (auch bei gleichem Namen), False wenn old fehlt
+            oder new bereits ein anderes Thema bezeichnet.
         """
         with self._lock:
             if old not in self.topics:
+                return False
+            if old == new:
+                return True
+            if new in self.topics:
                 return False
             self.topics[new] = self.topics.pop(old)
             if self.current_topic == old:
@@ -1076,10 +1081,9 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         new = new.strip()
         if not new or new == old:
             return
-        if new in self.state_model.topics:
+        if not self.state_model.rename_topic(old, new):
             messagebox.showwarning("Hinweis", "Ein Thema mit diesem Namen existiert bereits.")
             return
-        self.state_model.rename_topic(old, new)
         self.state_model.save()
         self._reload_topics()
         self._select_topic(new)

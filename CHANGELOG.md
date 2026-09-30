@@ -5,6 +5,14 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+### Behoben / Fixed
+- Themen können beim Umbenennen keine vorhandene Dokumentliste mehr überschreiben.
+  Die Zustandsverwaltung prüft den Zielnamen atomar; der Dialog speichert nur nach
+  erfolgreicher Umbenennung. Vier Regressionstests decken Namenskollisionen,
+  unveränderte Namen, gleichzeitige Umbenennungen und den Dialogpfad ab.
+- Renaming topics now preserves existing document lists. Target-name validation
+  runs under the state lock, and the dialog saves only after a successful rename.
+
 - **Pfad B Discoverability, 20/20 PEP 621 Topics-Sättigung, Plain-Text-Lizenzbegleiter & Vertragstest-Härtung (2026-09-28)**:
   - PEP 621 Metadaten in `pyproject.toml` vollständig gesättigt mit allen 20 GitHub-Repository-Topics (`desktop-app`, `document-management`, `library`, `pdf`, `pdf-export`, `python`, `tkinter`, `document-library`, `document-preview`, `file-management`, `local-first`, `pdf-preview`, `pdf-tools`, `personal-knowledge-management`, `json-export`, `offline-first`, `privacy-first`, `reading-list`, `windows`, `reading-state`).
   - Plain-Text-Lizenzbegleiter `THIRD_PARTY_LICENSES.txt` re-auditiert (Stand 2026-09-28) und in `[project.urls]` als `Third-Party Licenses (Text)` registriert.
