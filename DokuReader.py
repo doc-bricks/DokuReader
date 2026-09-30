@@ -1585,7 +1585,7 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
             with tempfile.TemporaryDirectory() as tmpdir:
                 tmpdir = Path(tmpdir)
                 pdf_parts: list[str] = []
-                log_lines: list[str] = []
+                skipped: list[str] = []
 
                 for d in docs:
                     src = d["path"]
@@ -1593,46 +1593,50 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
                     try:
                         if ext in PDF_EXTS:
                             pdf_parts.append(src)
-                            log_lines.append(f"OK: PDF übernommen: {src}")
                         elif ext in TXT_EXTS:
                             pdfp = self._txt_to_pdf(src, tmpdir)
                             if pdfp:
                                 pdf_parts.append(pdfp)
-                                log_lines.append(f"OK: TXT -> PDF: {src}")
                             else:
-                                log_lines.append(f"Übersprungen (TXT ohne ReportLab): {src}")
+                                skipped.append(f"TXT-Konvertierung fehlgeschlagen (ReportLab erforderlich): {src}")
                         elif ext in IMAGE_EXTS:
                             pdfp = self._image_to_pdf(src, tmpdir)
                             if pdfp:
                                 pdf_parts.append(pdfp)
-                                log_lines.append(f"OK: Bild -> PDF: {src}")
                             else:
-                                log_lines.append(f"Übersprungen (Bild ohne ReportLab/Pillow): {src}")
+                                skipped.append(f"Bild-Konvertierung fehlgeschlagen (ReportLab/Pillow erforderlich): {src}")
                         elif ext in WORD_EXTS:
                             pdfp = self._office_to_pdf(src, tmpdir)
                             if pdfp:
                                 pdf_parts.append(pdfp)
-                                log_lines.append(f"OK: Office -> PDF: {src}")
                             else:
-                                log_lines.append(f"Übersprungen (LibreOffice/Word nicht verfügbar): {src}")
+                                skipped.append(f"Office-Konvertierung fehlgeschlagen (LibreOffice oder Word erforderlich): {src}")
                         else:
-                            log_lines.append(f"Übersprungen (nicht unterstützt): {src}")
+                            skipped.append(f"Dateityp nicht unterstützt: {src}")
                     except Exception as e:
-                        log_lines.append(f"Fehler bei {src}: {e}")
+                        skipped.append(f"Konvertierung fehlgeschlagen: {src}\n  {e}")
+
+                details = "\n\nNicht enthalten:\n" + "\n".join(skipped) if skipped else ""
 
                 if not pdf_parts:
-                    self.status_info("Keine Dateien konnten in PDF überführt werden.")
+                    self.status_info("Keine Dateien konnten in PDF überführt werden." + details)
                     return
 
                 if not self._merge_pdfs(pdf_parts, out_path):
                     self.status_info(
                         "Konnte Sammel-PDF nicht vollständig erstellen. Prüfen Sie Quelldateien, "
-                        "Schreibrechte und PDF-Merge-Bibliothek. Eine vorhandene Ausgabe bleibt erhalten."
+                        "Schreibrechte und PDF-Merge-Bibliothek. Eine vorhandene Ausgabe bleibt erhalten." + details
                     )
                     return
 
-                summary = "Sammel-PDF erstellt:\n" + str(out_path)
-                self.after(0, lambda: messagebox.showinfo("Erfolg", summary))
+                if skipped:
+                    summary = ("Sammel-PDF mit ausgelassenen Dokumenten erstellt:\n"
+                               f"{out_path}\n\nEnthalten: {len(pdf_parts)} von {len(docs)} Dokumenten."
+                               + details)
+                    self.after(0, lambda: messagebox.showwarning("Unvollständiges Sammel-PDF", summary))
+                else:
+                    summary = "Sammel-PDF erstellt:\n" + str(out_path)
+                    self.after(0, lambda: messagebox.showinfo("Erfolg", summary))
         finally:
             self._set_busy(False)
 

@@ -137,6 +137,19 @@ def main() -> None:
                         "Fehlgeschlagener Merge hat die vorhandene Ausgabe verändert.")
                 _assert(sum(title == "Erfolg" for title, _msg in messages) == previous_successes,
                         "Fehlgeschlagener Merge hat Erfolg gemeldet.")
+                app.state_model.topics["Ärzte"].pop()
+                omitted_office = tmpdir / "nicht-konvertierbar.docx"
+                app.state_model.topics["Ärzte"].append({"path": str(omitted_office), "read": False})
+                with mock.patch.object(app, "_office_to_pdf", return_value=None), \
+                     mock.patch.object(DokuReader.messagebox, "showwarning") as partial_warning:
+                    app._create_collection_pdf_worker("Ärzte", "alle")
+                    partial_warning.assert_called_once()
+                    _assert(str(omitted_office) in partial_warning.call_args.args[1],
+                            "Warnung nennt die ausgelassene Office-Datei nicht.")
+                    _assert("2 von 3" in partial_warning.call_args.args[1],
+                            "Warnung nennt den Umfang des Teilergebnisses nicht.")
+                _assert(sum(title == "Erfolg" for title, _msg in messages) == previous_successes,
+                        "Teilergebnis hat vollständigen Erfolg gemeldet.")
 
             merged_pdf = tmpdir / "Ärzte_alle.pdf"
             _assert(merged_pdf.exists(), "Sammel-PDF wurde nicht erzeugt.")

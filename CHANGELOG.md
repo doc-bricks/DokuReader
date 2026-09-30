@@ -6,6 +6,12 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 ## [Unreleased]
 
 ### Behoben / Fixed
+- Sammel-PDFs mit ausgelassenen Konvertierungen zeigen eine Warnung mit Umfang,
+  Dateipfaden und Fehlerhinweisen. Auch bei vollständigem Konvertierungs- oder
+  Merge-Fehlschlag bleiben Auslassungen sichtbar; Lesestatus-Filter zählen nicht
+  als Fehler. Acht Regressionen prüfen die Meldungen und ihre Hauptthread-Ausführung.
+- Partial collection PDFs now warn about omitted files and conversion failures,
+  including counts and paths; read-status filtering is not reported as a failure.
 - JSON-Exporte ersetzen die Zieldatei atomar nach vollständigem UTF-8-Schreiben.
   Schreib-, Encoding- und Ersetzungsfehler erhalten bestehende Exporte. Fehler
   beim Erstellen der Metadaten werden ebenfalls im Dialog angezeigt; zehn neue
