@@ -11,7 +11,7 @@
 [![Python: 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python)](pyproject.toml)
 [![UI: Python / Tkinter](https://img.shields.io/badge/GUI-Python%20%2F%20Tkinter-blue)](DokuReader.py)
 [![Plattform: Windows | macOS | Linux](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-blue?logo=windows)](#einstieg--installation)
-[![Pytest: 145 tests, 0 failed](https://img.shields.io/badge/Pytest-145%20tests%2C%200%20failed-success?logo=pytest)](pyproject.toml)
+[![Pytest: 154 tests, 0 failed](https://img.shields.io/badge/Pytest-154%20tests%2C%200%20failed-success?logo=pytest)](pyproject.toml)
 [![Web Companion: 37 passed](https://img.shields.io/badge/Web%20Companion-37%20passed-success?logo=nodedotjs)](web_companion)
 [![Datenschutz: 100% Offline](https://img.shields.io/badge/Datenschutz-100%25%20Offline-success)](PRIVACY_POLICY.md)
 [![Sicherheit: Local--First](https://img.shields.io/badge/Sicherheit-Local--First-blue)](SECURITY.md)
@@ -416,7 +416,7 @@ DokuReader ist Kernbestandteil der **doc-bricks** Familie im Rahmen der **open-b
 Kontinuierliche Qualität wird durch unabhängige, automatisierte Prüfschritte gewährleistet:
 
 ```bash
-# Python Unit- und Metadaten-Vertragstests ausführen (145 Tests)
+# Python Unit- und Metadaten-Vertragstests ausführen (154 Tests)
 pytest
 
 # Statische Analyse und Linting durchführen

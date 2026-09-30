@@ -167,6 +167,15 @@ def main() -> None:
                 export_error.assert_called_once()
                 _assert(json_export.read_bytes() == previous_json,
                         "Fehlgeschlagener JSON-Export hat die vorherige Ausgabe verändert.")
+                for protected_target in (Path(DokuReader.STATE_FILE), txt_path):
+                    protected_bytes = protected_target.read_bytes()
+                    with mock.patch.object(DokuReader.filedialog, "asksaveasfilename", return_value=str(protected_target)):
+                        app.export_library_json()
+                    _assert(protected_target.read_bytes() == protected_bytes,
+                            "JSON-Export hat eine geschützte Bibliotheksdatei verändert.")
+                export_success.assert_called_once()
+                _assert(export_error.call_count == 3,
+                        "JSON-Export hat nicht beide geschützten Ziele sichtbar abgewiesen.")
         finally:
             app.destroy()
             DokuReader.STATE_FILE = original_state_file

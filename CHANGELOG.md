@@ -6,6 +6,11 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 ## [Unreleased]
 
 ### Behoben / Fixed
+- Der JSON-Exportdialog schützt eingebundene Originale, die interne Zustandsdatei
+  und die aktuelle Wiederherstellungssicherung vor dem Überschreiben. Auch
+  Pfadaliasse werden erkannt; die Meldung fordert eine andere Zieldatei an.
+- The JSON export dialog now rejects library originals, internal state, and the
+  current recovery backup as destinations, including aliases to protected files.
 - Sammel-PDF-Ausgaben ersetzen keine eingebundenen Originaldateien mehr. Bei
   einer Kollision erhält die Ausgabe einen freien nummerierten Namen; geschützt
   sind auch gefilterte Dokumente und andere Themen. Der Merge selbst weist eine

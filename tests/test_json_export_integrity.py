@@ -71,7 +71,7 @@ def test_failed_replace_preserves_export_and_foreign_temp(export_file, monkeypat
 @pytest.mark.parametrize("error_type", [OSError, ValueError, TypeError])
 @pytest.mark.parametrize("stage", ["build_library_export_payload", "write_library_export"])
 def test_dialog_reports_failures_without_success(export_file, monkeypatch, stage, error_type):
-    window = SimpleNamespace(state_model=SimpleNamespace(topics={}, current_topic=None))
+    window = SimpleNamespace(state_model=app.State())
     monkeypatch.setattr(app.filedialog, "asksaveasfilename", lambda **kw: str(export_file))
     monkeypatch.setattr(app, stage, Mock(side_effect=error_type("export failed")))
     showerror, showinfo = Mock(), Mock()

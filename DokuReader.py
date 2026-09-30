@@ -1733,6 +1733,14 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         if not out_path:
             return
         try:
+            protected_paths = self.state_model.all_document_paths() + [STATE_FILE]
+            if self.state_model.recovery_path:
+                protected_paths.append(self.state_model.recovery_path)
+            if is_original_document(out_path, protected_paths):
+                raise ValueError(
+                    "Die gewählte Datei ist ein Original, die interne Bibliothek oder ihre Sicherung.\n"
+                    "Wählen Sie eine andere JSON-Datei für den Export."
+                )
             payload = build_library_export_payload(
                 self.state_model.topics,
                 current_topic=self.state_model.current_topic,
