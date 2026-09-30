@@ -6,6 +6,12 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 ## [Unreleased]
 
 ### Behoben / Fixed
+- Beschädigte Bibliotheken werden vor späterem Speichern mit ihren Originalbytes
+  in einer eindeutigen `.bak`-Datei gesichert. Der Start zeigt den Sicherungspfad.
+  Scheitert die Sicherung, bleibt Speichern gesperrt; bei einem Speicherfehler
+  bleibt das Fenster geöffnet und zeigt eine Fehlermeldung.
+- Rejected libraries now receive a unique byte-preserving recovery backup before
+  subsequent saves. Startup reports its location; failed saves keep the window open.
 - Beim Laden werden JSON-Struktur, Dokumentpfade und Lesestatus vollständig
   geprüft, bevor der vorhandene Zustand ersetzt wird. Ungültiges JSON oder UTF-8
   bricht den Start nicht mehr ab. Ältere Dokumenteinträge ohne Lesestatus bleiben

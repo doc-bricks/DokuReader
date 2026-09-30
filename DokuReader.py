@@ -272,6 +272,39 @@ class State:
         self.topics: dict[str, list[dict]] = {}
         self.current_topic: str | None = None
         self._lock = threading.Lock()
+        self.load_failed = False
+        self.recovery_path: str | None = None
+
+    def _preserve_unreadable_state(self):
+        """Sichert die Originalbytes exklusiv; bei Fehler bleibt Speichern gesperrt."""
+        backup_path = None
+        descriptor = None
+        complete = False
+        try:
+            source_path = os.path.abspath(STATE_FILE)
+            with open(source_path, "rb") as source:
+                descriptor, backup_path = tempfile.mkstemp(
+                    prefix=os.path.basename(source_path) + ".damaged-", suffix=".bak",
+                    dir=os.path.dirname(source_path),
+                )
+                stream = os.fdopen(descriptor, "wb")
+                descriptor = None
+                with stream as destination:
+                    shutil.copyfileobj(source, destination)
+                    destination.flush()
+                    os.fsync(destination.fileno())
+            self.recovery_path = backup_path
+            complete = True
+        except OSError:
+            self.recovery_path = None
+        finally:
+            if descriptor is not None:
+                os.close(descriptor)
+            if backup_path is not None and not complete:
+                try:
+                    os.unlink(backup_path)
+                except OSError:
+                    pass
 
     def load(self):
         """Übernimmt nur vollständig gültige Bibliotheken aus der JSON-Datei."""
@@ -280,35 +313,44 @@ class State:
                 with open(STATE_FILE, "r", encoding="utf-8") as f:
                     data = json.load(f)
                 if not isinstance(data, dict) or not isinstance(data.get("topics"), dict):
-                    return
+                    raise ValueError("Invalid library structure")
                 loaded_topics = {}
                 for topic, docs in data["topics"].items():
                     if not isinstance(docs, list):
-                        return
+                        raise ValueError("Invalid document list")
                     loaded_docs = []
                     for doc in docs:
                         if not isinstance(doc, dict):
-                            return
+                            raise ValueError("Invalid document record")
                         path = doc.get("path")
                         read = doc.get("read", False)
                         if not isinstance(path, str) or not path or not isinstance(read, bool):
-                            return
+                            raise ValueError("Invalid path or read status")
                         loaded_docs.append({**doc, "read": read})
                     loaded_topics[topic] = loaded_docs
                 ct = data.get("current_topic")
                 self.topics = loaded_topics
                 self.current_topic = ct if isinstance(ct, str) and ct in loaded_topics else None
+                self.load_failed = False
+                self.recovery_path = None
+            except FileNotFoundError:
+                return
             except (OSError, ValueError):
                 # Auch ungültiges UTF-8 darf die vorhandene Bibliothek nicht ersetzen.
+                self.load_failed = True
+                self._preserve_unreadable_state()
                 return
 
-    def save(self):
+    def save(self) -> bool:
         """Speichert den aktuellen Zustand in die JSON-Datei (thread-sicher).
 
         Erst eine vollständige temporäre Datei schreiben, dann atomar ersetzen.
         Der Lock schützt den Zustand bis zur Veröffentlichung des Schnappschusses.
+        Gibt False zurück, wenn Speichern fehlschlägt oder die Sicherung fehlt.
         """
         with self._lock:
+            if self.load_failed and self.recovery_path is None:
+                return False
             temporary_path = None
             descriptor = None
             try:
@@ -328,8 +370,9 @@ class State:
                 with stream as f:
                     f.write(serialized)
                 os.replace(temporary_path, destination)
+                return True
             except (OSError, TypeError, ValueError):
-                pass
+                return False
             finally:
                 if descriptor is not None:
                     os.close(descriptor)
@@ -479,6 +522,16 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
             self._select_topic(self.state_model.current_topic)
 
         self.protocol("WM_DELETE_WINDOW", self.on_close)
+        if self.state_model.load_failed:
+            if self.state_model.recovery_path:
+                detail = ("Die beschädigte Datei wurde unverändert gesichert:\n"
+                          f"{self.state_model.recovery_path}\n\n"
+                          "Sie können eine neue Bibliothek anlegen. Die Sicherung bleibt erhalten.")
+            else:
+                detail = ("Die beschädigte oder unlesbare Datei konnte nicht gesichert werden:\n"
+                          f"{STATE_FILE}\n\n"
+                          "Speichern ist gesperrt. Sichern Sie die Datei und prüfen Sie die Zugriffsrechte.")
+            messagebox.showwarning("Bibliothek konnte nicht geladen werden", detail, parent=self)
 
     def _register_accessibility(self, key: str, widget, *, name: str, description: str, role: str, focusable: bool):
         """Registriert ein Widget im metadata-first-A11y-Vertrag."""
@@ -1777,7 +1830,14 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
 
     def on_close(self):
         """Callback beim Schließen des Fensters: State speichern und App beenden."""
-        self.state_model.save()
+        if self.state_model.save() is False:
+            messagebox.showerror(
+                "Bibliothek nicht gespeichert",
+                "Die Bibliothek konnte nicht gespeichert werden. Das Fenster bleibt geöffnet.\n"
+                "Prüfen Sie freien Speicherplatz, Zugriffsrechte und den Hinweis zur Sicherung.",
+                parent=self,
+            )
+            return
         self.destroy()
 
 

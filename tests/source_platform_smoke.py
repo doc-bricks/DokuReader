@@ -51,12 +51,16 @@ def main() -> None:
         DokuReader.STATE_FILE = str(tmpdir / "state.json")
         for damaged_state in (b"null", b"\xffinvalid", b'{"topics": {"Broken": [null]}}'):
             Path(DokuReader.STATE_FILE).write_bytes(damaged_state)
-            startup_app = DokuReader.App()
+            with mock.patch.object(DokuReader.messagebox, "showwarning") as warning:
+                startup_app = DokuReader.App()
+                warning.assert_called_once()
             try:
                 startup_app.update()
                 _assert(startup_app.state_model.topics == {}, "Ungültige Bibliothek wurde übernommen.")
                 _assert(Path(DokuReader.STATE_FILE).read_bytes() == damaged_state,
                         "Der Start hat die beschädigte Bibliotheksdatei verändert.")
+                _assert(Path(startup_app.state_model.recovery_path).read_bytes() == damaged_state,
+                        "Die Sicherung enthält nicht die vollständige beschädigte Bibliothek.")
             finally:
                 startup_app.destroy()
         Path(DokuReader.STATE_FILE).write_text('{"topics": {}}', encoding="utf-8")
