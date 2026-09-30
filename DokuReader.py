@@ -193,6 +193,34 @@ def collection_pdf_filename(topic: str, filter_mode: str) -> str:
     return f"{clean}_{filter_mode}.pdf"
 
 
+def is_original_document(path: str | os.PathLike[str], original_paths: list[str]) -> bool:
+    """Erkennt auch Pfadaliasse zu einer referenzierten Originaldatei."""
+    destination = os.path.normcase(os.path.realpath(path))
+    for original in original_paths:
+        try:
+            if destination == os.path.normcase(os.path.realpath(original)):
+                return True
+            if os.path.samefile(path, original):
+                return True
+        except (OSError, ValueError):
+            # Fehlende Dateien sind anhand ihres normalisierten Pfades geschützt.
+            continue
+    return False
+
+
+def collection_output_path(directory: Path, filename: str, original_paths: list[str]) -> Path:
+    """Wählt bei einer Kollision mit Originalen eine freie nummerierte Ausgabe."""
+    output = directory / filename
+    if not is_original_document(output, original_paths):
+        return output
+    index = 1
+    while True:
+        candidate = output.with_name(f"{output.stem} ({index}){output.suffix}")
+        if not os.path.lexists(candidate) and not is_original_document(candidate, original_paths):
+            return candidate
+        index += 1
+
+
 def isoformat_utc(timestamp: float) -> str:
     """Formatiert einen Unix-Timestamp als UTC-ISO-8601-Zeitstempel."""
     return datetime.fromtimestamp(timestamp, tz=timezone.utc).isoformat().replace("+00:00", "Z")
@@ -480,6 +508,11 @@ class State:
             for d in self.topics.get(topic, []):
                 if d["path"] == path:
                     d["read"] = is_read
+
+    def all_document_paths(self) -> list[str]:
+        """Gibt alle Originalpfade unter dem Zustandslock zurück, unabhängig vom Filter."""
+        with self._lock:
+            return [doc["path"] for docs in self.topics.values() for doc in docs]
 
     def list_docs(self, topic: str):
         """
@@ -1598,7 +1631,10 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
                 return
 
             try:
-                out_path = desktop_path() / collection_pdf_filename(topic, filter_mode)
+                out_path = collection_output_path(
+                    desktop_path(), collection_pdf_filename(topic, filter_mode),
+                    self.state_model.all_document_paths(),
+                )
             except ValueError as exc:
                 self.status_info(str(exc))
                 return
@@ -1868,7 +1904,7 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         descriptor = None
         try:
             writer = _PdfWriter()
-            if not pdf_paths:
+            if not pdf_paths or is_original_document(out_path, pdf_paths):
                 return False
             for p in pdf_paths:
                 writer.append(p)

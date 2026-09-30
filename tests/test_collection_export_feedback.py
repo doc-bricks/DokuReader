@@ -20,6 +20,9 @@ def export_window(tmp_path, monkeypatch):
         _merge_pdfs=Mock(return_value=True),
         after=lambda delay, callback: pending.append(callback),
     )
+    window.state_model.all_document_paths = lambda: [
+        doc["path"] for doc in window.state_model.list_docs.return_value
+    ]
     warning, success = Mock(), Mock()
     monkeypatch.setattr(app, "desktop_path", lambda: tmp_path)
     monkeypatch.setattr(app.messagebox, "showwarning", warning)

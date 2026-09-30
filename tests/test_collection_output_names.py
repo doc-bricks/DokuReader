@@ -23,7 +23,10 @@ def test_worker_exports_unsafe_topic_inside_desktop(tmp_path, monkeypatch, topic
     success = Mock()
     monkeypatch.setattr(app.messagebox, "showinfo", success)
     window = SimpleNamespace(
-        state_model=SimpleNamespace(list_docs=lambda topic: [{"path": str(source)}]),
+        state_model=SimpleNamespace(
+            list_docs=lambda topic: [{"path": str(source)}],
+            all_document_paths=lambda: [str(source)],
+        ),
         _set_busy=Mock(), status_info=Mock(),
         _merge_pdfs=lambda sources, output: app.App._merge_pdfs(None, sources, output),
         after=lambda delay, callback: callback(),

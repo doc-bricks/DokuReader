@@ -15,7 +15,10 @@ def worker_window(paths, tmp_path, monkeypatch):
     monkeypatch.setattr(app.messagebox, "showinfo", Mock())
     monkeypatch.setattr(app.messagebox, "showwarning", Mock())
     return SimpleNamespace(
-        state_model=SimpleNamespace(list_docs=lambda topic: [{"path": str(p)} for p in paths]),
+        state_model=SimpleNamespace(
+            list_docs=lambda topic: [{"path": str(p)} for p in paths],
+            all_document_paths=lambda: [str(p) for p in paths],
+        ),
         _set_busy=Mock(), status_info=Mock(),
         after=lambda delay, callback: callback(),
         _merge_pdfs=lambda parts, output: app.App._merge_pdfs(None, parts, output),

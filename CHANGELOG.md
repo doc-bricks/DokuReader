@@ -6,6 +6,12 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 ## [Unreleased]
 
 ### Behoben / Fixed
+- Sammel-PDF-Ausgaben ersetzen keine eingebundenen Originaldateien mehr. Bei
+  einer Kollision erhält die Ausgabe einen freien nummerierten Namen; geschützt
+  sind auch gefilterte Dokumente und andere Themen. Der Merge selbst weist eine
+  Ausgabe zurück, die einer Eingabedatei entspricht.
+- Collection exports now choose a free numbered output when their destination
+  refers to any library original, including filtered documents and other topics.
 - Themen mit Pfadtrennern, ungültigen Windows-Zeichen oder überlangen Namen
   erhalten portable Sammel-PDF-Dateinamen. Ein kurzer Hash trennt bereinigte
   Themenbezeichnungen; normale deutsche Namen behalten ihre echten Umlaute.
