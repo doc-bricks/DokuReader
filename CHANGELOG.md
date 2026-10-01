@@ -20,6 +20,15 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
   - Versionsnummer `1.0.1-dev` (`1.0.1.dev0` / Store: `1.0.1.0`) gemäß T-20260920-167562623 strikt unverändert beibehalten.
 
 ### Behoben / Fixed
+- Sammel-PDF-Exporte starten nur einmal gleichzeitig und halten Thema, Filter
+  und Dokumentdaten beim Klick fest. Ergebnisse erreichen die Oberfläche über
+  eine Queue; Export-Threads rufen keine Tk-Funktionen mehr auf. Beim Schließen
+  bleibt das Fenster ansprechbar und speichert erst nach dem tatsächlichen
+  Exportende. Start-, Worker- und Dialogfehler geben den Exportzustand frei.
+- Collection PDF exports now run one at a time with immutable request data.
+  Worker callbacks reach Tk through a GUI-polled queue. Closing waits without
+  blocking the UI until the accepted export finishes, then saves the library.
+  Start, worker and callback failures cannot strand the export state.
 - Speicherfehler nach Themen-, Dokument- und Lesestatusänderungen werden sofort
   gemeldet. Ungespeicherte Änderungen bleiben im Fenster erhalten; der sichtbare
   Speicherstatus und „Bibliothek speichern“ (Strg+S) ermöglichen einen erneuten

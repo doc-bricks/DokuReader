@@ -31,6 +31,7 @@ import subprocess
 import tempfile
 import platform
 import threading
+import queue
 import hashlib
 from datetime import datetime, timezone
 from pathlib import Path
@@ -518,6 +519,14 @@ class State:
         with self._lock:
             return [doc["path"] for docs in self.topics.values() for doc in docs]
 
+    def collection_snapshot(self, topic: str) -> tuple[list[dict], list[str]]:
+        """Fixiert Dokumentdaten und geschützte Originalpfade für einen Export."""
+        with self._lock:
+            return (
+                [dict(doc) for doc in self.topics.get(topic, [])],
+                [doc["path"] for docs in self.topics.values() for doc in docs],
+            )
+
     def list_docs(self, topic: str):
         """
         Gibt eine Kopie aller Dokumente eines Themas zurück (thread-sicher).
@@ -568,6 +577,15 @@ class State:
                 self.current_topic = None
 
 
+def _post_ui(window, callback):
+    """Worker übergeben UI-Arbeit ohne Tk-Aufruf an den Anwendungsthread."""
+    callbacks = getattr(window, "_ui_callbacks", None)
+    if callbacks is not None and threading.get_ident() != window._ui_thread_id:
+        callbacks.put(callback)
+    else:
+        window.after(0, callback)
+
+
 def _save_library_state(window, *, retry_recovery: bool = False) -> bool:
     """Report failed GUI persistence while retaining the current in-memory edits."""
     state = window.state_model
@@ -611,6 +629,10 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         """Initialisiert die App: Fenster konfigurieren, State laden, GUI aufbauen."""
         super().__init__()
         self._a11y_registry: dict[str, dict[str, object]] = {}
+        self._ui_thread_id = threading.get_ident()
+        self._ui_callbacks = queue.SimpleQueue()
+        self._collection_thread = None
+        self._close_requested = False
         self.title(APP_NAME)
         self.geometry("1400x840")
         self.minsize(1100, 720)
@@ -1232,9 +1254,15 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
                 enabled = False
 
         self.collection_export_hint_label.configure(text=hint)
+        if self._collection_thread is not None:
+            enabled = False
+            self.collection_export_hint_label.configure(
+                text=("Export läuft. Das Fenster schließt nach Abschluss."
+                      if self._close_requested else "Sammel-PDF wird erstellt …"),
+            )
         self.collection_export_button.state(["!disabled"] if enabled else ["disabled"])
         for button in self.collection_filter_buttons:
-            button.state(["!disabled"] if topic else ["disabled"])
+            button.state(["!disabled"] if topic and self._collection_thread is None else ["disabled"])
 
     def _set_document_state(self, text: str) -> None:
         """Setzt den sichtbaren und semantischen Dokumentlistenstatus."""
@@ -1666,23 +1694,78 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
     # Export Sammel-PDF
     def create_collection_pdf(self):
         """Startet den Sammel-PDF-Export als Hintergrund-Thread (gelesene/ungelesene/alle)."""
+        if self._collection_thread is not None or self._close_requested:
+            return
         topic = self.state_model.current_topic
         if not topic:
             messagebox.showinfo("Hinweis", "Bitte zuerst ein Thema auswählen.")
             return
         filter_mode = self.filter_var.get()
-        threading.Thread(target=self._create_collection_pdf_worker, args=(topic, filter_mode), daemon=True).start()
+        docs, originals = self.state_model.collection_snapshot(topic)
+        worker = threading.Thread(
+            target=self._create_collection_pdf_worker,
+            args=(topic, filter_mode, docs, originals), daemon=False,
+        )
+        self._collection_thread = worker
+        self._update_collection_export_controls()
+        try:
+            worker.start()
+        except Exception as exc:
+            self._collection_thread = None
+            self._update_collection_export_controls()
+            messagebox.showerror("Sammel-PDF nicht gestartet", str(exc), parent=self)
+            return
+        self.after(50, self._poll_collection_export)
 
-    def _create_collection_pdf_worker(self, topic: str, filter_mode: str):
+    def _poll_collection_export(self):
+        """Verarbeitet UI-Ergebnisse und schließt erst nach tatsächlichem Workerende."""
+        worker = self._collection_thread
+        if worker is None:
+            return
+
+        def drain_callbacks():
+            while True:
+                try:
+                    callback = self._ui_callbacks.get_nowait()
+                except queue.Empty:
+                    break
+                try:
+                    callback()
+                except Exception as exc:
+                    self.report_callback_exception(type(exc), exc, exc.__traceback__)
+
+        try:
+            drain_callbacks()
+        finally:
+            if worker.is_alive():
+                self.after(50, self._poll_collection_export)
+            else:
+                worker.join()  # Bereits beendet; kein Warten im GUI-Thread.
+                try:
+                    # Zwischen Empty-Prüfung und Threadende eingereihte Ergebnisse mitnehmen.
+                    drain_callbacks()
+                finally:
+                    self._collection_thread = None
+                    self.config(cursor="")
+                    self._update_collection_export_controls()
+                    if self._close_requested:
+                        self._close_requested = False
+                        self.on_close()
+
+    def _create_collection_pdf_worker(self, topic: str, filter_mode: str,
+                                      docs=None, original_paths=None):
         """Hintergrund-Worker: Konvertiert Dokumente in PDF und merged sie zu einer Datei.
 
         Args:
             topic: Name des Themas
             filter_mode: 'alle', 'gelesene' oder 'ungelesene'
+            docs: Beim Start kopierte Dokumentdaten; None für synchronen Aufruf
+            original_paths: Beim Start festgehaltene Originalpfade aller Themen
         """
-        self._set_busy(True)
         try:
-            docs = self.state_model.list_docs(topic)
+            self._set_busy(True)
+            if docs is None:
+                docs = self.state_model.list_docs(topic)
             if filter_mode == "gelesene":
                 docs = [d for d in docs if d.get("read")]
             elif filter_mode == "ungelesene":
@@ -1695,7 +1778,7 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
             try:
                 out_path = collection_output_path(
                     desktop_path(), collection_pdf_filename(topic, filter_mode),
-                    self.state_model.all_document_paths(),
+                    (original_paths or []) + self.state_model.all_document_paths(),
                 )
             except ValueError as exc:
                 self.status_info(str(exc))
@@ -1755,16 +1838,19 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
                     summary = ("Sammel-PDF mit ausgelassenen Dokumenten erstellt:\n"
                                f"{out_path}\n\nEnthalten: {len(pdf_parts)} von {len(docs)} Dokumenten."
                                + details)
-                    self.after(0, lambda: messagebox.showwarning("Unvollständiges Sammel-PDF", summary))
+                    _post_ui(self, lambda: messagebox.showwarning("Unvollständiges Sammel-PDF", summary))
                 else:
                     summary = "Sammel-PDF erstellt:\n" + str(out_path)
-                    self.after(0, lambda: messagebox.showinfo("Erfolg", summary))
+                    _post_ui(self, lambda: messagebox.showinfo("Erfolg", summary))
+        except Exception as exc:
+            error = f"Sammel-PDF konnte nicht erstellt werden:\n{exc}"
+            _post_ui(self, lambda: messagebox.showerror("Sammel-PDF fehlgeschlagen", error))
         finally:
             self._set_busy(False)
 
     # Busy/Status
     def _set_busy(self, busy: bool):
-        """Setzt den Warte-Cursor (thread-sicher via after()).
+        """Setzt den Warte-Cursor über die UI-Queue im Anwendungsthread.
 
         Args:
             busy: True = Warte-Cursor, False = normaler Cursor
@@ -1772,7 +1858,7 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         def apply():
             self.config(cursor="watch" if busy else "")
             self.update_idletasks()
-        self.after(0, apply)
+        _post_ui(self, apply)
 
     def status_info(self, msg: str):
         """Zeigt eine Info-Meldung thread-sicher im Hauptthread an.
@@ -1780,7 +1866,7 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         Args:
             msg: Anzuzeigende Nachricht
         """
-        self.after(0, lambda: messagebox.showinfo("Info", msg))
+        _post_ui(self, lambda: messagebox.showinfo("Info", msg))
 
     def export_library_json(self):
         """Exportiert die gesamte Bibliothek als `dokureader-library-v1.json`."""
@@ -2021,6 +2107,10 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
 
     def on_close(self):
         """Callback beim Schließen des Fensters: State speichern und App beenden."""
+        if getattr(self, "_collection_thread", None) is not None:
+            self._close_requested = True
+            self._update_collection_export_controls()
+            return
         if not _save_library_state(self):
             return
         self.destroy()
