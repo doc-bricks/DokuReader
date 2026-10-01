@@ -79,6 +79,29 @@ class SearchUiAccessibilityTests(unittest.TestCase):
         self.assertIn("disabled", self.app.clear_search_button.state())
         self.assertEqual(len(self.app.doc_tree.get_children()), 2)
 
+    def test_save_button_retries_failed_save_and_exposes_status(self):
+        import json
+        from unittest.mock import patch
+
+        self.assertTrue(self.app.state_model.save())
+        state_path = Path(DokuReader.STATE_FILE)
+        original = state_path.read_bytes()
+        self.app.state_model.set_read("Forschung", str(self._first_doc), True)
+        with patch.object(DokuReader.os, "replace", side_effect=PermissionError("destination busy")), \
+                patch.object(DokuReader.messagebox, "showerror") as error:
+            self.app.save_library_button.invoke()
+            error.assert_called_once()
+        self.assertEqual(state_path.read_bytes(), original)
+        self.assertIn("nicht gespeichert", self.app.save_status_label.cget("text"))
+        self.assertTrue(self.app.bind("<Control-s>"))
+        self.assertEqual(self.app._a11y_registry["library_save"]["role"], "button")
+        self.assertEqual(self.app._a11y_registry["library_save_status"]["role"], "status")
+
+        self.app.save_library_button.invoke()
+        self.assertNotIn("nicht", self.app.save_status_label.cget("text"))
+        saved = json.loads(state_path.read_text(encoding="utf-8"))
+        self.assertTrue(saved["topics"]["Forschung"][0]["read"])
+
     def test_escape_clears_search_and_restores_full_document_list(self):
         self.app._search_var.set("leseplan")
         self.app.update()
