@@ -30,6 +30,10 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 - Failed automatic library saves now show an error and retain current edits.
   A visible status and Save Library button (Ctrl+S) allow retrying; creating or
   renaming a topic also persists its final selection.
+- Bei kleinen Fenstern verkleinern sich die Vorschauflächen, damit Sammel-PDF
+  und JSON-Export auch bei der Mindestgröße von 1100 × 720 sichtbar bleiben.
+- Preview areas shrink in compact windows so collection PDF and JSON export
+  actions remain visible at the minimum supported size of 1100 × 720.
 - Der JSON-Exportdialog schützt eingebundene Originale, die interne Zustandsdatei
   und die aktuelle Wiederherstellungssicherung vor dem Überschreiben. Auch
   Pfadaliasse werden erkannt; die Meldung fordert eine andere Zieldatei an.

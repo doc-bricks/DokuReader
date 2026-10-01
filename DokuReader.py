@@ -981,12 +981,18 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
 
         # Rechte Spalte: Vorschau + Export
         right = ttk.Frame(paned, style="Column.TFrame")
+        right.columnconfigure(0, weight=1)
+        # Vorschauflächen geben bei kleinen Fenstern Platz für die Exportaktionen frei.
+        right.rowconfigure(1, weight=1, minsize=80)
+        right.rowconfigure(3, weight=1, minsize=40)
         paned.add(right, weight=2)
         self.preview_section_header = self._build_section_header(
             right,
             "Vorschau",
             "Prüfe Inhalte und exportiere nur den Stand, den du wirklich weitergeben willst.",
         )
+        self.preview_section_header.pack_forget()
+        self.preview_section_header.grid(row=0, column=0, sticky="ew", padx=14, pady=(14, 6))
         self.preview = tk.Canvas(
             right,
             bg=self._theme["preview_bg"],
@@ -995,7 +1001,7 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
             highlightthickness=1,
             highlightbackground=self._theme["border"],
         )
-        self.preview.pack(fill=tk.BOTH, expand=False, padx=14, pady=(0, 8))
+        self.preview.grid(row=1, column=0, sticky="nsew", padx=14, pady=(0, 8))
         self._register_accessibility(
             "preview_canvas",
             self.preview,
@@ -1010,7 +1016,7 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
             style="SectionSubtitle.TLabel",
             anchor="w",
         )
-        self.preview_state_label.pack(fill=tk.X, padx=14, pady=(0, 4))
+        self.preview_state_label.grid(row=2, column=0, sticky="ew", padx=14, pady=(0, 4))
         self._register_accessibility(
             "preview_state",
             self.preview_state_label,
@@ -1032,7 +1038,7 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
             padx=8,
             pady=8,
         )
-        self.preview_text.pack(fill=tk.BOTH, expand=True, padx=14, pady=(0, 8))
+        self.preview_text.grid(row=3, column=0, sticky="nsew", padx=14, pady=(0, 8))
         self._register_accessibility(
             "preview_text",
             self.preview_text,
@@ -1043,7 +1049,7 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         )
 
         export_frame = ttk.LabelFrame(right, text="Sammel-PDF", style="Card.TLabelframe")
-        export_frame.pack(fill=tk.X, padx=14, pady=(0, 8))
+        export_frame.grid(row=4, column=0, sticky="ew", padx=14, pady=(0, 8))
         self._register_accessibility(
             "collection_export_frame",
             export_frame,
@@ -1101,7 +1107,7 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         )
 
         library_export_frame = ttk.LabelFrame(right, text="Bibliothek (JSON)", style="Card.TLabelframe")
-        library_export_frame.pack(fill=tk.X, padx=14, pady=(0, 8))
+        library_export_frame.grid(row=5, column=0, sticky="ew", padx=14, pady=(0, 8))
         self._register_accessibility(
             "library_export_frame",
             library_export_frame,
