@@ -36,6 +36,14 @@ if __name__ == "__main__" and len(sys.argv) > 1 and sys.argv[1] == "--word-conve
         helper_status = 1
     raise SystemExit(helper_status)
 
+if __name__ == "__main__" and len(sys.argv) > 1 and sys.argv[1] == "--libreoffice-process-helper":
+    try:
+        from libreoffice_process import helper_main
+        helper_status = helper_main(sys.argv[2:])
+    except Exception:
+        helper_status = 1
+    raise SystemExit(helper_status)
+
 import os
 import json
 import shutil
@@ -48,6 +56,7 @@ import hashlib
 from datetime import datetime, timezone
 from pathlib import Path
 from office_conversion import convert_word_to_pdf, valid_pdf
+from libreoffice_process import run_libreoffice_process
 
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox, simpledialog
@@ -2027,6 +2036,10 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
             executable = shutil.which(candidate)
             if not executable:
                 continue
+            if platform.system() == "Windows":
+                console_entry = Path(executable).with_suffix(".com")
+                if console_entry.is_file():
+                    executable = str(console_entry)
             staged = None
             try:
                 with tempfile.TemporaryDirectory(prefix=".dokureader-libreoffice-", dir=tmpdir) as temporary:
@@ -2034,14 +2047,14 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
                     output_directory = work / "output"
                     output_directory.mkdir()
                     profile = work / "profile"
-                    result = subprocess.run(
+                    succeeded = run_libreoffice_process(
                         [executable, "-env:UserInstallation=" + profile.as_uri(),
                          "--headless", "--norestore", "--convert-to", "pdf",
                          "--outdir", str(output_directory), str(Path(path).resolve())],
-                        stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=180, check=False,
+                        timeout=180,
                     )
                     output = output_directory / (Path(path).stem + ".pdf")
-                    if result.returncode != 0 or not valid_pdf(output):
+                    if not succeeded or not valid_pdf(output):
                         continue
                     # Vorbereitung außerhalb des Profils: dessen Bereinigung muss
                     # vor dem Ersetzen einer früheren Konvertierung gelingen.

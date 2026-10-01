@@ -35,7 +35,7 @@ def _fake_soffice_run(tmpdir: Path):
                 writer.write(stream)
         finally:
             writer.close()
-        return mock.Mock(returncode=0)
+        return True
 
     return runner
 
@@ -116,7 +116,7 @@ def main() -> None:
                 xdg_mock.assert_called_once_with(["xdg-open", str(txt_path)], check=False, timeout=30)
 
             with mock.patch.object(DokuReader.shutil, "which", side_effect=lambda name: "/usr/bin/soffice" if name == "soffice" else None), \
-                 mock.patch.object(DokuReader.subprocess, "run", side_effect=_fake_soffice_run(tmpdir)) as soffice_mock:
+                 mock.patch.object(DokuReader, "run_libreoffice_process", side_effect=_fake_soffice_run(tmpdir)) as soffice_mock:
                 office_pdf = app._office_to_pdf(str(office_path), tmpdir)
                 _assert(office_pdf is not None, "LibreOffice-Fallback erzeugte keine PDF.")
                 _assert(Path(office_pdf).exists(), "LibreOffice-Fallback-Ausgabe fehlt.")
