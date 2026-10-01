@@ -1,5 +1,7 @@
 """Exercise starter selection and logging without touching a user library."""
 import json
+import ctypes
+from ctypes import wintypes
 import os
 from pathlib import Path
 import shutil
@@ -212,3 +214,51 @@ def test_source_virtual_environment_is_preferred(tmp_path):
     result = check_start(source, debug=True)
     assert result.returncode == 0, result.stderr
     assert Path(json.loads(result.stdout)["python"]) == source / ".venv/Scripts/python.exe"
+
+
+@pytest.mark.skipif(os.name != "nt", reason="Native WSH error dialog")
+def test_wsh_failure_displays_real_dialog(tmp_path):
+    # Only redirect the log destination; the actual WSH host and MsgBox remain.
+    script = (ROOT / "launch.vbs").read_text(encoding="utf-8")
+    script = script.replace('CreateObject("Shell.Application").NameSpace(&H1C).Self.Path',
+                            'files.GetParentFolderName(WScript.ScriptFullName)')
+    (tmp_path / "launch.vbs").write_text(script, encoding="ascii")
+    # Missing PS script forces the pre-Python fallback. The test closes its own dialog.
+    starter = (ROOT / "START.bat").read_text(encoding="ascii")
+    assert "//I //Nologo" in starter and "//B" not in starter
+    host = Path(os.environ["SystemRoot"]) / "System32/wscript.exe"
+    child = subprocess.Popen([str(host), "//I", "//Nologo", str(tmp_path / "launch.vbs")])
+    user32 = ctypes.WinDLL("user32", use_last_error=True)
+    callback_type = ctypes.WINFUNCTYPE(wintypes.BOOL, wintypes.HWND, wintypes.LPARAM)
+    user32.EnumWindows.argtypes = [callback_type, wintypes.LPARAM]
+    user32.GetWindowThreadProcessId.argtypes = [wintypes.HWND, ctypes.POINTER(wintypes.DWORD)]
+    user32.GetWindowTextW.argtypes = [wintypes.HWND, wintypes.LPWSTR, ctypes.c_int]
+    user32.IsWindowVisible.argtypes = [wintypes.HWND]
+    user32.PostMessageW.argtypes = [wintypes.HWND, wintypes.UINT, wintypes.WPARAM, wintypes.LPARAM]
+    dialogs = []
+
+    @callback_type
+    def inspect_window(hwnd, _):
+        pid = wintypes.DWORD()
+        user32.GetWindowThreadProcessId(hwnd, ctypes.byref(pid))
+        title = ctypes.create_unicode_buffer(256)
+        user32.GetWindowTextW(hwnd, title, len(title))
+        if pid.value == child.pid and title.value == "DokuReader - Startfehler" and user32.IsWindowVisible(hwnd):
+            dialogs.append(hwnd)
+        return True
+
+    try:
+        deadline = time.monotonic() + 15
+        while time.monotonic() < deadline and child.poll() is None:
+            user32.EnumWindows(inspect_window, 0)
+            if dialogs:
+                break
+            time.sleep(0.02)
+        assert dialogs, "WSH must display the real startup error dialog"
+        user32.PostMessageW(dialogs[0], 0x0010, 0, 0)  # WM_CLOSE, own PID only
+        assert child.wait(timeout=5) == 1
+        assert "Bitte debug.bat" in (tmp_path / "DokuReader/logs/starter-error.log").read_text(encoding="utf-8-sig")
+    finally:
+        if child.poll() is None:
+            child.kill()
+            child.wait(timeout=5)
