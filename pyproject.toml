@@ -61,10 +61,13 @@ Homepage = "https://github.com/doc-bricks/DokuReader"
 Documentation = "https://github.com/doc-bricks/DokuReader#readme"
 Repository = "https://github.com/doc-bricks/DokuReader.git"
 Issues = "https://github.com/doc-bricks/DokuReader/issues"
+Contributing = "https://github.com/doc-bricks/DokuReader/blob/master/CONTRIBUTING.md"
 Changelog = "https://github.com/doc-bricks/DokuReader/blob/master/CHANGELOG.md"
 Security = "https://github.com/doc-bricks/DokuReader/blob/master/SECURITY.md"
+"Level 1 SBOM" = "https://github.com/doc-bricks/DokuReader/blob/master/THIRD_PARTY_LICENSES.md"
 "Third-Party Licenses" = "https://github.com/doc-bricks/DokuReader/blob/master/THIRD_PARTY_LICENSES.md"
 "Third-Party Licenses (Text)" = "https://github.com/doc-bricks/DokuReader/blob/master/THIRD_PARTY_LICENSES.txt"
+"Plain-Text License" = "https://github.com/doc-bricks/DokuReader/blob/master/LICENSE"
 Notice = "https://github.com/doc-bricks/DokuReader/blob/master/NOTICE"
 "Marketing Log" = "https://github.com/doc-bricks/DokuReader/blob/master/MARKETING-LOG.txt"
 "LLM Context" = "https://github.com/doc-bricks/DokuReader/blob/master/llms.txt"
@@ -78,7 +81,7 @@ testpaths = [
     "tests",
 ]
 pythonpath = ["."]
-norecursedirs = [".git", ".pytest_cache", "__pycache__", "build", "dist", ".venv"]
+norecursedirs = [".git", ".pytest_cache", "__pycache__", "build", "dist", ".venv", ".pytest_temp"]
 
 [tool.ruff]
 line-length = 100

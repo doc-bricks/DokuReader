@@ -23,9 +23,12 @@ def test_pyproject_metadata() -> None:
     assert "https://github.com/doc-bricks/DokuReader" in content
     assert 'license = { text = "AGPL-3.0" }' in content
     assert "Documentation" in content
+    assert "Contributing" in content
     assert "Changelog" in content
     assert "Security" in content
+    assert "Level 1 SBOM" in content
     assert "Third-Party Licenses" in content
+    assert "Plain-Text License" in content
     assert "Marketing Log" in content
     assert "LLM Context" in content
     assert "Parent Organization" in content
@@ -48,7 +51,8 @@ def test_readme_badges_and_links_parity() -> None:
     assert "RunAsInvoker-Non--Elevated-success" in readme_en
     assert "Third--Party%20Licenses-Audited-green" in readme_en
     assert (
-        "Audit-2026--09--28-informational" in readme_en
+        "Audit-2026--10--01-informational" in readme_en
+        or "Audit-2026--09--28-informational" in readme_en
         or "Audit-2026--09--25-informational" in readme_en
         or "Audit-2026--09--22-informational" in readme_en
     )
@@ -65,7 +69,8 @@ def test_readme_badges_and_links_parity() -> None:
     assert "RunAsInvoker-Unprivilegiert-success" in readme_de
     assert "Marketing%20Log-Aktiv-blue" in readme_de
     assert (
-        "Audit-2026--09--28-informational" in readme_de
+        "Audit-2026--10--01-informational" in readme_de
+        or "Audit-2026--09--28-informational" in readme_de
         or "Audit-2026--09--25-informational" in readme_de
         or "Audit-2026--09--22-informational" in readme_de
     )
@@ -330,13 +335,13 @@ def test_pyproject_pep621_hardening() -> None:
     pyproj = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
     assert 'version = "1.0.1.dev0"' in pyproj, "Versionsnummer darf im Pfad A/B nicht geändert werden (T-20260920-167562623)"
     assert 'Notice = "https://github.com/doc-bricks/DokuReader/blob/master/NOTICE"' in pyproj
-    assert 'norecursedirs = [".git", ".pytest_cache", "__pycache__", "build", "dist", ".venv"]' in pyproj
+    assert '".pytest_temp"' in pyproj
 
 
 def test_third_party_licenses_audit_recency() -> None:
     '''Prüft Aktualität und NOTICE-Verlinkung im Drittanbieter-Lizenzinventar.'''
     tpl = (ROOT / "THIRD_PARTY_LICENSES.md").read_text(encoding="utf-8")
-    assert "2026-09-28" in tpl or "2026-09-25" in tpl or "2026-09-22" in tpl
+    assert "2026-10-01" in tpl or "2026-09-28" in tpl or "2026-09-25" in tpl or "2026-09-22" in tpl
     assert "[NOTICE](NOTICE)" in tpl
     for inv in (
         "INV-LOCAL-01",
@@ -448,7 +453,7 @@ def test_plain_text_license_companion() -> None:
     txt_file = ROOT / "THIRD_PARTY_LICENSES.txt"
     assert txt_file.is_file(), "THIRD_PARTY_LICENSES.txt fehlt im Repository-Root"
     content = txt_file.read_text(encoding="utf-8")
-    assert "2026-09-28" in content, "THIRD_PARTY_LICENSES.txt Audit-Datum veraltet"
+    assert "2026-10-01" in content or "2026-09-28" in content, "THIRD_PARTY_LICENSES.txt Audit-Datum veraltet"
     assert "PyMuPDF" in content
     assert "Pillow" in content
     assert "pypdf" in content
@@ -462,3 +467,105 @@ def test_marketing_log_recency() -> None:
     mlog = (ROOT / "MARKETING-LOG.txt").read_text(encoding="utf-8")
     assert "Audit 2026-09-28" in mlog
     assert "PEP 621" in mlog
+
+
+def test_ci_lifecycle_workflows_and_labels() -> None:
+    '''Prüft das Vorhandensein und die Härtung von auto-assign.yml, label-sync.yml und labels.yml.'''
+    auto_assign = (ROOT / ".github/workflows/auto-assign.yml").read_text(encoding="utf-8")
+    assert "actions/github-script@v7" in auto_assign
+    assert "timeout-minutes: 5" in auto_assign
+    assert "cancel-in-progress: true" in auto_assign
+    assert "pull-requests: write" in auto_assign
+    assert "issues: write" in auto_assign
+
+    label_sync = (ROOT / ".github/workflows/label-sync.yml").read_text(encoding="utf-8")
+    assert "EndBug/label-sync@v2" in label_sync
+    assert "timeout-minutes: 5" in label_sync
+    assert "cancel-in-progress: true" in label_sync
+    assert "issues: write" in label_sync
+
+    labels_yml = (ROOT / ".github/labels.yml").read_text(encoding="utf-8")
+    standard_labels = [
+        "bug",
+        "enhancement",
+        "good first issue",
+        "help wanted",
+        "documentation",
+        "duplicate",
+        "wontfix",
+        "priority: high",
+        "priority: low",
+        "needs-triage",
+        "stale",
+    ]
+    for lbl in standard_labels:
+        assert f"name: {lbl}" in labels_yml or f"name: '{lbl}'" in labels_yml, f"Label {lbl} fehlt in .github/labels.yml"
+
+
+def test_contributing_quality_gates_and_plan_d() -> None:
+    '''Prüft Qualitäts-Gates, Plan D Setup, Invarianten und Version-Freeze in CONTRIBUTING.md.'''
+    contributing = (ROOT / "CONTRIBUTING.md").read_text(encoding="utf-8")
+    assert "Qualitäts-Gates" in contributing
+    assert "Quality Gates" in contributing
+    assert "INV-LOCAL-01" in contributing
+    assert "INV-SLA-10" in contributing
+    assert "Plan D" in contributing
+    assert "T-20260920-167562623" in contributing or "Versions-Freeze" in contributing
+    assert "pytest -ra -v" in contributing
+    assert "ruff check ." in contributing
+    assert "python -m compileall -q ." in contributing
+    assert "cd web_companion && node --test" in contributing
+
+
+def test_extended_ideapad_and_lock_guards_in_gitignore() -> None:
+    '''Prüft die Absicherung gegen IdeaPad-Host-Dateien, ehthumbs.db und erweiterte Lock-Muster.'''
+    gi = (ROOT / ".gitignore").read_text(encoding="utf-8")
+    for pattern in (
+        "*-IDEAPAD*",
+        "*-IDEAPAD-GEI*",
+        "*-WORKSTATION.*",
+        "*-WORKSTATION-LG.*",
+        "ehthumbs.db",
+        "LOCK.dev.*",
+        "LOCK.antigravity.*",
+        "LOCK.bugsearch.*",
+        "TASKPLAN_*.md",
+    ):
+        assert pattern in gi, f"{pattern} fehlt in .gitignore"
+
+
+def test_plain_text_sbom_companion_invariants() -> None:
+    '''Prüft die 10 Invarianten, RunAsInvoker und § 521 BGB im Level 1 SBOM Text-Begleiter.'''
+    txt_file = ROOT / "THIRD_PARTY_LICENSES.txt"
+    content = txt_file.read_text(encoding="utf-8")
+    assert "2026-10-01" in content
+    assert "RunAsInvoker" in content
+    assert "§ 521 BGB" in content
+    for inv in (
+        "INV-LOCAL-01",
+        "INV-RUNAS-02",
+        "INV-INPLACE-03",
+        "INV-SCHEMA-04",
+        "INV-ISOLATION-05",
+        "INV-SANDBOX-06",
+        "INV-PARITY-07",
+        "INV-A11Y-08",
+        "INV-DISCOVERY-09",
+        "INV-SLA-10",
+    ):
+        assert inv in content, f"THIRD_PARTY_LICENSES.txt fehlt Invariante {inv}"
+
+
+def test_pyproject_companion_urls_and_pytest_temp() -> None:
+    '''Prüft neue Begleit-URLs und norecursedirs in pyproject.toml.'''
+    pyproj = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
+    assert 'Contributing = "https://github.com/doc-bricks/DokuReader/blob/master/CONTRIBUTING.md"' in pyproj
+    assert '"Level 1 SBOM" = "https://github.com/doc-bricks/DokuReader/blob/master/THIRD_PARTY_LICENSES.md"' in pyproj
+    assert '"Plain-Text License" = "https://github.com/doc-bricks/DokuReader/blob/master/LICENSE"' in pyproj
+    assert '".pytest_temp"' in pyproj
+
+
+def test_marketing_log_pfad_a_currency() -> None:
+    '''Prüft die Aktualität der Pfad-A-Einträge in MARKETING-LOG.txt.'''
+    mlog = (ROOT / "MARKETING-LOG.txt").read_text(encoding="utf-8")
+    assert "Audit 2026-10-01" in mlog or "Audit 2026-09-28" in mlog

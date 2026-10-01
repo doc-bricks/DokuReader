@@ -32,6 +32,44 @@ Pull Requests werden unter der Projektlizenz eingereicht, sofern im konkreten Be
 - Keine API-Keys, Tokens, Passwörter oder privaten Dokumente
 - Lokale Build-Artefakte bleiben ungetrackt
 
+### Qualitäts-Gates & Automatisierte Tests
+
+Vor jedem Pull Request oder Commit müssen alle lokalen Qualitätsprüfungen fehlerfrei bestehen:
+
+```bash
+# 1. Vollständige Python-Testsuite ausführen (inklusive Metadaten- und Vertragstests)
+pytest -ra -v
+
+# 2. Linter & statische Codeanalyse
+ruff check .
+
+# 3. Vollständige Bytecode-Kompilierung
+python -m compileall -q .
+
+# 4. Mobile Web-Companion-Testsuite
+cd web_companion && node --test
+```
+
+### Architektonische Invarianten & Governance
+
+Beiträge müssen alle 10 Kern-Invarianten des Projekts respektieren:
+- `INV-LOCAL-01` (100% Local-First & Zero Egress): Keine Hintergrund-Netzwerkverbindungen, Telemetrie oder externe API-Aufrufe.
+- `INV-RUNAS-02` (Unprivilegierter Modus): Standard-Benutzerrechte (`RunAsInvoker`), keine Admin-Rechte erforderlich.
+- `INV-INPLACE-03` (Originale unverändert): Dokumente verbleiben an Ort und Stelle; keine Dateimanipulation im Dateisystem.
+- `INV-SCHEMA-04` (Deterministisches Schema): Bibliotheks-Exporte folgen strikt der `dokureader-library-v1` Spezifikation.
+- `INV-ISOLATION-05` (Zustands- & Cache-Isolation): Lokaler Zustand in `~/.dokubibliothek_state.json`; isolierter PWA-Cache.
+- `INV-SANDBOX-06` (Sichere Subprozesse): Optionale externe Tools (LibreOffice, Poppler) laufen mit Timeouts.
+- `INV-PARITY-07` (Plattform-Parität): Vollständige Unterstützung für Windows, macOS und Linux.
+- `INV-A11Y-08` (Barrierefreiheit): Tastaturbedienbarkeit und semantische Rollen für alle Steuerelemente.
+- `INV-DISCOVERY-09` (Transparenz): Zweisprachige Dokumentation (EN/DE) und gepflegte `llms.txt`.
+- `INV-SLA-10` (Sicherheits-SLA): 48h-Erstreaktionszeit und 5-Werktage-Triage gem. `SECURITY.md`.
+
+### Plan D Lokales Setup & Versions-Disziplin
+
+- **Kanonischer Arbeitsort:** Lokaler Git-Klon unter `C:\_Local_DEV\repos\REL-PUB_DokuReader-tasksolver-1084-1085`.
+- **OneDrive-Spiegel:** `C:\Users\lukas\OneDrive\.TOPICS\.SOFTWARE\DOCS\REL-PUB_DokuReader` dient als gitloser Spiegel.
+- **Versions-Freeze (T-20260920-167562623):** Die Versionsnummer (`1.0.1-dev` / `1.0.1.dev0`) bleibt für laufende Hygiene- und Marketing-Läufe strikt eingefroren. Alle Neuerungen werden unter `## [Unreleased]` im `CHANGELOG.md` erfasst.
+
 ### Erste Schritte
 
 ```bash
@@ -74,6 +112,44 @@ Pull requests are submitted under the project license unless otherwise agreed fo
 - No hardcoded local paths
 - No API keys, tokens, passwords, or private documents
 - Local build artifacts stay untracked
+
+### Quality Gates & Automated Verification
+
+All pull requests and commits must pass local verification gates before submission:
+
+```bash
+# 1. Full Python test suite (including contract and metadata validation)
+pytest -ra -v
+
+# 2. Fast linting and static analysis
+ruff check .
+
+# 3. Whole-repository bytecode compilation
+python -m compileall -q .
+
+# 4. Mobile Web Companion test runner
+cd web_companion && node --test
+```
+
+### Architectural Invariants & Governance
+
+Contributions must preserve all 10 architectural and runtime invariants:
+- `INV-LOCAL-01` (100% Local-First & Zero Egress): No outbound network requests, analytics, or external telemetry.
+- `INV-RUNAS-02` (Unprivileged User Mode): Executes purely under `RunAsInvoker` without administrative elevation.
+- `INV-INPLACE-03` (In-Place File Safety): Original documents are strictly read-only; originals never moved or altered.
+- `INV-SCHEMA-04` (Deterministic Schema): Export payloads adhere to the versioned `dokureader-library-v1` JSON specification.
+- `INV-ISOLATION-05` (State & Cache Isolation): Isolated user state in `~/.dokubibliothek_state.json`; scoped PWA cache.
+- `INV-SANDBOX-06` (Safe Subprocesses): Bounded execution with strict timeout limits for optional tools.
+- `INV-PARITY-07` (Tri-Platform Support): Parity across Windows, macOS, and Linux host environments.
+- `INV-A11Y-08` (Accessibility): Full keyboard navigation and semantic roles across the UI.
+- `INV-DISCOVERY-09` (Transparency): Bilingual documentation parity (EN/DE) and machine-readable `llms.txt`.
+- `INV-SLA-10` (Security Response SLA): Binding 48-hour initial response and 5-day triage commitment.
+
+### Plan D Setup & Version Freeze Discipline
+
+- **Canonical Repository:** Local Git clone at `C:\_Local_DEV\repos\REL-PUB_DokuReader-tasksolver-1084-1085`.
+- **OneDrive Mirror:** `C:\Users\lukas\OneDrive\.TOPICS\.SOFTWARE\DOCS\REL-PUB_DokuReader` serves as gitless multi-device mirror.
+- **Version Freeze (T-20260920-167562623):** Version numbers (`1.0.1-dev` / `1.0.1.dev0`) remain strictly frozen during routine maintenance. All enhancements are tracked under `## [Unreleased]` in `CHANGELOG.md`.
 
 ### Getting Started
 

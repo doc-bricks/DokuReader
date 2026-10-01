@@ -5,6 +5,20 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+- **Pfad A Repository-Hygiene, CI-Lifecycle-Workflows, Multi-Host-Lock-Defense, Level-1-SBOM-Text-Begleitdatei & Vertragstest-Erweiterung (2026-10-01)**:
+  - CI-Lifecycle-Automation eingerichtet: `.github/workflows/auto-assign.yml` (`actions/github-script@v7`, `timeout-minutes: 5`, `cancel-in-progress: true`, least-privilege `pull-requests: write`, `issues: write`) und `label-sync.yml` (`EndBug/label-sync@v2`, `timeout-minutes: 5`, `cancel-in-progress: true`, `issues: write`).
+  - Kanonische `.github/labels.yml` mit 11 Standard-Labels gemäß GOVERNANCE.md §4.2 angelegt.
+  - `CONTRIBUTING.md` mit Quality Gates (`pytest -ra -v`, `ruff check .`, `python -m compileall -q .`, `cd web_companion && node --test`), Plan D Local Dev Setup, architektonischen Invarianten (`INV-LOCAL-01` bis `INV-SLA-10`) und Versions-Freeze-Regel (T-20260920-167562623) in Deutsch und Englisch erweitert.
+  - Multi-Host- und Canonical-Lock-Defense in `.gitignore` gehärtet: `*-IDEAPAD*`, `*-IDEAPAD-GEI*`, `*-WORKSTATION.*`, `*-WORKSTATION-LG.*`, `ehthumbs.db`, `LOCK.dev.*`, `LOCK.antigravity.*`, `LOCK.bugsearch.*`, `TASKPLAN_*.md`.
+  - PEP 621 Standardisierung in `pyproject.toml` mit standardisierten Begleit-URLs (`Contributing`, `Level 1 SBOM`, `Plain-Text License`) unter `[project.urls]` registriert; `norecursedirs` mit `.pytest_temp` abgesichert; Versionsnummer `1.0.1.dev0` gemäß T-20260920-167562623 strikt eingefroren.
+  - Level 1 SBOM Text-Begleitdatei `THIRD_PARTY_LICENSES.txt` re-auditiert und auf Stand 2026-10-01 aktualisiert unter Bestätigung aller 10 Invarianten (`INV-LOCAL-01` bis `INV-SLA-10`), `RunAsInvoker` Non-Elevation-Zertifizierung (`INV-RUNAS-02`), Zero-Egress Air-Gap und gesetzlichem Haftungsausschluss gem. § 521 BGB Gefälligkeitsrecht.
+  - `THIRD_PARTY_LICENSES.md` Re-Audit auf Stand 2026-10-01 harmonisiert mit wechselseitiger Verlinkung zu `THIRD_PARTY_LICENSES.txt` und `NOTICE`.
+  - `README.md` und `README_de.md` Badges synchronisiert auf Audit `2026-10-01` und 160 Pytest Tests (100% grün, 0 failed) unter Wahrung aller 18 Schnellnavigationspunkte und reziproken dualen HTML-Anker (`sec-01` bis `sec-18`).
+  - `llms.txt` auf Stand 2026-10-01 mit 160 Python-Tests und 37 Web-Companion-Tests synchronisiert (197 verifizierte Tests gesamt).
+  - `MARKETING-LOG.txt` um Audit 2026-10-01 erweitert.
+  - Vertragstestsuite `tests/test_metadata.py` um 6 neue Contract-Tests für CI-Workflows, labels.yml, Contributing Guidelines, Multi-Host-Ignore-Guards, Plain-Text-SBOM-Invarianten und Begleit-URLs erweitert (160 Pytest-Tests, 100% bestanden).
+  - Versionsnummer `1.0.1-dev` (`1.0.1.dev0` / Store: `1.0.1.0`) gemäß T-20260920-167562623 strikt unverändert beibehalten.
+
 ### Behoben / Fixed
 - Der JSON-Exportdialog schützt eingebundene Originale, die interne Zustandsdatei
   und die aktuelle Wiederherstellungssicherung vor dem Überschreiben. Auch

@@ -11,7 +11,7 @@
 [![Python: 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python)](pyproject.toml)
 [![UI: Python / Tkinter](https://img.shields.io/badge/GUI-Python%20%2F%20Tkinter-blue)](DokuReader.py)
 [![Plattform: Windows | macOS | Linux](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-blue?logo=windows)](#einstieg--installation)
-[![Pytest: 154 tests, 0 failed](https://img.shields.io/badge/Pytest-154%20tests%2C%200%20failed-success?logo=pytest)](pyproject.toml)
+[![Pytest: 160 tests, 0 failed](https://img.shields.io/badge/Pytest-160%20tests%2C%200%20failed-success?logo=pytest)](pyproject.toml)
 [![Web Companion: 37 passed](https://img.shields.io/badge/Web%20Companion-37%20passed-success?logo=nodedotjs)](web_companion)
 [![Datenschutz: 100% Offline](https://img.shields.io/badge/Datenschutz-100%25%20Offline-success)](PRIVACY_POLICY.md)
 [![Sicherheit: Local--First](https://img.shields.io/badge/Sicherheit-Local--First-blue)](SECURITY.md)
@@ -22,7 +22,7 @@
 [![LLM-Ready: llms.txt](https://img.shields.io/badge/LLM--Ready-llms.txt-success)](llms.txt)
 [![Ökosystem: doc-bricks](https://img.shields.io/badge/%C3%96kosystem-doc--bricks-purple)](https://github.com/doc-bricks)
 [![Dachorganisation: open-bricks](https://img.shields.io/badge/Dachorganisation-open--bricks-blue)](https://github.com/open-bricks)
-[![Audit: 2026--09--28](https://img.shields.io/badge/Audit-2026--09--28-informational)](#qualitäts-gates--automatisierte-testsuiten)
+[![Audit: 2026--10--01](https://img.shields.io/badge/Audit-2026--10--01-informational)](#qualitäts-gates--automatisierte-testsuiten)
 [![Attribution: NOTICE](https://img.shields.io/badge/Attribution-NOTICE-blue)](NOTICE)
 
 > [!NOTE]
@@ -416,7 +416,7 @@ DokuReader ist Kernbestandteil der **doc-bricks** Familie im Rahmen der **open-b
 Kontinuierliche Qualität wird durch unabhängige, automatisierte Prüfschritte gewährleistet:
 
 ```bash
-# Python Unit- und Metadaten-Vertragstests ausführen (154 Tests)
+# Python Unit- und Metadaten-Vertragstests ausführen (160 Tests)
 pytest
 
 # Statische Analyse und Linting durchführen

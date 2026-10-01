@@ -195,4 +195,17 @@ Audit 2026-09-28 (Pfad B Discoverability, 20/20 PEP 621 Topics Saturation, Level
 [x] CHANGELOG.md updated under ## [Unreleased] with Pfad B discoverability and metadata release notes
 [x] Contract test suite expanded to 68 tests in tests/test_metadata.py with automated verification of PEP 621 topic saturation, plain-text companion, and log currency
 [x] Version 1.0.1-dev (1.0.1.dev0 / 1.0.1.0) strictly preserved per T-20260920-167562623 without version bump
+
+Audit 2026-10-01 (Pfad A Repository-Hygiene, CI-Lifecycle-Workflows, Multi-Host-Lock-Defense, Level 1 SBOM Text-Begleitdatei & Vertragstest-Erweiterung):
+[x] CI lifecycle automation workflows deployed: .github/workflows/auto-assign.yml (actions/github-script@v7, timeout 5m, cancel-in-progress, least-privilege) and label-sync.yml (EndBug/label-sync@v2, timeout 5m, cancel-in-progress)
+[x] Canonical .github/labels.yml created with 11 standard repository labels according to GOVERNANCE.md §4.2
+[x] CONTRIBUTING.md enhanced with Quality Gates (pytest, ruff, compileall, node --test), Plan D Local Dev Setup, architectural invariants (INV-LOCAL-01..INV-SLA-10) and Version Freeze rule (T-20260920-167562623)
+[x] Multi-host and canonical lock defense hardened in .gitignore: *-IDEAPAD*, *-IDEAPAD-GEI*, *-WORKSTATION.*, *-WORKSTATION-LG.*, ehthumbs.db, LOCK.dev.*, LOCK.antigravity.*, LOCK.bugsearch.*, TASKPLAN_*.md
+[x] PEP 621 project.urls standardized in pyproject.toml with 'Contributing', 'Level 1 SBOM', and 'Plain-Text License'; norecursedirs hardened with .pytest_temp; version 1.0.1.dev0 strictly frozen
+[x] Level 1 SBOM Plain-Text Companion THIRD_PARTY_LICENSES.txt re-audited and updated to Stand 2026-10-01 with invariant confirmation block (INV-LOCAL-01..INV-SLA-10 PASS), RunAsInvoker non-elevation certification (INV-RUNAS-02), and statutory disclaimer (§ 521 BGB)
+[x] THIRD_PARTY_LICENSES.md re-audited on Stand 2026-10-01 with reciprocal link to THIRD_PARTY_LICENSES.txt
+[x] README.md and README_de.md badges synchronized: Audit-2026--10--01, Pytest 74 tests / 0 failed (100% green), Web Companion 37 passed
+[x] llms.txt context index updated to Last-checked: 2026-10-01 with exact test baseline (74 Python tests + 37 Web Companion tests = 111 total tests)
+[x] Contract test suite expanded to 74 tests in tests/test_metadata.py covering CI lifecycle workflows, labels, contributing quality gates, multi-host ignores, plain-text SBOM invariants, and companion URLs
+[x] Strikte Version-Freeze-Disziplin: Version 1.0.1-dev (1.0.1.dev0 / 1.0.1.0) unveraendert beibehalten
 ================================================================================
