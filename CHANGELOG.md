@@ -5,6 +5,21 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+- Die Word-Konvertierung besitzt jetzt eine Frist von 180 Sekunden einschließlich
+  COM-Start, Öffnen, Exportieren, Schließen und COM-Abbau. Ein fensterloser Helfer
+  startet eine eigene Word-Instanz innerhalb eines von Beginn an verwalteten
+  Windows-Jobs. Bei Erfolg, Fehler, Timeout und Elternprozessabbruch werden nur
+  die eigenen Prozesse beendet; beobachtete Prozesshandles werden mit einer
+  gemeinsamen fünfsekündigen Aufräumfrist abgewartet. Vorbestehende Word-Prozesse
+  bleiben unberührt. Unvollständige PDFs ersetzen keine vorhandene Ausgabe.
+- Word conversion now runs in an owned Windows process job with a 180-second
+  deadline covering automation startup, conversion and teardown. Atomic job
+  assignment, kill-on-close cleanup and bounded waits for observed handles avoid
+  reusing or terminating existing Word processes. The windowed executable handles
+  conversion before Tk imports; failed helpers do not display traceback dialogs.
+  Twenty-three regressions cover output integrity, ownership, timeout, parent
+  crashes, job rejection, teardown stalls and both source/frozen command paths.
+
 - Sammel-PDFs schützen auch Originale, die erst während des Exports eingebunden
   werden. Die abschließende Originalprüfung und Veröffentlichung teilen sich die
   Bibliothekssperre; Auftragssnapshot, normalisierte Pfade und Dateialiasse bleiben

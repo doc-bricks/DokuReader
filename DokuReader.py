@@ -5,7 +5,7 @@ Dokumentenbibliothek mit Themen, Vorschau, Gelesen/ungelesen, Doppelklick-Öffne
 und Sammel-PDF-Export (alle/gelesene/ungelesene) mit vielen Fallbacks.
 
 Features:
-- GUI mit Tkinter (eine einzelne .py-Datei)
+- GUI mit Tkinter
 - Themen anlegen/umbenennen/löschen
 - Dateien pro Thema verwalten (nur Verweise, Originaldateien bleiben unberührt)
 - Drag & Drop hinzufügen (optional: tkinterdnd2)
@@ -24,6 +24,18 @@ Features:
 - Persistenz: JSON im Home-Verzeichnis (.dokubibliothek_state.json)
 """
 
+import sys
+
+# The windowed executable also serves as its bounded Word conversion helper.
+if __name__ == "__main__" and len(sys.argv) > 1 and sys.argv[1] == "--word-conversion-helper":
+    try:
+        from office_conversion import word_helper_main
+        helper_status = word_helper_main(sys.argv[2:])
+    except Exception:
+        # A windowed helper must not display an unhandled-error dialog.
+        helper_status = 1
+    raise SystemExit(helper_status)
+
 import os
 import json
 import shutil
@@ -35,6 +47,7 @@ import queue
 import hashlib
 from datetime import datetime, timezone
 from pathlib import Path
+from office_conversion import convert_word_to_pdf
 
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox, simpledialog
@@ -1826,7 +1839,7 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
                             if pdfp:
                                 pdf_parts.append(pdfp)
                             else:
-                                skipped.append(f"Office-Konvertierung fehlgeschlagen (LibreOffice oder Word erforderlich): {src}")
+                                skipped.append(f"Office-Konvertierung fehlgeschlagen (Konverter fehlt, Zeitlimit erreicht oder Datei nicht lesbar): {src}")
                         else:
                             skipped.append(f"Dateityp nicht unterstützt: {src}")
                     except Exception as e:
@@ -2024,36 +2037,7 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
                     pass
         # 2) Microsoft Word COM (nur Windows; öffnet DOC/DOCX/RTF; ODT oft nicht)
         if platform.system() == "Windows":
-            word = None
-            doc = None
-            try:
-                import win32com.client  # pywin32
-                word = win32com.client.Dispatch("Word.Application")
-                word.Visible = False
-                doc = word.Documents.Open(path)
-                out_path = str(tmpdir / (Path(path).stem + ".pdf"))
-                wdFormatPDF = 17
-                doc.SaveAs(out_path, FileFormat=wdFormatPDF)
-                doc.Close(False)
-                doc = None
-                word.Quit()
-                word = None
-                if os.path.exists(out_path):
-                    return out_path
-            except (OSError, ImportError, AttributeError):
-                pass
-            finally:
-                # COM-Objekte freigeben, falls durch Exception nicht geschlossen
-                try:
-                    if doc is not None:
-                        doc.Close(False)
-                except Exception:
-                    pass
-                try:
-                    if word is not None:
-                        word.Quit()
-                except Exception:
-                    pass
+            return convert_word_to_pdf(path, tmpdir)
         return None
 
     def _merge_pdfs(self, pdf_paths: list[str], out_path: Path, *, original_paths=None) -> bool:

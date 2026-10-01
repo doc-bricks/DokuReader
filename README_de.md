@@ -11,7 +11,7 @@
 [![Python: 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python)](pyproject.toml)
 [![UI: Python / Tkinter](https://img.shields.io/badge/GUI-Python%20%2F%20Tkinter-blue)](DokuReader.py)
 [![Plattform: Windows | macOS | Linux](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-blue?logo=windows)](#einstieg--installation)
-[![Pytest: 191 tests, 0 failed](https://img.shields.io/badge/Pytest-191%20tests%2C%200%20failed-success?logo=pytest)](pyproject.toml)
+[![Pytest: 214 tests, 0 failed](https://img.shields.io/badge/Pytest-214%20tests%2C%200%20failed-success?logo=pytest)](pyproject.toml)
 [![Web Companion: 37 passed](https://img.shields.io/badge/Web%20Companion-37%20passed-success?logo=nodedotjs)](web_companion)
 [![Datenschutz: 100% Offline](https://img.shields.io/badge/Datenschutz-100%25%20Offline-success)](PRIVACY_POLICY.md)
 [![Sicherheit: Local--First](https://img.shields.io/badge/Sicherheit-Local--First-blue)](SECURITY.md)
@@ -293,7 +293,7 @@ START.bat
 Für den vollen Funktionsumfang bei Vorschau und Konvertierung:
 - **LibreOffice:** Erforderlich für die automatisierte Konvertierung von DOC/DOCX/ODT/RTF nach PDF.
 - **Poppler:** Erforderlich bei Nutzung des optionalen `pdf2image`-Vorschau-Backends.
-- **Microsoft Word:** Unterstützt unter Windows für direkte COM-basierte Konvertierung.
+- **Microsoft Word:** Unter Windows 10 oder neuer mit pywin32 unterstützt. Die Word-Automatisierung läuft in einem eigenen Prozessjob mit 180 Sekunden Frist für Start, Export und Schließen sowie höchstens fünf Sekunden Aufräumfrist. Bereits laufende Word-Prozesse werden weder verwendet noch beendet.
 
 ---
 
@@ -416,7 +416,7 @@ DokuReader ist Kernbestandteil der **doc-bricks** Familie im Rahmen der **open-b
 Kontinuierliche Qualität wird durch unabhängige, automatisierte Prüfschritte gewährleistet:
 
 ```bash
-# Python Unit- und Metadaten-Vertragstests ausführen (191 Tests)
+# Python Unit- und Metadaten-Vertragstests ausführen (214 Tests)
 pytest
 
 # Statische Analyse und Linting durchführen
