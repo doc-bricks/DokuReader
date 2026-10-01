@@ -298,7 +298,7 @@ selection without opening the application or changing its library.
 ### Optional System Dependencies
 
 For full preview rendering and external document conversion:
-- **LibreOffice:** Required for headless DOC/DOCX/ODT/RTF to PDF conversion. Each attempt uses a fresh private user profile and output directory, with a 180-second launcher timeout. Only a newly produced, readable PDF with pages and exit code 0 is accepted. Failed conversion, profile cleanup or publication preserves the previous output. The launcher timeout does not guarantee that every descendant process has exited.
+- **LibreOffice:** Required for headless DOC/DOCX/ODT/RTF to PDF conversion. Each attempt uses a fresh private profile and output directory with a 180-second deadline. Windows terminates the owned process job and observes its exit before returning; an available `soffice.com` console entry is preferred. Linux/macOS send SIGKILL to the owned process group before waiting for and reaping its supervisor. Cleanup allows up to five additional seconds. Only a fresh readable PDF with pages, exit code 0 and successful cleanup is accepted. Conversion, profile cleanup or publication failures preserve previous output. The deadline applies per attempt; another converter may subsequently be tried. Detached POSIX processes fall outside this group boundary; termination of every grandchild is not generally proven.
 - **Poppler:** Required if using the optional `pdf2image` preview backend.
 - **Microsoft Word:** Supported on Windows 10 or later with pywin32. Word automation runs in an owned process job with a 180-second deadline covering startup, export and shutdown, plus at most five seconds for cleanup. Existing Word processes are not reused or terminated.
 

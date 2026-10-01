@@ -1,6 +1,5 @@
 """LibreOffice failures cannot publish old, partial or invalid output."""
 from pathlib import Path
-from types import SimpleNamespace
 from unittest.mock import Mock
 import subprocess
 
@@ -41,9 +40,9 @@ def test_failure_preserves_previous_output(tmp_path, monkeypatch, isolated_backe
             write_pdf(output)
         if kind == "timeout":
             raise subprocess.TimeoutExpired(command, 180)
-        return SimpleNamespace(returncode=7 if kind == "nonzero" else 0)
+        return kind != "nonzero"
 
-    monkeypatch.setattr(app.subprocess, "run", run)
+    monkeypatch.setattr(app, "run_libreoffice_process", run)
     assert app.App._office_to_pdf(None, str(source), tmp_path) is None
     assert source.read_bytes() == b"unchanged original"
     assert destination.read_bytes() == previous
@@ -69,9 +68,9 @@ def test_fresh_pdf_uses_isolated_profile_and_output(tmp_path, monkeypatch, isola
         assert command[-1] == str(source.resolve())
         write_pdf(output_directory / destination.name, pages=2)
         captured.append(output_directory.parent)
-        return SimpleNamespace(returncode=0)
+        return True
 
-    monkeypatch.setattr(app.subprocess, "run", run)
+    monkeypatch.setattr(app, "run_libreoffice_process", run)
     result = app.App._office_to_pdf(None, str(source), tmp_path)
     assert result == str(destination)
     from pypdf import PdfReader
@@ -83,7 +82,7 @@ def test_fresh_pdf_uses_isolated_profile_and_output(tmp_path, monkeypatch, isola
 def test_start_error_retains_word_fallback(tmp_path, monkeypatch):
     monkeypatch.setattr(app.shutil, "which", lambda name: "/private/soffice" if name == "soffice" else None)
     monkeypatch.setattr(app.platform, "system", lambda: "Windows")
-    monkeypatch.setattr(app.subprocess, "run", Mock(side_effect=OSError("cannot start")))
+    monkeypatch.setattr(app, "run_libreoffice_process", Mock(side_effect=OSError("cannot start")))
     word = Mock(return_value="word-result.pdf")
     monkeypatch.setattr(app, "convert_word_to_pdf", word)
     assert app.App._office_to_pdf(None, "source.docx", tmp_path) == "word-result.pdf"
@@ -106,10 +105,10 @@ def test_failed_candidate_output_cannot_leak_into_retry(tmp_path, monkeypatch, i
         attempts.append((output, profile))
         if len(attempts) == 1:
             write_pdf(output / "source.pdf", pages=2)
-            return SimpleNamespace(returncode=1)
-        return SimpleNamespace(returncode=0)
+            return False
+        return True
 
-    monkeypatch.setattr(app.subprocess, "run", run)
+    monkeypatch.setattr(app, "run_libreoffice_process", run)
     assert app.App._office_to_pdf(None, str(source), tmp_path) is None
     assert len(attempts) == 2
     assert attempts[0][0] != attempts[1][0]
@@ -129,9 +128,9 @@ def test_finalization_failure_keeps_previous_pdf(tmp_path, monkeypatch, isolated
     def run(command, **kwargs):
         output = Path(command[command.index("--outdir") + 1]) / "source.pdf"
         write_pdf(output, pages=2)
-        return SimpleNamespace(returncode=0)
+        return True
 
-    monkeypatch.setattr(app.subprocess, "run", run)
+    monkeypatch.setattr(app, "run_libreoffice_process", run)
     if failure == "cleanup":
         real_temporary = app.tempfile.TemporaryDirectory
 
@@ -160,3 +159,25 @@ def test_finalization_failure_keeps_previous_pdf(tmp_path, monkeypatch, isolated
     assert source.read_bytes() == b"original"
     assert destination.read_bytes() == previous
     assert sorted(path.name for path in tmp_path.iterdir()) == ["source.odt", "source.pdf"]
+
+
+def test_windows_prefers_available_console_entry(tmp_path, monkeypatch):
+    source = tmp_path / "source.odt"
+    source.write_bytes(b"original")
+    executable = tmp_path / "soffice.exe"
+    console = tmp_path / "soffice.com"
+    executable.touch()
+    console.touch()
+    monkeypatch.setattr(app.shutil, "which", lambda name: str(executable) if name == "soffice" else None)
+    monkeypatch.setattr(app.platform, "system", lambda: "Windows")
+
+    def run(command, **kwargs):
+        assert command[0] == str(console)
+        assert kwargs["timeout"] == 180
+        output = Path(command[command.index("--outdir") + 1]) / "source.pdf"
+        write_pdf(output)
+        return True
+
+    monkeypatch.setattr(app, "run_libreoffice_process", run)
+    assert app.App._office_to_pdf(None, str(source), tmp_path) == str(tmp_path / "source.pdf")
+    assert source.read_bytes() == b"original"
