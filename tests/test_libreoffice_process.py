@@ -42,7 +42,8 @@ def test_descendant_pipes_do_not_extend_deadline(tmp_path, mode):
     marker = tmp_path / "descendant.pid"
     child = tmp_path / "Öl & child.py"
     child.write_text("import os,sys,time; from pathlib import Path; "
-                     "Path(sys.argv[1]).write_text(str(os.getpid())); time.sleep(8)", encoding="utf-8")
+                     "p=Path(sys.argv[1]); staging=p.with_suffix('.tmp'); "
+                     "staging.write_text(str(os.getpid())); os.replace(staging,p); time.sleep(8)", encoding="utf-8")
     script = tmp_path / "Ärzte converter.py"
     script.write_text('''import subprocess, sys, time
 from pathlib import Path
@@ -86,7 +87,10 @@ def test_crashed_unreaped_supervisor_still_allows_group_cleanup(tmp_path):
     script.write_text('''import json, os, signal, subprocess, sys, time
 from pathlib import Path
 child = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(8)"])
-Path(sys.argv[1]).write_text(json.dumps([os.getpid(), child.pid]))
+p = Path(sys.argv[1])
+staging = p.with_suffix('.tmp')
+staging.write_text(json.dumps([os.getpid(), child.pid]))
+os.replace(staging, p)
 os.kill(os.getppid(), signal.SIGKILL)
 time.sleep(8)
 ''', encoding="utf-8")
@@ -143,7 +147,10 @@ def test_parent_death_stops_its_session(tmp_path):
     converter = tmp_path / "converter.py"
     converter.write_text('''import json, os, sys, time
 from pathlib import Path
-Path(sys.argv[1]).write_text(json.dumps([os.getppid(), os.getpid()]))
+p = Path(sys.argv[1])
+staging = p.with_suffix('.tmp')
+staging.write_text(json.dumps([os.getppid(), os.getpid()]))
+os.replace(staging, p)
 time.sleep(15)
 ''', encoding="utf-8")
     program = "import sys; from libreoffice_process import run_libreoffice_process; run_libreoffice_process(sys.argv[1:], timeout=20)"
