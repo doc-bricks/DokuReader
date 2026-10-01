@@ -20,6 +20,20 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
   - Versionsnummer `1.0.1-dev` (`1.0.1.dev0` / Store: `1.0.1.0`) gemäß T-20260920-167562623 strikt unverändert beibehalten.
 
 ### Behoben / Fixed
+- Speicherfehler nach Themen-, Dokument- und Lesestatusänderungen werden sofort
+  gemeldet. Ungespeicherte Änderungen bleiben im Fenster erhalten; der sichtbare
+  Speicherstatus und „Bibliothek speichern“ (Strg+S) ermöglichen einen erneuten
+  Versuch. Neue und umbenannte Themen speichern auch die aktuelle Auswahl.
+- Ist die ursprüngliche Sicherung einer beschädigten Bibliothek gescheitert,
+  versucht nur die ausdrückliche Speicheraktion diese erneut. Erst eine
+  vollständige Sicherung erlaubt das Ersetzen; ihr Pfad wird angezeigt.
+- Failed automatic library saves now show an error and retain current edits.
+  A visible status and Save Library button (Ctrl+S) allow retrying; creating or
+  renaming a topic also persists its final selection.
+- Bei kleinen Fenstern verkleinern sich die Vorschauflächen, damit Sammel-PDF
+  und JSON-Export auch bei der Mindestgröße von 1100 × 720 sichtbar bleiben.
+- Preview areas shrink in compact windows so collection PDF and JSON export
+  actions remain visible at the minimum supported size of 1100 × 720.
 - Der JSON-Exportdialog schützt eingebundene Originale, die interne Zustandsdatei
   und die aktuelle Wiederherstellungssicherung vor dem Überschreiben. Auch
   Pfadaliasse werden erkannt; die Meldung fordert eine andere Zieldatei an.

@@ -409,16 +409,20 @@ class State:
                 self._preserve_unreadable_state()
                 return
 
-    def save(self) -> bool:
+    def save(self, *, retry_recovery: bool = False) -> bool:
         """Speichert den aktuellen Zustand in die JSON-Datei (thread-sicher).
 
         Erst eine vollständige temporäre Datei schreiben, dann atomar ersetzen.
         Der Lock schützt den Zustand bis zur Veröffentlichung des Schnappschusses.
         Gibt False zurück, wenn Speichern fehlschlägt oder die Sicherung fehlt.
+        Nur ein ausdrücklicher Wiederholungsversuch darf die Sicherung erneut anlegen.
         """
         with self._lock:
             if self.load_failed and self.recovery_path is None:
-                return False
+                if retry_recovery:
+                    self._preserve_unreadable_state()
+                if self.recovery_path is None:
+                    return False
             temporary_path = None
             descriptor = None
             try:
@@ -564,6 +568,35 @@ class State:
                 self.current_topic = None
 
 
+def _save_library_state(window, *, retry_recovery: bool = False) -> bool:
+    """Report failed GUI persistence while retaining the current in-memory edits."""
+    state = window.state_model
+    previous_recovery = getattr(state, "recovery_path", None)
+    saved = (state.save(retry_recovery=True) if retry_recovery else state.save()) is not False
+    status = getattr(window, "save_status_label", None)
+    if status is not None:
+        status.configure(text=("Bibliothek gespeichert." if saved else "Änderungen noch nicht gespeichert."))
+    if not saved:
+        recovery = getattr(state, "recovery_path", None)
+        recovery_detail = f"\nSicherung der ursprünglichen Datei:\n{recovery}" if recovery else ""
+        messagebox.showerror(
+            "Bibliothek nicht gespeichert",
+            "Die Änderungen konnten nicht gespeichert werden. Sie bleiben im geöffneten Fenster erhalten.\n"
+            "Prüfen Sie freien Speicherplatz, Zugriffsrechte und den Hinweis zur Sicherung.\n"
+            "Versuchen Sie danach mit „Bibliothek speichern“ oder Strg+S erneut zu speichern."
+            + recovery_detail,
+            parent=window,
+        )
+    elif retry_recovery and previous_recovery is None and getattr(state, "recovery_path", None):
+        messagebox.showinfo(
+            "Sicherung erstellt",
+            "Die ursprüngliche Bibliotheksdatei wurde unverändert gesichert:\n"
+            f"{state.recovery_path}",
+            parent=window,
+        )
+    return saved
+
+
 class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
     """
     Hauptanwendung der Dokumentenbibliothek.
@@ -595,6 +628,8 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
             self._select_topic(self.state_model.current_topic)
 
         self.protocol("WM_DELETE_WINDOW", self.on_close)
+        self.bind("<Control-s>", self.save_library)
+        self.bind("<Control-S>", self.save_library)
         if self.state_model.load_failed:
             if self.state_model.recovery_path:
                 detail = ("Die beschädigte Datei wurde unverändert gesichert:\n"
@@ -733,6 +768,27 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
             description="Aktueller Desktop-Oberflächenstand",
             role="status",
             focusable=False,
+        )
+
+        save_bar = ttk.Frame(shell, style="Toolbar.TFrame")
+        save_bar.pack(fill=tk.X, pady=(0, 10))
+        self.save_status_label = ttk.Label(save_bar, text="Bereit.", style="SectionSubtitle.TLabel")
+        self.save_status_label.pack(side=tk.LEFT)
+        self._register_accessibility(
+            "library_save_status", self.save_status_label,
+            name="Speicherstatus der Bibliothek",
+            description="Zeigt an, ob Änderungen gespeichert wurden oder noch ungespeichert sind",
+            role="status", focusable=False,
+        )
+        self.save_library_button = ttk.Button(
+            save_bar, text="Bibliothek speichern (Strg+S)", command=self.save_library,
+        )
+        self.save_library_button.pack(side=tk.RIGHT)
+        self._register_accessibility(
+            "library_save", self.save_library_button,
+            name="Bibliothek speichern",
+            description="Speichert die Bibliothek oder versucht es nach einem Speicherfehler erneut",
+            role="button", focusable=True,
         )
 
         paned = ttk.Panedwindow(shell, orient=tk.HORIZONTAL, style="App.Horizontal.TPanedwindow")
@@ -925,12 +981,18 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
 
         # Rechte Spalte: Vorschau + Export
         right = ttk.Frame(paned, style="Column.TFrame")
+        right.columnconfigure(0, weight=1)
+        # Vorschauflächen geben bei kleinen Fenstern Platz für die Exportaktionen frei.
+        right.rowconfigure(1, weight=1, minsize=80)
+        right.rowconfigure(3, weight=1, minsize=40)
         paned.add(right, weight=2)
         self.preview_section_header = self._build_section_header(
             right,
             "Vorschau",
             "Prüfe Inhalte und exportiere nur den Stand, den du wirklich weitergeben willst.",
         )
+        self.preview_section_header.pack_forget()
+        self.preview_section_header.grid(row=0, column=0, sticky="ew", padx=14, pady=(14, 6))
         self.preview = tk.Canvas(
             right,
             bg=self._theme["preview_bg"],
@@ -939,7 +1001,7 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
             highlightthickness=1,
             highlightbackground=self._theme["border"],
         )
-        self.preview.pack(fill=tk.BOTH, expand=False, padx=14, pady=(0, 8))
+        self.preview.grid(row=1, column=0, sticky="nsew", padx=14, pady=(0, 8))
         self._register_accessibility(
             "preview_canvas",
             self.preview,
@@ -954,7 +1016,7 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
             style="SectionSubtitle.TLabel",
             anchor="w",
         )
-        self.preview_state_label.pack(fill=tk.X, padx=14, pady=(0, 4))
+        self.preview_state_label.grid(row=2, column=0, sticky="ew", padx=14, pady=(0, 4))
         self._register_accessibility(
             "preview_state",
             self.preview_state_label,
@@ -976,7 +1038,7 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
             padx=8,
             pady=8,
         )
-        self.preview_text.pack(fill=tk.BOTH, expand=True, padx=14, pady=(0, 8))
+        self.preview_text.grid(row=3, column=0, sticky="nsew", padx=14, pady=(0, 8))
         self._register_accessibility(
             "preview_text",
             self.preview_text,
@@ -987,7 +1049,7 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         )
 
         export_frame = ttk.LabelFrame(right, text="Sammel-PDF", style="Card.TLabelframe")
-        export_frame.pack(fill=tk.X, padx=14, pady=(0, 8))
+        export_frame.grid(row=4, column=0, sticky="ew", padx=14, pady=(0, 8))
         self._register_accessibility(
             "collection_export_frame",
             export_frame,
@@ -1045,7 +1107,7 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         )
 
         library_export_frame = ttk.LabelFrame(right, text="Bibliothek (JSON)", style="Card.TLabelframe")
-        library_export_frame.pack(fill=tk.X, padx=14, pady=(0, 8))
+        library_export_frame.grid(row=5, column=0, sticky="ew", padx=14, pady=(0, 8))
         self._register_accessibility(
             "library_export_frame",
             library_export_frame,
@@ -1211,7 +1273,7 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
             return
         topic = self.topic_list.get(sel[0])
         self._select_topic(topic)
-        self.state_model.save()
+        _save_library_state(self)
 
     def add_topic(self):
         """Dialog zum Anlegen eines neuen Themas; prüft auf leeren Namen und Duplikate."""
@@ -1225,9 +1287,9 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
             messagebox.showwarning("Hinweis", "Thema existiert bereits.")
             return
         self.state_model.ensure_topic(name)
-        self.state_model.save()
         self._reload_topics()
         self._select_topic(name)
+        _save_library_state(self)
 
     def rename_topic(self):
         """Dialog zum Umbenennen des aktuell gewählten Themas; prüft auf Duplikate."""
@@ -1244,9 +1306,9 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         if not self.state_model.rename_topic(old, new):
             messagebox.showwarning("Hinweis", "Ein Thema mit diesem Namen existiert bereits.")
             return
-        self.state_model.save()
         self._reload_topics()
         self._select_topic(new)
+        _save_library_state(self)
 
     def delete_topic(self):
         """Löscht das aktuell gewählte Thema nach Bestätigung (Originaldateien bleiben erhalten)."""
@@ -1256,7 +1318,7 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         topic = self.topic_list.get(sel[0])
         if messagebox.askyesno("Bestätigen", f"Thema '{topic}' entfernen? (Dateien bleiben am Originalort)"):
             self.state_model.remove_topic(topic)
-            self.state_model.save()
+            _save_library_state(self)
             self._reload_topics()
             self.doc_tree.delete(*self.doc_tree.get_children())
             self.clear_preview()
@@ -1352,7 +1414,7 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         if not paths:
             return
         added = self.state_model.add_docs(topic, paths)
-        self.state_model.save()
+        _save_library_state(self)
         self._reload_docs()
         if added == 0:
             messagebox.showinfo("Hinweis", "Keine neuen unterstützten Dateien hinzugefügt.")
@@ -1368,7 +1430,7 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
             self._set_document_state("Keine gültigen Dateipfade im Drag-and-drop-Ereignis erkannt.")
             return "break"
         added = self.state_model.add_docs(topic, paths)
-        self.state_model.save()
+        _save_library_state(self)
         self._reload_docs()
         if added == 0:
             self._set_document_state("Keine neuen unterstützten Dateien per Drag-and-drop hinzugefügt.")
@@ -1469,7 +1531,7 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
             return
         path = sel[0]
         self.state_model.set_read(topic, path, is_read)
-        self.state_model.save()
+        _save_library_state(self)
         self._reload_docs()
 
     def remove_selected_doc(self):
@@ -1481,7 +1543,7 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         path = sel[0]
         if messagebox.askyesno("Entfernen", "Dokument aus der Bibliothek entfernen?\n(Originaldatei bleibt erhalten)"):
             self.state_model.remove_doc(topic, path)
-            self.state_model.save()
+            _save_library_state(self)
             self._reload_docs()
 
     def on_doc_select(self, _=None):
@@ -1952,15 +2014,14 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
                 except OSError:
                     pass
 
+    def save_library(self, _event=None):
+        """Save all current edits, including a retry after failed automatic saving."""
+        _save_library_state(self, retry_recovery=True)
+        return "break"
+
     def on_close(self):
         """Callback beim Schließen des Fensters: State speichern und App beenden."""
-        if self.state_model.save() is False:
-            messagebox.showerror(
-                "Bibliothek nicht gespeichert",
-                "Die Bibliothek konnte nicht gespeichert werden. Das Fenster bleibt geöffnet.\n"
-                "Prüfen Sie freien Speicherplatz, Zugriffsrechte und den Hinweis zur Sicherung.",
-                parent=self,
-            )
+        if not _save_library_state(self):
             return
         self.destroy()
 

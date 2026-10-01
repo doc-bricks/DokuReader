@@ -79,6 +79,29 @@ class SearchUiAccessibilityTests(unittest.TestCase):
         self.assertIn("disabled", self.app.clear_search_button.state())
         self.assertEqual(len(self.app.doc_tree.get_children()), 2)
 
+    def test_save_button_retries_failed_save_and_exposes_status(self):
+        import json
+        from unittest.mock import patch
+
+        self.assertTrue(self.app.state_model.save())
+        state_path = Path(DokuReader.STATE_FILE)
+        original = state_path.read_bytes()
+        self.app.state_model.set_read("Forschung", str(self._first_doc), True)
+        with patch.object(DokuReader.os, "replace", side_effect=PermissionError("destination busy")), \
+                patch.object(DokuReader.messagebox, "showerror") as error:
+            self.app.save_library_button.invoke()
+            error.assert_called_once()
+        self.assertEqual(state_path.read_bytes(), original)
+        self.assertIn("nicht gespeichert", self.app.save_status_label.cget("text"))
+        self.assertTrue(self.app.bind("<Control-s>"))
+        self.assertEqual(self.app._a11y_registry["library_save"]["role"], "button")
+        self.assertEqual(self.app._a11y_registry["library_save_status"]["role"], "status")
+
+        self.app.save_library_button.invoke()
+        self.assertNotIn("nicht", self.app.save_status_label.cget("text"))
+        saved = json.loads(state_path.read_text(encoding="utf-8"))
+        self.assertTrue(saved["topics"]["Forschung"][0]["read"])
+
     def test_escape_clears_search_and_restores_full_document_list(self):
         self.app._search_var.set("leseplan")
         self.app.update()
@@ -166,24 +189,34 @@ class SearchUiAccessibilityTests(unittest.TestCase):
         self.assertIn("2 ungelesenen Dokumente", self.app.collection_export_hint_label.cget("text"))
 
     def test_compact_layout_keeps_topic_and_export_actions_inside_window(self):
-        self.app.geometry("1400x840+60+60")
         self.app.deiconify()
-        self.app.update()
-        self.app.update_idletasks()
-
-        window_right = self.app.winfo_rootx() + self.app.winfo_width()
-        window_bottom = self.app.winfo_rooty() + self.app.winfo_height()
-        self.assertLessEqual(
-            self.app.delete_topic_button.winfo_rootx()
-            + self.app.delete_topic_button.winfo_width(),
-            window_right,
-        )
-        self.assertLessEqual(
-            self.app.library_export_button.winfo_rooty()
-            + self.app.library_export_button.winfo_height(),
-            window_bottom,
-        )
-        self.assertTrue(self.app.library_export_button.winfo_ismapped())
+        for size in ("1400x840", "1400x760", "1400x720", "1100x720"):
+            with self.subTest(size=size):
+                self.app.geometry(f"{size}+0+0")
+                self.app.update()
+                self.app.update_idletasks()
+                window_left = self.app.winfo_rootx()
+                window_top = self.app.winfo_rooty()
+                window_right = window_left + self.app.winfo_width()
+                window_bottom = window_top + self.app.winfo_height()
+                for button in (
+                    self.app.delete_topic_button,
+                    self.app.save_library_button,
+                    self.app.collection_export_button,
+                    self.app.library_export_button,
+                ):
+                    self.assertTrue(button.winfo_ismapped(), button.cget("text"))
+                    self.assertGreaterEqual(button.winfo_rootx(), window_left)
+                    self.assertGreaterEqual(button.winfo_rooty(), window_top)
+                    self.assertLessEqual(
+                        button.winfo_rootx() + button.winfo_width(), window_right,
+                    )
+                    self.assertLessEqual(
+                        button.winfo_rooty() + button.winfo_height(), window_bottom,
+                    )
+                for preview in (self.app.preview, self.app.preview_text):
+                    self.assertTrue(preview.winfo_ismapped())
+                    self.assertGreaterEqual(preview.winfo_height(), 40)
         self.app.withdraw()
 
 
