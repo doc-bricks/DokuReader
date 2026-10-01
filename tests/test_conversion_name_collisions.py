@@ -21,7 +21,7 @@ def worker_window(paths, tmp_path, monkeypatch):
         ),
         _set_busy=Mock(), status_info=Mock(),
         after=lambda delay, callback: callback(),
-        _merge_pdfs=lambda parts, output: app.App._merge_pdfs(None, parts, output),
+        _merge_pdfs=lambda parts, output, **kwargs: app.App._merge_pdfs(None, parts, output, **kwargs),
     )
 
 

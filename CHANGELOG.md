@@ -5,6 +5,17 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+- Sammel-PDFs schützen auch Originale, die erst während des Exports eingebunden
+  werden. Die abschließende Originalprüfung und Veröffentlichung teilen sich die
+  Bibliothekssperre; Auftragssnapshot, normalisierte Pfade und Dateialiasse bleiben
+  geschützt. Bei einer Kollision bleibt das Original erhalten; erneutes Starten
+  wählt einen sicheren nummerierten Ausgabepfad.
+- Collection PDF publication checks current library originals, request snapshot
+  originals and merge inputs under the library lock before replacing the output.
+  A late collision aborts without overwriting an original; retrying selects a
+  safe numbered destination. Nine regression cases cover aliases, concurrent
+  registration, loaded references, snapshot removal and replacement failures.
+
 - **Pfad A Repository-Hygiene, CI-Lifecycle-Workflows, Multi-Host-Lock-Defense, Level-1-SBOM-Text-Begleitdatei & Vertragstest-Erweiterung (2026-10-01)**:
   - CI-Lifecycle-Automation eingerichtet: `.github/workflows/auto-assign.yml` (`actions/github-script@v7`, `timeout-minutes: 5`, `cancel-in-progress: true`, least-privilege `pull-requests: write`, `issues: write`) und `label-sync.yml` (`EndBug/label-sync@v2`, `timeout-minutes: 5`, `cancel-in-progress: true`, `issues: write`).
   - Kanonische `.github/labels.yml` mit 11 Standard-Labels gemäß GOVERNANCE.md §4.2 angelegt.

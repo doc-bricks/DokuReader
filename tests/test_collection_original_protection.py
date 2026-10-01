@@ -34,7 +34,7 @@ def test_export_uses_new_name_when_target_is_library_original(tmp_path, monkeypa
     monkeypatch.setattr(app.messagebox, "showinfo", success)
     window = SimpleNamespace(
         state_model=state, _set_busy=Mock(), status_info=Mock(),
-        _merge_pdfs=lambda parts, output: app.App._merge_pdfs(None, parts, output),
+        _merge_pdfs=lambda parts, output, **kwargs: app.App._merge_pdfs(None, parts, output, **kwargs),
         after=lambda delay, callback: callback(),
     )
     app.App._create_collection_pdf_worker(window, "Topic", mode)
@@ -60,7 +60,7 @@ def test_collision_suffix_does_not_overwrite_existing_unrelated_file(tmp_path, m
     monkeypatch.setattr(app.messagebox, "showinfo", Mock())
     window = SimpleNamespace(
         state_model=state, _set_busy=Mock(), status_info=Mock(),
-        _merge_pdfs=lambda parts, output: app.App._merge_pdfs(None, parts, output),
+        _merge_pdfs=lambda parts, output, **kwargs: app.App._merge_pdfs(None, parts, output, **kwargs),
         after=lambda delay, callback: callback(),
     )
     app.App._create_collection_pdf_worker(window, "Topic", "alle")
