@@ -527,6 +527,17 @@ class State:
                 [doc["path"] for docs in self.topics.values() for doc in docs],
             )
 
+    def publish_collection_pdf(self, temporary_path, destination, original_paths) -> bool:
+        """Prüft Originalziele und veröffentlicht unter derselben Zustandssperre."""
+        with self._lock:
+            protected = list(original_paths) + [
+                doc["path"] for docs in self.topics.values() for doc in docs
+            ]
+            if is_original_document(destination, protected):
+                return False
+            os.replace(temporary_path, destination)
+            return True
+
     def list_docs(self, topic: str):
         """
         Gibt eine Kopie aller Dokumente eines Themas zurück (thread-sicher).
@@ -1827,10 +1838,12 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
                     self.status_info("Keine Dateien konnten in PDF überführt werden." + details)
                     return
 
-                if not self._merge_pdfs(pdf_parts, out_path):
+                if not self._merge_pdfs(pdf_parts, out_path, original_paths=original_paths):
                     self.status_info(
                         "Konnte Sammel-PDF nicht vollständig erstellen. Prüfen Sie Quelldateien, "
-                        "Schreibrechte und PDF-Merge-Bibliothek. Eine vorhandene Ausgabe bleibt erhalten." + details
+                        "Schreibrechte, geschützte Originalziele und PDF-Merge-Bibliothek. "
+                        "Eine vorhandene Ausgabe bleibt erhalten. Wurde das Ziel inzwischen als "
+                        "Original eingebunden, starten Sie den Export erneut." + details
                     )
                     return
 
@@ -2043,12 +2056,13 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
                     pass
         return None
 
-    def _merge_pdfs(self, pdf_paths: list[str], out_path: Path) -> bool:
+    def _merge_pdfs(self, pdf_paths: list[str], out_path: Path, *, original_paths=None) -> bool:
         """Führt alle PDFs vollständig zusammen und ersetzt die Ausgabe atomar.
 
         Args:
             pdf_paths: Liste von Pfaden zu den Einzel-PDFs
             out_path: Pfad für die zusammengeführte PDF
+            original_paths: Geschützte Originalpfade aus dem Auftragssnapshot
 
         Returns:
             True bei Erfolg, False bei fehlendem PdfWriter oder Fehler
@@ -2060,7 +2074,8 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         descriptor = None
         try:
             writer = _PdfWriter()
-            if not pdf_paths or is_original_document(out_path, pdf_paths):
+            protected = list(pdf_paths) + list(original_paths or [])
+            if not pdf_paths or is_original_document(out_path, protected):
                 return False
             for p in pdf_paths:
                 writer.append(p)
@@ -2080,6 +2095,11 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
             # Auch unter Windows müssen die Quelldateien vor dem Ersetzen frei sein.
             writer.close()
             writer = None
+            state = getattr(self, "state_model", None)
+            if isinstance(state, State):
+                return state.publish_collection_pdf(temporary_path, destination, protected)
+            if is_original_document(destination, protected):
+                return False
             os.replace(temporary_path, destination)
             return True
         except Exception:

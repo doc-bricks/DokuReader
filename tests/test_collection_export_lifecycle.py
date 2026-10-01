@@ -78,11 +78,11 @@ def block_merge(window, monkeypatch):
     original = window._merge_pdfs
     calls = []
 
-    def merge(parts, destination):
+    def merge(parts, destination, **kwargs):
         calls.append((parts, destination))
         entered.set()
         assert release.wait(3)
-        return original(parts, destination)
+        return original(parts, destination, **kwargs)
 
     monkeypatch.setattr(window, "_merge_pdfs", merge)
     return entered, release, calls

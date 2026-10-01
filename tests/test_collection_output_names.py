@@ -28,7 +28,7 @@ def test_worker_exports_unsafe_topic_inside_desktop(tmp_path, monkeypatch, topic
             all_document_paths=lambda: [str(source)],
         ),
         _set_busy=Mock(), status_info=Mock(),
-        _merge_pdfs=lambda sources, output: app.App._merge_pdfs(None, sources, output),
+        _merge_pdfs=lambda sources, output, **kwargs: app.App._merge_pdfs(None, sources, output, **kwargs),
         after=lambda delay, callback: callback(),
     )
     app.App._create_collection_pdf_worker(window, topic, "alle")
