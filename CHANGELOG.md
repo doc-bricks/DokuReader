@@ -5,6 +5,17 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+- LibreOffice verwendet je Konvertierungsversuch ein frisches privates Profil und
+  Ausgabeverzeichnis. Alte, beschädigte, seitenlose oder trotz Fehler erzeugte PDFs
+  gelten nicht als Erfolg. Die Übernahme erfolgt erst nach PDF-Prüfung und
+  Profilbereinigung; Fehler erhalten die vorherige Ausgabe und die Quelldatei.
+  Zehn Regressionen decken Fehlversuche, Wiederholung und Veröffentlichung ab.
+- LibreOffice conversion isolates each attempt's profile and output. Exit code 0
+  and a newly written readable PDF with pages are required before publishing.
+  Cleanup completes before replacement, preserving previous output on failure.
+  Linux CI additionally runs real LibreOffice with Unicode/escaped URI paths,
+  PDF text extraction, unchanged source bytes and a stale-output failure probe.
+
 - Die Word-Konvertierung besitzt jetzt eine Frist von 180 Sekunden einschließlich
   COM-Start, Öffnen, Exportieren, Schließen und COM-Abbau. Ein fensterloser Helfer
   startet eine eigene Word-Instanz innerhalb eines von Beginn an verwalteten

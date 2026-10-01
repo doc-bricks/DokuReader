@@ -27,8 +27,14 @@ def _preview_text(app: DokuReader.App) -> str:
 
 def _fake_soffice_run(tmpdir: Path):
     def runner(cmd, stdout=None, stderr=None, timeout=None, check=None):
-        target = tmpdir / (Path(cmd[-1]).stem + ".pdf")
-        target.write_bytes(b"%PDF-1.4\n1 0 obj<</Type/Catalog>>endobj\ntrailer<</Root 1 0 R>>\n%%EOF\n")
+        target = Path(cmd[cmd.index("--outdir") + 1]) / (Path(cmd[-1]).stem + ".pdf")
+        writer = DokuReader._PdfWriter()
+        try:
+            writer.add_blank_page(width=200, height=200)
+            with target.open("wb") as stream:
+                writer.write(stream)
+        finally:
+            writer.close()
         return mock.Mock(returncode=0)
 
     return runner
