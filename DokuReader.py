@@ -47,7 +47,7 @@ import queue
 import hashlib
 from datetime import datetime, timezone
 from pathlib import Path
-from office_conversion import convert_word_to_pdf
+from office_conversion import convert_word_to_pdf, valid_pdf
 
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox, simpledialog
@@ -2022,19 +2022,49 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         Returns:
             Pfad zur erstellten PDF oder None bei Fehler/fehlenden Programmen
         """
-        # 1) LibreOffice headless (soffice/libreoffice)
-        for cand in ["soffice", "libreoffice"]:
-            if shutil.which(cand):
-                try:
-                    subprocess.run(
-                        [cand, "--headless", "--convert-to", "pdf", "--outdir", str(tmpdir), path],
-                        stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=180, check=False
+        # Jeder Versuch verwendet neue Ausgabe- und Profilverzeichnisse.
+        for candidate in ["soffice", "libreoffice"]:
+            executable = shutil.which(candidate)
+            if not executable:
+                continue
+            staged = None
+            try:
+                with tempfile.TemporaryDirectory(prefix=".dokureader-libreoffice-", dir=tmpdir) as temporary:
+                    work = Path(temporary).resolve()
+                    output_directory = work / "output"
+                    output_directory.mkdir()
+                    profile = work / "profile"
+                    result = subprocess.run(
+                        [executable, "-env:UserInstallation=" + profile.as_uri(),
+                         "--headless", "--norestore", "--convert-to", "pdf",
+                         "--outdir", str(output_directory), str(Path(path).resolve())],
+                        stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=180, check=False,
                     )
-                    out = tmpdir / (Path(path).stem + ".pdf")
-                    if out.exists():
-                        return str(out)
-                except (OSError, subprocess.SubprocessError):
-                    pass
+                    output = output_directory / (Path(path).stem + ".pdf")
+                    if result.returncode != 0 or not valid_pdf(output):
+                        continue
+                    # Vorbereitung außerhalb des Profils: dessen Bereinigung muss
+                    # vor dem Ersetzen einer früheren Konvertierung gelingen.
+                    descriptor, staging_path = tempfile.mkstemp(
+                        prefix=".dokureader-libreoffice-result-", suffix=".tmp", dir=tmpdir,
+                    )
+                    staged = Path(staging_path)
+                    with os.fdopen(descriptor, "wb") as destination, output.open("rb") as source:
+                        shutil.copyfileobj(source, destination)
+                        destination.flush()
+                        os.fsync(destination.fileno())
+                destination = tmpdir / (Path(path).stem + ".pdf")
+                os.replace(staged, destination)
+                staged = None
+                return str(destination)
+            except (OSError, ValueError, subprocess.SubprocessError):
+                pass
+            finally:
+                if staged is not None:
+                    try:
+                        staged.unlink(missing_ok=True)
+                    except OSError:
+                        pass
         # 2) Microsoft Word COM (nur Windows; öffnet DOC/DOCX/RTF; ODT oft nicht)
         if platform.system() == "Windows":
             return convert_word_to_pdf(path, tmpdir)
