@@ -5,6 +5,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
+import tempfile
 import time
 
 import pytest
@@ -77,7 +78,9 @@ def test_hidden_failure_reports_message_and_logs(tmp_path):
 @pytest.mark.parametrize("kind", ["relative", "project", "onedrive", "absent"])
 def test_log_directory_cannot_use_project_or_onedrive(tmp_path, monkeypatch, kind):
     from runtime import app_logging
-    home = tmp_path / "home"
+    # CI's pytest base lives inside the checkout; a simulated home must not.
+    # No files are created here: log_dir only computes a path.
+    home = Path(tempfile.gettempdir()) / "dokureader-starter-test-home"
     monkeypatch.setattr(Path, "home", classmethod(lambda cls: home))
     monkeypatch.delenv("XDG_STATE_HOME", raising=False)
     for key in ("OneDrive", "OneDriveConsumer", "OneDriveCommercial"):
