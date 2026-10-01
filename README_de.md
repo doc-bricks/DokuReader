@@ -275,6 +275,17 @@ Unter Windows kann der Start direkt über die Batch-Datei erfolgen:
 START.bat
 ```
 
+`START.bat` startet den aktuellen Quellcode ohne Konsolenfenster. Ein vorhandener
+Plan-D-Pointer bestimmt den kanonischen Quellordner; alte EXEs werden nicht bevorzugt.
+Ein Projekt-venv hat Vorrang vor dem Python-Interpreter im PATH (Python 3.10 oder neuer).
+Die Abhängigkeiten müssen zuvor installiert sein. `debug.bat` öffnet die Ausgabe zur
+Fehlersuche. Startfehler werden angezeigt; Ausgaben und Abstürze stehen lokal unter
+`%LOCALAPPDATA%\DokuReader\logs\app-<PID>.log`, außerhalb des Projekts und von OneDrive.
+Pro Prozess werden bis zu vier Dateien mit jeweils 2 MiB geführt; ältere Prozesslogs
+werden nicht automatisch gelöscht. Die reine Startprüfung
+`powershell -NoProfile -File .\start_source.ps1 -Check` zeigt Quellordner und Interpreter,
+ohne die App zu öffnen oder die Bibliothek zu verändern.
+
 ---
 
 ## Unterstützte Formate & Systemabhängigkeiten
