@@ -11,7 +11,7 @@
 [![Python: 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python)](pyproject.toml)
 [![UI: Python / Tkinter](https://img.shields.io/badge/GUI-Python%20%2F%20Tkinter-blue)](DokuReader.py)
 [![Platform: Windows | macOS | Linux](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-blue?logo=windows)](#getting-started--installation)
-[![Pytest: 191 tests, 0 failed](https://img.shields.io/badge/Pytest-191%20tests%2C%200%20failed-success?logo=pytest)](pyproject.toml)
+[![Pytest: 214 tests, 0 failed](https://img.shields.io/badge/Pytest-214%20tests%2C%200%20failed-success?logo=pytest)](pyproject.toml)
 [![Web Companion: 37 passed](https://img.shields.io/badge/Web%20Companion-37%20passed-success?logo=nodedotjs)](web_companion)
 [![Privacy: 100% Offline](https://img.shields.io/badge/Privacy-100%25%20Offline-success)](PRIVACY_POLICY.md)
 [![Security: Local--First](https://img.shields.io/badge/Security-Local--First-blue)](SECURITY.md)
@@ -290,7 +290,7 @@ START.bat
 For full preview rendering and external document conversion:
 - **LibreOffice:** Required for headless DOC/DOCX/ODT/RTF to PDF conversion.
 - **Poppler:** Required if using the optional `pdf2image` preview backend.
-- **Microsoft Word:** Supported on Windows for direct COM-based document conversion.
+- **Microsoft Word:** Supported on Windows 10 or later with pywin32. Word automation runs in an owned process job with a 180-second deadline covering startup, export and shutdown, plus at most five seconds for cleanup. Existing Word processes are not reused or terminated.
 
 ---
 
@@ -411,7 +411,7 @@ DokuReader is a core component of the **doc-bricks** family under the **open-bri
 Continuous quality is assured through independent, automated verification gates:
 
 ```bash
-# Run Python unit and metadata contract tests (191 tests)
+# Run Python unit and metadata contract tests (214 tests)
 pytest
 
 # Run static analysis and lint checks
