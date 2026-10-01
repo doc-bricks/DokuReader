@@ -273,6 +273,16 @@ On Windows, launch directly via:
 START.bat
 ```
 
+`START.bat` opens the current source without a console window. An existing Plan-D
+pointer selects the canonical source directory; old executables take no precedence.
+A project venv is preferred over Python on PATH (Python 3.10 or newer). Install the
+dependencies first. Use `debug.bat` for console diagnostics. Startup failures display
+an error; output and crashes are logged outside the project and OneDrive under
+`%LOCALAPPDATA%\DokuReader\logs\app-<PID>.log`. Each process keeps up to four 2 MiB
+files; older process logs are not automatically deleted. Run
+`powershell -NoProfile -File .\start_source.ps1 -Check` to inspect source and interpreter
+selection without opening the application or changing its library.
+
 ---
 
 ## Supported Formats & System Dependencies
