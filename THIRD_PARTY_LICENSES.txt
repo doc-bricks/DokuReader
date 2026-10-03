@@ -1,7 +1,7 @@
 THIRD-PARTY SOFTWARE LICENSES & LEVEL 1 SBOM COMPANION
 ================================================================================
 Project: DokuReader (Local Document Library & PDF Organizer Desktop Application)
-Audited: 2026-10-01 against Level 1 SBOM and Runtime Invariants (Previous Audits: 2026-09-28, 2026-09-25, 2026-09-22, 2026-09-11)
+Audited: 2026-10-03 against Level 1 SBOM and Runtime Invariants (Previous Audits: 2026-10-01, 2026-09-28, 2026-09-25, 2026-09-22, 2026-09-11)
 License: GNU Affero General Public License v3.0 (AGPL-3.0) (see LICENSE and NOTICE)
 Repository: https://github.com/doc-bricks/DokuReader
 Parent Organization: doc-bricks (https://github.com/doc-bricks)
@@ -15,7 +15,7 @@ All direct runtime, optional media tools, build tooling, and test dependencies a
 enumerated with their canonical package names, license terms, SPDX identifiers,
 upstream URLs, and integration notices.
 
-LEVEL 1 SBOM INVARIANT VALIDATION CONFIRMATION (Stand 2026-10-01):
+LEVEL 1 SBOM INVARIANT VALIDATION CONFIRMATION (Stand 2026-10-03):
 - INV-LOCAL-01 (100% Local-First & Zero-Egress): PASS. Zero external telemetry; documents, state, outlines, and previews remain strictly local.
 - INV-RUNAS-02 (Unprivileged User Mode & Non-Elevation): PASS. RunAsInvoker mode; standard user privileges without administrative elevation.
 - INV-INPLACE-03 (In-Place File Safety): PASS. Original documents are strictly read-only; files are never modified, moved, or deleted.

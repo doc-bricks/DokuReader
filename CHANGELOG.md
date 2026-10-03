@@ -5,6 +5,15 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+- **Pfad B Discoverability, Four-View ASCII Architecture Topology, Level-1-SBOM-Text-Begleitdatei & Vertragstest-Erweiterung (2026-10-03)**:
+  - Standardisierte ASCII Vier-Sichten-Architekturprojektion (`[VIEW 1]` bis `[VIEW 4]` bzw. `[SICHT 1]` bis `[SICHT 4]`) in `README.md` und `README_de.md` Sektion 3 integriert unter Erhalt aller 18 Schnellnavigationspunkte (`sec-01` bis `sec-18`) und Verankerung aller 10 Governance-Invarianten (`INV-LOCAL-01` bis `INV-SLA-10`).
+  - Shields.io Badges synchronisiert: Audit `2026-10-03`, Contributing Guidelines (`Contributing: Welcome` / `Mitwirken: Leitfaden`), Level 1 SBOM Text Companion (`Level 1 SBOM: Text Companion` / `Textbegleiter`), Attributions und 164 Pytest Tests (100% grün).
+  - Level 1 SBOM Text-Begleitdatei `THIRD_PARTY_LICENSES.txt` und `THIRD_PARTY_LICENSES.md` re-auditiert auf Stand 2026-10-03 mit Invarianten-Bestätigungsblock (`INV-LOCAL-01` bis `INV-SLA-10`), `RunAsInvoker` Non-Elevation (`INV-RUNAS-02`), Zero-Egress Air-Gap und § 521 BGB Gefälligkeitsrecht.
+  - `llms.txt` RAG-Kontextindex aktualisiert auf Last-checked: 2026-10-03 mit 4-View Topologie-Dokumentation und Mess-Zeitstempel.
+  - Lokales `MARKETING-LOG.txt` um Audit 2026-10-03 (Pfad B) und 3 nicht-automatisierte Empfehlungen für Social Preview Cards, interaktive GitHub Pages Demo und Bibliothekskatalog-Brücke erweitert.
+  - Vertragstestsuite `tests/test_metadata.py` um neue Contract-Tests für ASCII Four-View Topologie Parität EN/DE, 2026-10-03 Audit-Aktualität und MARKETING-LOG Currency erweitert (100% bestanden).
+  - Versionsnummer `1.0.1-dev` (`1.0.1.dev0` / Store: `1.0.1.0`) gemäß T-20260920-167562623 strikt unverändert beibehalten.
+
 - LibreOffice verwendet je Konvertierungsversuch ein frisches privates Profil und
   Ausgabeverzeichnis. Alte, beschädigte, seitenlose oder trotz Fehler erzeugte PDFs
   gelten nicht als Erfolg. Die Übernahme erfolgt erst nach PDF-Prüfung und

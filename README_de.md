@@ -11,7 +11,7 @@
 [![Python: 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python)](pyproject.toml)
 [![UI: Python / Tkinter](https://img.shields.io/badge/GUI-Python%20%2F%20Tkinter-blue)](DokuReader.py)
 [![Plattform: Windows | macOS | Linux](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-blue?logo=windows)](#einstieg--installation)
-[![Pytest: 224 tests, 0 failed](https://img.shields.io/badge/Pytest-224%20tests%2C%200%20failed-success?logo=pytest)](pyproject.toml)
+[![Pytest: 254 tests, 0 failed](https://img.shields.io/badge/Pytest-254%20tests%2C%200%20failed-success?logo=pytest)](pyproject.toml)
 [![Web Companion: 37 passed](https://img.shields.io/badge/Web%20Companion-37%20passed-success?logo=nodedotjs)](web_companion)
 [![Datenschutz: 100% Offline](https://img.shields.io/badge/Datenschutz-100%25%20Offline-success)](PRIVACY_POLICY.md)
 [![Sicherheit: Local--First](https://img.shields.io/badge/Sicherheit-Local--First-blue)](SECURITY.md)
@@ -22,7 +22,9 @@
 [![LLM-Ready: llms.txt](https://img.shields.io/badge/LLM--Ready-llms.txt-success)](llms.txt)
 [![Ökosystem: doc-bricks](https://img.shields.io/badge/%C3%96kosystem-doc--bricks-purple)](https://github.com/doc-bricks)
 [![Dachorganisation: open-bricks](https://img.shields.io/badge/Dachorganisation-open--bricks-blue)](https://github.com/open-bricks)
-[![Audit: 2026--10--01](https://img.shields.io/badge/Audit-2026--10--01-informational)](#qualitäts-gates--automatisierte-testsuiten)
+[![Level 1 SBOM: Text](https://img.shields.io/badge/Level%201%20SBOM-Textbegleiter-blue)](THIRD_PARTY_LICENSES.txt)
+[![Mitwirken: Willkommen](https://img.shields.io/badge/Mitwirken-Leitfaden-blue)](CONTRIBUTING.md)
+[![Audit: 2026--10--03](https://img.shields.io/badge/Audit-2026--10--03-informational)](#qualitäts-gates--automatisierte-testsuiten)
 [![Attribution: NOTICE](https://img.shields.io/badge/Attribution-NOTICE-blue)](NOTICE)
 
 > [!NOTE]
@@ -151,6 +153,61 @@ flowchart TD
     PDFMerger --> PDFOutput
 
     ExportFile -. Offline JSON-Import / Sync .-> PWA
+```
+
+### ASCII Vier-Sichten-Architekturprojektion
+
+```text
+========================================================================================================================
+                      DOKUREADER -- VIER-SICHTEN-ARCHITEKTURPROJEKTION (LOCAL-FIRST & ZERO-EGRESS)
+========================================================================================================================
+
+ [SICHT 1: AUFRUFER-LAUFZEITEN, NUTZERINTERAKTION & DESKTOP GUI/CLI STEUERUNG]
+ +-------------------------------------------------------------------------------------------------------------------+
+ |  Windows Desktop-Shell / CLI-Starter            Tkinter Desktop-Anwendung                PWA Mobile Companion     |
+ |  (START.bat / build_exe.bat / python)           (DokuReader.py / Tkinter / TkinterDnD2)  (web_companion / JS ES6) |
+ |  - Lokaler Python-Start                         - Themenliste & Baum-Navigation          - Reines Vanilla HTML5/CSS3|
+ |  - PyInstaller EXE-Starter                      - Multi-Format Dokumentenvorschau        - Isolierter CacheStorage|
+ |  - Automatisierte Test-Orchestrierung           - Gelesen / Ungelesen Umschalt-Schalter  - Zero-Egress PWA-Shell  |
+ |  - RunAsInvoker Non-Elevation (INV-RUNAS-02)    - Such- & Filtersteuerung (INV-A11Y-08)  - Offline-Prüfung mobil  |
+ +-------------------------------------------------------------------------------------------------------------------+
+                                                           |
+                                                           v
+ [SICHT 2: DOKUREADER DESKTOP KERN, VORSCHAU-ENGINE & BÜNDELUNGS-PIPELINES]
+ +-------------------------------------------------------------------------------------------------------------------+
+ |  Dokumenten-Zustandsverwaltung      Vorschau-Engine Subsystem            Export- & Bündelungs-Subsystem           |
+ |  (DokuReader.py Kernmodell)         (Multi-Format Rendering)             (PDF-Zusammenführung & Gliederung)       |
+ |  - Themenhierarchie-Wörterbuch      - PyMuPDF (fitz) PDF-Seitenrendering - pypdf deterministischer Concatenator   |
+ |  - Pfadvalidierung & Normalisierung - Pillow (PIL) Bilddekodierung       - reportlab Text-zu-PDF Compiler         |
+ |  - Lesestatus-Abbildung             - Textvorschau (UTF-8 / Latin-1)     - Lesestatus-Filterprädikate             |
+ |  - Sichere Themen-Umbenennung       - Headless LibreOffice / Word COM    - Atomare Dateiveröffentlichung          |
+ |    (INV-SCHEMA-04, INV-PARITY-07)     (INV-SANDBOX-06 Subprozess-Grenzen)  (INV-INPLACE-03 Dateischutz)           |
+ +-------------------------------------------------------------------------------------------------------------------+
+                                                           |
+                                                           v
+ [SICHT 3: LAUFZEIT-PERSISTENZ, LOKALE ZUSTANDSWIEDERHERSTELLUNG & EXPORT-EBENEN]
+ +-------------------------------------------------------------------------------------------------------------------+
+ |  Original-Dokumentenspeicher        Anwendungs-Zustandsspeicher          Strukturierte Export-Artefakte           |
+ |  (Lokales Dateisystem)              (~/.dokubibliothek_state.json)       (dokureader-library-v1 / PDF-Bündel)     |
+ |  - Originaldateien strikt           - Atomares Schreiben via Temp-Datei  - Schemakonformer JSON-Bibliotheksexport |
+ |    schreibgeschützt (INV-INPLACE-03)- Automatische .bak Backup-Erstellung- Reiner Metadaten-Katalog (ohne Binär)  |
+ |  - Keine Dateiverschiebungen        - Notfall-Wiederherstellung defekt   - Konsolidiertes Themen-PDF-Dokument     |
+ |  - Themen-Pfad-Verweise             - Isolierter Namespace (INV-ISOLATION-05)- Round-Trip Mobil-Importformat      |
+ +-------------------------------------------------------------------------------------------------------------------+
+                                                           |
+                                                           v
+ [SICHT 4: AIR-GAP SCHUTZPERIMETER, UNPRIVILEGIERTES RUNASINVOKER & ZERO-EGRESS GOVERNANCE]
+ +-------------------------------------------------------------------------------------------------------------------+
+ |  100% Offline Air-Gap (INV-LOCAL-01)          Unprivilegiertes RunAsInvoker (INV-RUNAS-02)                        |
+ |  - Keine ausgehenden Sockets, HTTP/S oder DNS - Standard-Benutzerberechtigungsmodus                               |
+ |  - Keine Analyse, Telemetrie oder Cloud-Aufrufe- Keine UAC-Administratorerhöhung erforderlich                     |
+ |  - Kompletter Offline-Datenschutz by Design   - Begrenzte Subprozessausführung (INV-SANDBOX-06)                   |
+ |                                                                                                                   |
+ |  Gesetzlicher § 521 BGB Hinweis               48h Sicherheits-Reaktions-SLA (INV-SLA-10)                          |
+ |  - § 521 BGB Gefälligkeitsrecht gilt          - 48h Erstbestätigungs-SLA                                          |
+ |  - Keine Haftung bei unentgeltlicher Software - 5 Werktage Triage-Verpflichtung (security@open-bricks.org)        |
+ +-------------------------------------------------------------------------------------------------------------------+
+========================================================================================================================
 ```
 
 ---

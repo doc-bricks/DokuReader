@@ -51,7 +51,8 @@ def test_readme_badges_and_links_parity() -> None:
     assert "RunAsInvoker-Non--Elevated-success" in readme_en
     assert "Third--Party%20Licenses-Audited-green" in readme_en
     assert (
-        "Audit-2026--10--01-informational" in readme_en
+        "Audit-2026--10--03-informational" in readme_en
+        or "Audit-2026--10--01-informational" in readme_en
         or "Audit-2026--09--28-informational" in readme_en
         or "Audit-2026--09--25-informational" in readme_en
         or "Audit-2026--09--22-informational" in readme_en
@@ -69,7 +70,8 @@ def test_readme_badges_and_links_parity() -> None:
     assert "RunAsInvoker-Unprivilegiert-success" in readme_de
     assert "Marketing%20Log-Aktiv-blue" in readme_de
     assert (
-        "Audit-2026--10--01-informational" in readme_de
+        "Audit-2026--10--03-informational" in readme_de
+        or "Audit-2026--10--01-informational" in readme_de
         or "Audit-2026--09--28-informational" in readme_de
         or "Audit-2026--09--25-informational" in readme_de
         or "Audit-2026--09--22-informational" in readme_de
@@ -341,7 +343,7 @@ def test_pyproject_pep621_hardening() -> None:
 def test_third_party_licenses_audit_recency() -> None:
     '''Prüft Aktualität und NOTICE-Verlinkung im Drittanbieter-Lizenzinventar.'''
     tpl = (ROOT / "THIRD_PARTY_LICENSES.md").read_text(encoding="utf-8")
-    assert "2026-10-01" in tpl or "2026-09-28" in tpl or "2026-09-25" in tpl or "2026-09-22" in tpl
+    assert "2026-10-03" in tpl or "2026-10-01" in tpl or "2026-09-28" in tpl or "2026-09-25" in tpl or "2026-09-22" in tpl
     assert "[NOTICE](NOTICE)" in tpl
     for inv in (
         "INV-LOCAL-01",
@@ -453,7 +455,7 @@ def test_plain_text_license_companion() -> None:
     txt_file = ROOT / "THIRD_PARTY_LICENSES.txt"
     assert txt_file.is_file(), "THIRD_PARTY_LICENSES.txt fehlt im Repository-Root"
     content = txt_file.read_text(encoding="utf-8")
-    assert "2026-10-01" in content or "2026-09-28" in content, "THIRD_PARTY_LICENSES.txt Audit-Datum veraltet"
+    assert "2026-10-03" in content or "2026-10-01" in content or "2026-09-28" in content, "THIRD_PARTY_LICENSES.txt Audit-Datum veraltet"
     assert "PyMuPDF" in content
     assert "Pillow" in content
     assert "pypdf" in content
@@ -538,7 +540,7 @@ def test_plain_text_sbom_companion_invariants() -> None:
     '''Prüft die 10 Invarianten, RunAsInvoker und § 521 BGB im Level 1 SBOM Text-Begleiter.'''
     txt_file = ROOT / "THIRD_PARTY_LICENSES.txt"
     content = txt_file.read_text(encoding="utf-8")
-    assert "2026-10-01" in content
+    assert "2026-10-03" in content or "2026-10-01" in content
     assert "RunAsInvoker" in content
     assert "§ 521 BGB" in content
     for inv in (
@@ -569,3 +571,67 @@ def test_marketing_log_pfad_a_currency() -> None:
     '''Prüft die Aktualität der Pfad-A-Einträge in MARKETING-LOG.txt.'''
     mlog = (ROOT / "MARKETING-LOG.txt").read_text(encoding="utf-8")
     assert "Audit 2026-10-01" in mlog or "Audit 2026-09-28" in mlog
+
+
+def test_four_view_ascii_topology_parity_en_de() -> None:
+    '''Prüft die ASCII Vier-Sichten-Topologie in README.md und README_de.md samt aller 10 Invarianten.'''
+    readme_en = (ROOT / "README.md").read_text(encoding="utf-8")
+    readme_de = (ROOT / "README_de.md").read_text(encoding="utf-8")
+
+    assert "ASCII Four-View Architectural Topology" in readme_en
+    assert "[VIEW 1: CALLER RUNTIMES, USER INTERACTION & DESKTOP GUI/CLI CONTROLS]" in readme_en
+    assert "[VIEW 2: DOKUREADER DESKTOP CORE, PREVIEW ENGINE & BUNDLING PIPELINES]" in readme_en
+    assert "[VIEW 3: RUNTIME PERSISTENCE, LOCAL STATE RECOVERY & EXPORT TIERS]" in readme_en
+    assert "[VIEW 4: AIR-GAP DEFENSE PERIMETER, UNPRIVILEGED RUNASINVOKER & ZERO-EGRESS GOVERNANCE]" in readme_en
+
+    assert "ASCII Vier-Sichten-Architekturprojektion" in readme_de
+    assert "[SICHT 1: AUFRUFER-LAUFZEITEN, NUTZERINTERAKTION & DESKTOP GUI/CLI STEUERUNG]" in readme_de
+    assert "[SICHT 2: DOKUREADER DESKTOP KERN, VORSCHAU-ENGINE & BÜNDELUNGS-PIPELINES]" in readme_de
+    assert "[SICHT 3: LAUFZEIT-PERSISTENZ, LOKALE ZUSTANDSWIEDERHERSTELLUNG & EXPORT-EBENEN]" in readme_de
+    assert "[SICHT 4: AIR-GAP SCHUTZPERIMETER, UNPRIVILEGIERTES RUNASINVOKER & ZERO-EGRESS GOVERNANCE]" in readme_de
+
+    for inv in (
+        "INV-LOCAL-01",
+        "INV-RUNAS-02",
+        "INV-INPLACE-03",
+        "INV-SCHEMA-04",
+        "INV-ISOLATION-05",
+        "INV-SANDBOX-06",
+        "INV-PARITY-07",
+        "INV-A11Y-08",
+        "INV-DISCOVERY-09",
+        "INV-SLA-10",
+    ):
+        assert inv in readme_en
+        assert inv in readme_de
+
+
+def test_third_party_licenses_audit_recency_20261003() -> None:
+    '''Prüft das Audit-Datum 2026-10-03 in THIRD_PARTY_LICENSES.md und THIRD_PARTY_LICENSES.txt.'''
+    tpl_md = (ROOT / "THIRD_PARTY_LICENSES.md").read_text(encoding="utf-8")
+    tpl_txt = (ROOT / "THIRD_PARTY_LICENSES.txt").read_text(encoding="utf-8")
+    assert "2026-10-03" in tpl_md
+    assert "Pfad B Discoverability, Visual Architecture & Level 1 SBOM Re-Audit" in tpl_md
+    assert "Audited: 2026-10-03 against Level 1 SBOM and Runtime Invariants" in tpl_txt
+
+
+def test_marketing_log_pfad_b_currency_20261003() -> None:
+    '''Prüft die Aktualität und Vollständigkeit des Pfad B Audits 2026-10-03 in MARKETING-LOG.txt.'''
+    mlog = (ROOT / "MARKETING-LOG.txt").read_text(encoding="utf-8")
+    assert "Audit 2026-10-03 (Pfad B Discoverability" in mlog
+    assert "NON-AUTOMATED RECOMMENDATIONS (Stand 2026-10-03):" in mlog
+    assert "[REC-20261003-01]" in mlog
+    assert "[REC-20261003-02]" in mlog
+    assert "[REC-20261003-03]" in mlog
+
+
+def test_readme_badges_audit_recency_20261003() -> None:
+    '''Prüft die Badges für Audit-2026--10--03, Contributing Guidelines und Level 1 SBOM Text Companion.'''
+    readme_en = (ROOT / "README.md").read_text(encoding="utf-8")
+    readme_de = (ROOT / "README_de.md").read_text(encoding="utf-8")
+    assert "Audit-2026--10--03-informational" in readme_en
+    assert "Level%201%20SBOM-Text%20Companion-blue" in readme_en
+    assert "Contributing-Guidelines-blue" in readme_en
+    assert "Audit-2026--10--03-informational" in readme_de
+    assert "Level%201%20SBOM-Textbegleiter-blue" in readme_de
+    assert "Mitwirken-Leitfaden-blue" in readme_de

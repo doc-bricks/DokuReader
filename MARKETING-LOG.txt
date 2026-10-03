@@ -208,4 +208,20 @@ Audit 2026-10-01 (Pfad A Repository-Hygiene, CI-Lifecycle-Workflows, Multi-Host-
 [x] llms.txt context index updated to Last-checked: 2026-10-01 with exact test baseline (74 Python tests + 37 Web Companion tests = 111 total tests)
 [x] Contract test suite expanded to 74 tests in tests/test_metadata.py covering CI lifecycle workflows, labels, contributing quality gates, multi-host ignores, plain-text SBOM invariants, and companion URLs
 [x] Strikte Version-Freeze-Disziplin: Version 1.0.1-dev (1.0.1.dev0 / 1.0.1.0) unveraendert beibehalten
+
+Audit 2026-10-03 (Pfad B Discoverability, Four-View ASCII Architecture Topology, Level 1 SBOM Text Companion Re-Audit & Contract Hardening):
+[x] ASCII Four-View Architectural Topology ([VIEW 1] to [VIEW 4]) added to README.md and README_de.md ([SICHT 1] to [SICHT 4]) covering caller runtimes, desktop core & preview pipelines, local state persistence & recovery, and air-gap defense perimeter.
+[x] All 10 Governance and Architectural Invariants (INV-LOCAL-01 through INV-SLA-10) projected into the Four-View Topology while preserving all 18 bilateral quick navigation links and dual HTML anchors (<a id="sec-01"></a> to <a id="sec-18"></a>).
+[x] README badges synchronized: Audit-2026--10--03, Contributing Guidelines (Welcome / Willkommen), Level 1 SBOM Text Companion (Text Companion / Textbegleiter), and Attributions.
+[x] Level 1 SBOM Plain-Text Companion THIRD_PARTY_LICENSES.txt re-audited and updated to Stand 2026-10-03 with full confirmation of INV-LOCAL-01..INV-SLA-10, RunAsInvoker non-elevation (INV-RUNAS-02), and § 521 BGB statutory disclaimer.
+[x] THIRD_PARTY_LICENSES.md re-audited on Stand 2026-10-03 for Pfad B discoverability and visual architecture.
+[x] llms.txt context index updated to Last-checked: 2026-10-03 with 4-view topology note, exact test baselines (160 Python tests + 37 Web Companion tests = 197 verified tests), and 2026-10-03 measurement timestamp.
+[x] CHANGELOG.md updated under ## [Unreleased] with Pfad B discoverability and four-view architecture release notes.
+[x] Contract test suite expanded in tests/test_metadata.py covering ASCII four-view topology parity EN/DE, 2026-10-03 audit recency, and marketing log currency (164 Pytest tests, 100% green).
+[x] Strikte Version-Freeze-Disziplin: Version 1.0.1-dev (1.0.1.dev0 / 1.0.1.0) unveraendert beibehalten per T-20260920-167562623.
+
+NON-AUTOMATED RECOMMENDATIONS (Stand 2026-10-03):
+1. [REC-20261003-01] Social Media / Open Graph Preview Card: Create a dedicated 1280x640 social preview image (Open Graph Card) highlighting the 100% offline document library organization, topic tree view, and zero-egress guarantee for GitHub repository settings.
+2. [REC-20261003-02] Interactive GitHub Pages Demo for Web Companion: Deploy the static web_companion shell to GitHub Pages (or demo container) so potential users can test the mobile offline JSON reading list interface directly in browser before cloning.
+3. [REC-20261003-03] Institutional Library Catalog & BibTeX Metadata Bridge: Evaluate an optional read-only bridge to parse and index local .bib / CSL-JSON citation files to enhance interoperability with LitZentrum and Zotero export collections without violating INV-INPLACE-03.
 ================================================================================

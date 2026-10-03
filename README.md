@@ -11,7 +11,7 @@
 [![Python: 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python)](pyproject.toml)
 [![UI: Python / Tkinter](https://img.shields.io/badge/GUI-Python%20%2F%20Tkinter-blue)](DokuReader.py)
 [![Platform: Windows | macOS | Linux](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-blue?logo=windows)](#getting-started--installation)
-[![Pytest: 224 tests, 0 failed](https://img.shields.io/badge/Pytest-224%20tests%2C%200%20failed-success?logo=pytest)](pyproject.toml)
+[![Pytest: 254 tests, 0 failed](https://img.shields.io/badge/Pytest-254%20tests%2C%200%20failed-success?logo=pytest)](pyproject.toml)
 [![Web Companion: 37 passed](https://img.shields.io/badge/Web%20Companion-37%20passed-success?logo=nodedotjs)](web_companion)
 [![Privacy: 100% Offline](https://img.shields.io/badge/Privacy-100%25%20Offline-success)](PRIVACY_POLICY.md)
 [![Security: Local--First](https://img.shields.io/badge/Security-Local--First-blue)](SECURITY.md)
@@ -22,7 +22,9 @@
 [![LLM-Ready: llms.txt](https://img.shields.io/badge/LLM--Ready-llms.txt-success)](llms.txt)
 [![Ecosystem: doc-bricks](https://img.shields.io/badge/Ecosystem-doc--bricks-purple)](https://github.com/doc-bricks)
 [![Umbrella: open-bricks](https://img.shields.io/badge/Umbrella-open--bricks-blue)](https://github.com/open-bricks)
-[![Audit: 2026--10--01](https://img.shields.io/badge/Audit-2026--10--01-informational)](#quality-gates--automated-test-suites)
+[![Level 1 SBOM: Text](https://img.shields.io/badge/Level%201%20SBOM-Text%20Companion-blue)](THIRD_PARTY_LICENSES.txt)
+[![Contributing: Welcome](https://img.shields.io/badge/Contributing-Guidelines-blue)](CONTRIBUTING.md)
+[![Audit: 2026--10--03](https://img.shields.io/badge/Audit-2026--10--03-informational)](#quality-gates--automated-test-suites)
 [![Attribution: NOTICE](https://img.shields.io/badge/Attribution-NOTICE-blue)](NOTICE)
 
 > [!NOTE]
@@ -149,6 +151,61 @@ flowchart TD
     PDFMerger --> PDFOutput
 
     ExportFile -. Offline JSON Import / Sync .-> PWA
+```
+
+### ASCII Four-View Architectural Topology
+
+```text
+========================================================================================================================
+                      DOKUREADER -- FOUR-VIEW ARCHITECTURAL TOPOLOGY (LOCAL-FIRST & ZERO-EGRESS)
+========================================================================================================================
+
+ [VIEW 1: CALLER RUNTIMES, USER INTERACTION & DESKTOP GUI/CLI CONTROLS]
+ +-------------------------------------------------------------------------------------------------------------------+
+ |  Windows Desktop Shell / CLI Launcher           Tkinter Desktop Application              PWA Mobile Companion     |
+ |  (START.bat / build_exe.bat / python)           (DokuReader.py / Tkinter / TkinterDnD2)  (web_companion / JS ES6) |
+ |  - Local python launch                          - Topic List & Tree Navigation           - Pure vanilla HTML5/CSS3|
+ |  - PyInstaller EXE runner                       - Multi-Format Document Preview          - Scoped CacheStorage    |
+ |  - Automated test orchestrators                 - Read / Unread Status Checkbox Toggles  - Zero-egress PWA shell  |
+ |  - RunAsInvoker Non-Elevation (INV-RUNAS-02)    - Search & Filter Controls (INV-A11Y-08) - Offline library review |
+ +-------------------------------------------------------------------------------------------------------------------+
+                                                           |
+                                                           v
+ [VIEW 2: DOKUREADER DESKTOP CORE, PREVIEW ENGINE & BUNDLING PIPELINES]
+ +-------------------------------------------------------------------------------------------------------------------+
+ |  Document State Manager             Preview Engine Subsystem             Export & Bundling Subsystem              |
+ |  (DokuReader.py Core Model)         (Multi-Format Rendering)             (Merging & Outline Generation)           |
+ |  - Topic hierarchy dictionary       - PyMuPDF (fitz) PDF page rendering  - pypdf deterministic concatenator       |
+ |  - Path validation & normalization  - Pillow (PIL) image decoding        - reportlab text-to-PDF compiler         |
+ |  - Read/unread state mapping        - Text preview (UTF-8 / Latin-1)     - Read/unread filter predicates          |
+ |  - Safe topic rename & merge gates  - Headless LibreOffice / Word COM    - Atomic file publication                |
+ |    (INV-SCHEMA-04, INV-PARITY-07)     (INV-SANDBOX-06 subprocess bounds)   (INV-INPLACE-03 file protection)       |
+ +-------------------------------------------------------------------------------------------------------------------+
+                                                           |
+                                                           v
+ [VIEW 3: RUNTIME PERSISTENCE, LOCAL STATE RECOVERY & EXPORT TIERS]
+ +-------------------------------------------------------------------------------------------------------------------+
+ |  Original Documents Vault           Application State Store              Structured Export Artifacts              |
+ |  (Local Filesystem)                 (~/.dokubibliothek_state.json)       (dokureader-library-v1 / PDF Bundles)    |
+ |  - In-place originals strictly      - Atomic write via unique temp file  - Schema-compliant JSON library export   |
+ |    read-only (INV-INPLACE-03)       - Automatic .bak backup generation   - Metadata-only outline (no binaries)    |
+ |  - Zero file moves or overwrites    - Corrupted state fallback recovery  - Consolidated topic PDF document        |
+ |  - Multi-topic path referencing     - Isolated namespace (INV-ISOLATION-05)- Round-trip mobile import format      |
+ +-------------------------------------------------------------------------------------------------------------------+
+                                                           |
+                                                           v
+ [VIEW 4: AIR-GAP DEFENSE PERIMETER, UNPRIVILEGED RUNASINVOKER & ZERO-EGRESS GOVERNANCE]
+ +-------------------------------------------------------------------------------------------------------------------+
+ |  100% Offline Air-Gap (INV-LOCAL-01)          Unprivileged RunAsInvoker (INV-RUNAS-02)                            |
+ |  - Zero outbound sockets, HTTP/S, or DNS      - Standard user privilege mode execution                            |
+ |  - Zero analytics, telemetry, or cloud calls  - No UAC administrative elevation required                          |
+ |  - Total offline data privacy by design       - Bounded subprocess execution (INV-SANDBOX-06)                      |
+ |                                                                                                                   |
+ |  Statutory § 521 BGB Disclaimer               48h Security Response SLA (INV-SLA-10)                              |
+ |  - § 521 BGB Gefaelligkeitsrecht applies      - 48h initial acknowledgement SLA                                   |
+ |  - No warranty for unpaid open source         - 5-day triage commitment (security@open-bricks.org)                |
+ +-------------------------------------------------------------------------------------------------------------------+
+========================================================================================================================
 ```
 
 ---
