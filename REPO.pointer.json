@@ -12,8 +12,8 @@
   "onedrive_mirror": {
     "mode": "tracked-files-no-git",
     "relative_root": ".",
-    "source_commit": "5ee812a042b419d63e71674be7784ec26870abd1",
-    "generated_at": "2026-10-01T03:31:00+02:00",
+    "source_commit": "ff0602139ea6ff29bd1e2857835e52b184abca55",
+    "generated_at": "2026-10-03T18:05:30+02:00",
     "delete_policy": "no-delete",
     "migration_state": "active-mirrored"
   },
