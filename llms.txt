@@ -47,6 +47,8 @@ desktop document library JSON export
 
 DokuReader is not a cloud document manager, hosted OCR platform, general note-taking app, or full citation-management suite. It stores references and read status for local files; LitZentrum covers the broader literature-management workflow in the same doc-bricks family.
 
+For local agent job files and process startup/status, see [FolderHome](https://github.com/ellmos-ai/FolderHome), a separate project with no DokuReader integration.
+
 ## Local Data Boundary & Invariants
 
 - Original documents remain in their existing filesystem locations (INV-INPLACE-03).

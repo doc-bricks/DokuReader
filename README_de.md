@@ -455,6 +455,7 @@ DokuReader ist Kernbestandteil der **doc-bricks** Familie im Rahmen der **open-b
 | **[PDFtoPDFocr](https://github.com/doc-bricks/PDFtoPDFocr)** | PDF OCR-Verarbeitung | Erstellung durchsuchbarer Sandwich-PDFs mit lokaler Tesseract-OCR |
 | **[MediaBrain](https://github.com/doc-bricks/MediaBrain)** | Mediendatei-Organizer | Visuelles Medien-Tagging, Kategorisierung und Metadaten-Indexierung |
 | **[DokuZen](https://github.com/doc-bricks/DokuZen)** | Ablenkungsfreies Lesen | Minimalistische Zen-Leseumgebung und Dokumenteninspektion |
+| **[FolderHome](https://github.com/ellmos-ai/FolderHome)** | Agenten-/Arbeitsraumkoordination | Eigenständiges Werkzeug für lokale Agenten-Jobdateien sowie Prozessstart und -status; keine DokuReader-Integration |
 | **[ProFiler](https://github.com/file-bricks/ProFiler)** | Multi-Tool Dateianalyse | Tiefgehende Datei-Inspektion, Struktur-Parser und Metadaten-Profiler |
 | **[ExplorerPro](https://github.com/file-bricks/ExplorerPro)** | Erweiterter Dateimanager | Leistungsstarker Multi-Pane Desktop-Dateimanager |
 | **[DevCenter](https://github.com/dev-bricks/DevCenter)** | Entwickler-Arbeitsplatz | Zentrales Entwickler-Dashboard und Projektmanagement-Zentrum |
