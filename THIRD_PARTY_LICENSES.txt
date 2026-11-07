@@ -27,9 +27,9 @@ LEVEL 1 SBOM INVARIANT VALIDATION CONFIRMATION (Stand 2026-10-03):
 - INV-DISCOVERY-09 (Multimodal Transparency): PASS. Full bilingual documentation (EN/DE), machine-readable llms.txt, dual Mermaid diagrams.
 - INV-SLA-10 (48h Response & 5-Day Triage SLA): PASS. Binding vulnerability response SLA under SECURITY.md with dedicated security contact channels.
 
-ZERO-COPYLEFT & PERMISSIVE RUNTIME VERIFICATION:
+RUNTIME LICENSE POSITION (COPYLEFT AND PERMISSIVE COMPONENTS):
 - The DokuReader project itself is licensed under AGPL-3.0.
-- Optional PyMuPDF (fitz) integration complies with AGPL-3.0 or Artifex Commercial Licensing.
+- PyMuPDF (fitz) is a declared runtime dependency (pyproject.toml, requirements.txt) and is installed with the package. The source guards its import, but the dependency is not optional in the declared metadata. PyMuPDF is available under AGPL-3.0 or the Artifex Commercial License; DokuReader uses it under AGPL-3.0, which is why DokuReader itself is AGPL-3.0.
 - All core document helpers (Pillow, pypdf, reportlab, python-docx, odfpy, tkinterdnd2, pywin32, pdf2image) use permissive MIT/BSD-3-Clause/Apache-2.0/PSF-2.0 licenses.
 - Subprocess utilities (LibreOffice, Poppler pdftoppm) are invoked out-of-process via standard IPC streams without linking.
 
