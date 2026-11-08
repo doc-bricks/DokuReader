@@ -6,7 +6,7 @@ Pillow>=10.0.0
 pypdf>=4.0.0
 # Alternativ: PyPDF2>=3.0.0
 
-# Optional - PDF-Vorschau (empfohlen)
+# PDF-Vorschau
 pdf2image>=1.16.0
 # ODER
 PyMuPDF>=1.23.0

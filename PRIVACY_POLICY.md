@@ -34,7 +34,7 @@ Die Kern-App benötigt keinen eigenen Online-Dienst. Einzelne optionale Systemko
 
 ## Open-Source- und Lizenzhinweis
 
-DokuReader steht unter AGPL-3.0. Optionale PDF-Vorschau kann PyMuPDF verwenden, das ebenfalls im AGPL-Kontext steht. Die Drittanbieter-Übersicht liegt in `THIRD_PARTY_LICENSES.txt`.
+DokuReader steht unter AGPL-3.0. Die integrierte PDF-Vorschau über PyMuPDF steht ebenfalls im AGPL-Kontext. Die Drittanbieter-Übersicht liegt in `THIRD_PARTY_LICENSES.txt`.
 
 ## Support und Rückfragen
 

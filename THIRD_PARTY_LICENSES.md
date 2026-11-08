@@ -22,7 +22,7 @@ DokuReader is engineered as a local-first, offline document management and topic
 
 | Package | Version Range | License | Type | Role in DokuReader | Egress / Privilege Posture |
 |:---|:---|:---|:---|:---|:---|
-| **PyMuPDF** (`fitz`) | `>=1.20.0` | AGPL-3.0 / Artifex Commercial | Reciprocal / Permitted | High-performance PDF page rendering, text extraction, thumbnail generation | 100% Local / In-process |
+| **PyMuPDF** (`fitz`) | `>=1.23.0` | AGPL-3.0 / Artifex Commercial | Reciprocal / Permitted | High-performance PDF page rendering, text extraction, thumbnail generation | 100% Local / In-process |
 | **Pillow** (`PIL`) | `>=9.0.0` | MIT-CMU | Permissive | Image thumbnail generation, image format decoding, and image-to-PDF pipeline | 100% Local / In-process |
 | **pypdf** | `>=3.0.0` | BSD-3-Clause | Permissive | Deterministic PDF concatenation, outline preservation, and multi-file merging | 100% Local / In-process |
 | **reportlab** | `>=3.6.0` | BSD-3-Clause | Permissive | Text-to-PDF compilation engine with typographic formatting and page budgeting | 100% Local / In-process |

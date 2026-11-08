@@ -53,7 +53,7 @@ classifiers = [
     "Topic :: Utilities",
 ]
 dependencies = [
-    "PyMuPDF>=1.20.0",
+    "PyMuPDF>=1.23.0",
 ]
 
 [project.urls]
