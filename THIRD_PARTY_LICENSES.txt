@@ -40,7 +40,7 @@ PyMuPDF (fitz)
 License: AGPL-3.0 / Artifex Commercial License
 SPDX: AGPL-3.0-only
 URL: https://pypi.org/project/PyMuPDF/
-Notice: High-performance PDF page rendering, text extraction, and thumbnail generation (>=1.20.0)
+Notice: High-performance PDF page rendering, text extraction, and thumbnail generation (>=1.23.0)
 
 Pillow
 License: MIT-CMU / HPND
