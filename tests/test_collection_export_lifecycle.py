@@ -33,7 +33,11 @@ def window(tmp_path, monkeypatch):
         try:
             ui = app.App()
             break
-        except app.tk.TclError:
+        except (app.tk.TclError, RuntimeError) as exc:
+            # tkinterdnd2 wraps a failed "package require tkdnd" in a plain
+            # RuntimeError; treat that like the transient TclError it hides.
+            if isinstance(exc, RuntimeError) and "tkdnd" not in str(exc):
+                raise
             partial = getattr(app.tk, "_default_root", None)
             if partial is not None:
                 try:

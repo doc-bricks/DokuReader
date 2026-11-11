@@ -34,12 +34,16 @@ class SearchUiAccessibilityTests(unittest.TestCase):
         self._second_doc = tmp_path / "Paper_Markierungen.pdf"
         self._second_doc.write_bytes(b"%PDF-1.4\n%%EOF\n")
 
-        last_error: tk.TclError | None = None
+        last_error: Exception | None = None
         for _attempt in range(3):
             try:
                 self.app = DokuReader.App()
                 break
-            except tk.TclError as exc:
+            except (tk.TclError, RuntimeError) as exc:
+                # tkinterdnd2 wraps a failed "package require tkdnd" in a
+                # plain RuntimeError; treat it like the TclError it hides.
+                if isinstance(exc, RuntimeError) and "tkdnd" not in str(exc):
+                    raise
                 last_error = exc
                 partial_root = getattr(tk, "_default_root", None)
                 if partial_root is not None:
