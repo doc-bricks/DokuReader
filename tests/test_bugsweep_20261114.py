@@ -183,6 +183,27 @@ def test_transparent_image_keeps_a_white_background_in_the_pdf(tmp_path):
     assert pixmap.pixel(w // 2 - int(w * 0.3), h // 2) == (255, 255, 255)
 
 
+def test_text_pdf_keeps_blank_lines_and_stays_inside_the_page(tmp_path):
+    """Leerzeilen verschwanden (Absätze klebten zusammen); breite Zeichen liefen über den Rand
+    (Schätzung 6 pt/Zeichen) und wurden am Seitenrand abgeschnitten."""
+    import pytest
+
+    fitz = pytest.importorskip("fitz")
+    if not app.REPORTLAB_AVAILABLE:
+        pytest.skip("ReportLab nötig")
+    source = tmp_path / "brief.txt"
+    source.write_text("W" * 150 + "\n\nAbsatz zwei\n", encoding="utf-8")
+    out = app.App._txt_to_pdf(object(), str(source), tmp_path)
+    page = fitz.open(out)[0]
+    words = page.get_text("words")  # (x0, y0, x1, y1, word, ...)
+    right_edge = page.rect.width - 2 * 72 / 2.54  # 2 cm Rand
+    assert max(w[2] for w in words) <= right_edge + 1, "Text läuft über den rechten Rand"
+    assert sum(len(w[4]) for w in words if set(w[4]) == {"W"}) == 150, "Zeichen abgeschnitten"
+    w_lines = sorted({round(w[1]) for w in words if set(w[4]) == {"W"}})
+    absatz_y = min(w[1] for w in words if w[4] == "Absatz")
+    assert absatz_y - w_lines[-1] >= 2 * 12 - 1, "Leerzeile zwischen den Absätzen fehlt"
+
+
 def test_pdf_part_problem_names_the_reason(tmp_path):
     normal = tmp_path / "ok.pdf"
     protected = tmp_path / "pw.pdf"

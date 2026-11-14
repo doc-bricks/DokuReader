@@ -2035,17 +2035,32 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
             content = read_text_with_fallback(path)
             if content is None:
                 return None
+            # Umbruch nach gemessener Breite (die frühere Schätzung von 6 pt/Zeichen ließ breite
+            # Zeichen über den Seitenrand laufen) und Leerzeilen als Leerzeilen erhalten.
+            max_width = width - 2 * margin
+            rendered: list[str] = []
             for line in content.splitlines() or [""]:
+                line = line.expandtabs(4)
+                if not line:
+                    rendered.append("")
                 while line:
-                    max_chars = int((width - 2 * margin) / 6)  # Näherung
-                    part = line[:max_chars]
+                    fits, too_long = 1, len(line)
+                    while fits < too_long:
+                        middle = (fits + too_long + 1) // 2
+                        if c.stringWidth(line[:middle], "Helvetica", 11) <= max_width:
+                            fits = middle
+                        else:
+                            too_long = middle - 1
+                    rendered.append(line[:fits])
+                    line = line[fits:]
+            for part in rendered:
+                if part:
                     c.drawString(margin, y, part)
-                    y -= line_height
-                    line = line[len(part):]
-                    if y < margin:
-                        c.showPage()
-                        c.setFont("Helvetica", 11)
-                        y = height - margin
+                y -= line_height
+                if y < margin:
+                    c.showPage()
+                    c.setFont("Helvetica", 11)
+                    y = height - margin
             c.showPage()
             c.save()
             return str(out)
