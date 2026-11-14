@@ -208,7 +208,39 @@ def human_size(num_bytes: int) -> str:
     return f"{num_bytes:.1f} TB"
 
 
+def _known_desktop_folder() -> str | None:
+    """Echter Windows-Desktop (FOLDERID_Desktop) — auch bei OneDrive-Ordnersicherung."""
+    if platform.system() != "Windows":
+        return None
+    try:
+        import ctypes
+        import uuid
+        from ctypes import wintypes
+
+        class _Guid(ctypes.Structure):
+            _fields_ = [("Data1", wintypes.DWORD), ("Data2", wintypes.WORD),
+                        ("Data3", wintypes.WORD), ("Data4", ctypes.c_ubyte * 8)]
+
+        folder = uuid.UUID("{B4BFCC3A-DB2C-424C-B029-7FE99A87C641}")
+        guid = _Guid(folder.fields[0], folder.fields[1], folder.fields[2],
+                     (ctypes.c_ubyte * 8)(*folder.bytes[8:]))
+        path = ctypes.c_wchar_p()
+        if ctypes.windll.shell32.SHGetKnownFolderPath(ctypes.byref(guid), 0, None, ctypes.byref(path)) != 0:
+            return None
+        try:
+            return path.value
+        finally:
+            ctypes.windll.ole32.CoTaskMemFree(path)
+    except (OSError, AttributeError, ValueError):
+        return None
+
+
 def desktop_path() -> Path:
+    # Path.home()/"Desktop" ist mit OneDrive-Ordnersicherung (Windows-11-Standard) ein alter,
+    # unsichtbarer Ordner; der sichtbare Desktop liegt dann unter …\OneDrive\Desktop.
+    known = _known_desktop_folder()
+    if known and Path(known).is_dir():
+        return Path(known)
     p = Path.home() / "Desktop"
     return p if p.exists() else Path.home()
 

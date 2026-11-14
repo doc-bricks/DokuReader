@@ -151,6 +151,21 @@ def test_logging_prunes_old_per_process_logs(tmp_path, monkeypatch):
     assert remaining == sorted(["app-333.log", "notizen.txt", target.name])
 
 
+def test_desktop_path_uses_the_windows_known_folder(tmp_path, monkeypatch):
+    """Mit OneDrive-Ordnersicherung ist der echte Desktop …\\OneDrive\\Desktop; Path.home()/Desktop
+    ist dann ein alter, unsichtbarer Ordner — das Sammel-PDF landete dort."""
+    import pytest
+
+    real_desktop = tmp_path / "OneDrive" / "Desktop"
+    real_desktop.mkdir(parents=True)
+    monkeypatch.setattr(app, "_known_desktop_folder", lambda: str(real_desktop), raising=False)
+    if not hasattr(app, "_known_desktop_folder") or app.platform.system() != "Windows":
+        pytest.skip("nur Windows")
+    assert app.desktop_path() == real_desktop
+    monkeypatch.setattr(app, "_known_desktop_folder", lambda: None)
+    assert app.desktop_path() in {app.Path.home() / "Desktop", app.Path.home()}
+
+
 def test_pdf_part_problem_names_the_reason(tmp_path):
     normal = tmp_path / "ok.pdf"
     protected = tmp_path / "pw.pdf"
