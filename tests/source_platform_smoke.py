@@ -138,7 +138,19 @@ def main() -> None:
                 damaged_pdf = tmpdir / "beschädigt.pdf"
                 damaged_pdf.write_bytes(b"not a PDF")
                 app.state_model.topics["Ärzte"].append({"path": str(damaged_pdf), "read": False})
-                app._create_collection_pdf_worker("Ärzte", "alle")
+                # Die Vorprüfung lässt beschädigte PDFs aus (Teilergebnis mit Warnung). Ein echter
+                # Dialog würde den Headless-Lauf blockieren, daher immer gemockt.
+                with mock.patch.object(DokuReader.messagebox, "showwarning") as damaged_warning:
+                    app._create_collection_pdf_worker("Ärzte", "alle")
+                    damaged_warning.assert_called_once()
+                    _assert(str(damaged_pdf) in damaged_warning.call_args.args[1],
+                            "Warnung nennt die beschädigte PDF nicht.")
+                previous_pdf = (tmpdir / "Ärzte_alle.pdf").read_bytes()
+                # Scheitert der Merge trotz Vorprüfung, bleibt die vorhandene Ausgabe erhalten.
+                with mock.patch.object(DokuReader, "pdf_part_problem", return_value=None), \
+                     mock.patch.object(DokuReader.messagebox, "showwarning"), \
+                     mock.patch.object(DokuReader.messagebox, "showerror"):
+                    app._create_collection_pdf_worker("Ärzte", "alle")
                 _assert((tmpdir / "Ärzte_alle.pdf").read_bytes() == previous_pdf,
                         "Fehlgeschlagener Merge hat die vorhandene Ausgabe verändert.")
                 _assert(sum(title == "Erfolg" for title, _msg in messages) == previous_successes,
