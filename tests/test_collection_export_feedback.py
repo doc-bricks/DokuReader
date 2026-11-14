@@ -10,6 +10,15 @@ import DokuReader as app
 
 @pytest.fixture
 def export_window(tmp_path, monkeypatch):
+    # Seit 2026-11-14 prüft der Worker jede Quell-PDF vorab (pdf_part_problem):
+    # „included.pdf“ muss daher eine echte, lesbare PDF sein.
+    from pypdf import PdfWriter
+
+    monkeypatch.chdir(tmp_path)
+    writer = PdfWriter()
+    writer.add_blank_page(width=100, height=100)
+    with open("included.pdf", "wb") as stream:
+        writer.write(stream)
     pending = []
     window = SimpleNamespace(
         state_model=SimpleNamespace(list_docs=Mock()),

@@ -78,11 +78,14 @@ except Exception:
     REPORTLAB_AVAILABLE = False
 
 try:
+    from pypdf import PdfReader as _PdfReader
     from pypdf import PdfWriter as _PdfWriter
 except Exception:
     try:
+        from PyPDF2 import PdfReader as _PdfReader
         from PyPDF2 import PdfWriter as _PdfWriter
     except Exception:
+        _PdfReader = None
         _PdfWriter = None
 
 # PDF-Vorschau optional
@@ -214,6 +217,28 @@ def collection_pdf_filename(topic: str, filter_mode: str) -> str:
         digest = hashlib.sha256(topic.encode("utf-8", errors="surrogatepass")).hexdigest()[:12]
         clean += "_" + digest
     return f"{clean}_{filter_mode}.pdf"
+
+
+def pdf_part_problem(path: str) -> str | None:
+    """Grund, warum eine Quell-PDF nicht ins Sammel-PDF kann, sonst None.
+
+    Eine einzige passwortgeschützte oder beschädigte PDF ließ sonst den ganzen
+    Sammel-PDF-Export scheitern, ohne zu sagen, welche Datei betroffen war.
+    """
+    if _PdfReader is None:
+        return None
+    if not os.path.isfile(path):
+        return "Datei fehlt"
+    try:
+        reader = _PdfReader(path)
+        if reader.is_encrypted and not reader.decrypt(""):
+            return "Passwortgeschützte PDF"
+        if not len(reader.pages):
+            return "PDF ohne Seiten"
+    except Exception:
+        # Die PDF-Backends haben eigene Fehlerklassen (u. a. für fehlende Passwörter).
+        return "PDF nicht lesbar (beschädigt oder Passwortgeschützt)"
+    return None
 
 
 def is_original_document(path: str | os.PathLike[str], original_paths: list[str]) -> bool:
@@ -1830,7 +1855,11 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
                         if ext not in PDF_EXTS:
                             conversion_dir.mkdir()
                         if ext in PDF_EXTS:
-                            pdf_parts.append(src)
+                            problem = pdf_part_problem(src)
+                            if problem:
+                                skipped.append(f"{problem}: {src}")
+                            else:
+                                pdf_parts.append(src)
                         elif ext in TXT_EXTS:
                             pdfp = self._txt_to_pdf(src, conversion_dir)
                             if pdfp:
