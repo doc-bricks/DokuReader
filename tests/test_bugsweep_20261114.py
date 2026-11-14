@@ -116,6 +116,41 @@ def test_pdf_preview_falls_back_to_pymupdf_without_poppler(tmp_path, monkeypatch
     assert states == ["PDF-Vorschau geladen: vertrag.pdf"]
 
 
+def test_logging_prunes_old_per_process_logs(tmp_path, monkeypatch):
+    """Jeder Start schrieb eine neue app-<PID>.log; alte wurden nie entfernt (unbegrenzt viele Dateien)."""
+    import logging
+    import os
+    import time
+
+    from runtime import app_logging
+
+    # tmp_path liegt hier im Projekt (--basetemp=.pytest_temp); log_dir würde dann bewusst
+    # auf das echte LOCALAPPDATA ausweichen. Deshalb den Logordner direkt umlenken.
+    logs = tmp_path / "logs"
+    monkeypatch.setattr(app_logging, "log_dir", lambda app_slug=None: logs)
+    logs.mkdir(parents=True)
+    old_time = time.time() - 40 * 86400
+    for name in ("app-111.log", "app-111.log.1", "app-222.log"):
+        (logs / name).write_text("alt", encoding="utf-8")
+        os.utime(logs / name, (old_time, old_time))
+    (logs / "app-333.log").write_text("frisch", encoding="utf-8")
+    (logs / "notizen.txt").write_text("fremd", encoding="utf-8")
+    os.utime(logs / "notizen.txt", (old_time, old_time))
+
+    root = logging.getLogger()
+    before = list(root.handlers)
+    try:
+        target = app_logging.setup_logging(app_slug="DokuReaderTest", console=False)
+    finally:
+        for handler in list(root.handlers):
+            if handler not in before:
+                root.removeHandler(handler)
+                handler.close()
+
+    remaining = sorted(p.name for p in logs.iterdir())
+    assert remaining == sorted(["app-333.log", "notizen.txt", target.name])
+
+
 def test_pdf_part_problem_names_the_reason(tmp_path):
     normal = tmp_path / "ok.pdf"
     protected = tmp_path / "pw.pdf"
