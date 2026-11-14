@@ -85,6 +85,37 @@ def test_windows_text_encodings_are_read_correctly(tmp_path):
     assert app.read_text_with_fallback(str(tmp_path / "binary.txt")) is not None
 
 
+def test_pdf_preview_falls_back_to_pymupdf_without_poppler(tmp_path, monkeypatch):
+    """pdf2image ohne Poppler (Windows-Normalfall) wirft PDFInfoNotInstalledError (kein OSError):
+    die Vorschau brach ab, bevor der PyMuPDF-Fallback lief."""
+    import pytest
+
+    if not (app.PDF2IMG_AVAILABLE and app.PYMUPDF_AVAILABLE and app.PIL_AVAILABLE):
+        pytest.skip("pdf2image, PyMuPDF und Pillow nötig")
+    from pdf2image.exceptions import PDFInfoNotInstalledError
+
+    def no_poppler(*_args, **_kwargs):
+        raise PDFInfoNotInstalledError("Unable to get page count. Is poppler installed and in PATH?")
+
+    monkeypatch.setattr(app, "convert_from_path", no_poppler)
+    monkeypatch.setattr(app.ImageTk, "PhotoImage", lambda img: ("photo", img.size))
+    pdf = tmp_path / "vertrag.pdf"
+    write_pdf(pdf, 300)
+    preview = Mock()
+    preview.winfo_width.return_value = 600
+    preview.winfo_height.return_value = 320
+    states = []
+    window = SimpleNamespace(
+        preview=preview, _theme={"muted": "#777"}, _preview_img=None,
+        _set_preview_text=Mock(), _set_preview_state=states.append,
+    )
+
+    app.App.show_preview(window, str(pdf))
+
+    preview.create_image.assert_called_once()
+    assert states == ["PDF-Vorschau geladen: vertrag.pdf"]
+
+
 def test_pdf_part_problem_names_the_reason(tmp_path):
     normal = tmp_path / "ok.pdf"
     protected = tmp_path / "pw.pdf"

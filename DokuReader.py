@@ -1706,7 +1706,9 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
                         pages = convert_from_path(path, first_page=1, last_page=1)
                         if pages:
                             img = pages[0]
-                    except (OSError, ValueError, RuntimeError):
+                    except Exception:
+                        # pdf2image hat eigene Fehlerklassen (z. B. PDFInfoNotInstalledError ohne
+                        # Poppler, unter Windows der Normalfall) — sonst liefe der PyMuPDF-Fallback nie.
                         img = None
                 if img is None and PYMUPDF_AVAILABLE:
                     try:
