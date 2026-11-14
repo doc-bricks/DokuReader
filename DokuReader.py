@@ -1394,8 +1394,18 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         return "break"
 
     def _select_topic(self, topic: str):
-        """Setzt das aktuelle Thema und lädt die zugehörigen Dokumente."""
+        """Setzt das aktuelle Thema, markiert es in der Liste und lädt die Dokumente.
+
+        Umbenennen/Löschen lesen die Listenauswahl: ohne Markierung blieben sie direkt
+        nach „Neues Thema“ oder nach dem Start ohne Wirkung.
+        """
         self.state_model.current_topic = topic
+        names = list(self.topic_list.get(0, tk.END))
+        if topic in names:
+            index = names.index(topic)
+            self.topic_list.selection_clear(0, tk.END)
+            self.topic_list.selection_set(index)
+            self.topic_list.see(index)
         self._reload_docs()
 
     def on_topic_select(self, _=None):

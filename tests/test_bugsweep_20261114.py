@@ -204,6 +204,38 @@ def test_text_pdf_keeps_blank_lines_and_stays_inside_the_page(tmp_path):
     assert absatz_y - w_lines[-1] >= 2 * 12 - 1, "Leerzeile zwischen den Absätzen fehlt"
 
 
+def test_current_topic_is_highlighted_so_rename_works_right_after_adding(tmp_path, monkeypatch):
+    """Das aktuelle Thema wurde nie in der Liste markiert: direkt nach „Neues Thema“ (oder nach dem
+    Start) blieben „Umbenennen“/„Löschen“ ohne Wirkung, weil sie die Listenauswahl lesen."""
+    import os
+    import sys
+
+    import pytest
+
+    if not (sys.platform.startswith("win") or os.environ.get("DISPLAY") or os.environ.get("WAYLAND_DISPLAY")):
+        pytest.skip("Tk UI requires a display")
+    monkeypatch.setattr(app, "STATE_FILE", str(tmp_path / "state.json"))
+    monkeypatch.setattr(app.messagebox, "showinfo", Mock())
+    monkeypatch.setattr(app.messagebox, "showerror", Mock())
+    answers = iter(["Neu", "Umbenannt"])
+    monkeypatch.setattr(app.simpledialog, "askstring", lambda *a, **k: next(answers))
+    try:
+        ui = app.App()
+    except (app.tk.TclError, RuntimeError) as exc:
+        pytest.skip(f"Tk nicht verfügbar: {exc}")
+    try:
+        ui.withdraw()
+        ui.state_model.topics = {"Alt": []}
+        ui._reload_topics()
+        ui.add_topic()  # wird aktuelles Thema
+        assert [ui.topic_list.get(i) for i in ui.topic_list.curselection()] == ["Neu"]
+        ui.rename_topic()
+        assert "Umbenannt" in ui.state_model.topics and "Neu" not in ui.state_model.topics
+        assert [ui.topic_list.get(i) for i in ui.topic_list.curselection()] == ["Umbenannt"]
+    finally:
+        ui.destroy()
+
+
 def test_pdf_part_problem_names_the_reason(tmp_path):
     normal = tmp_path / "ok.pdf"
     protected = tmp_path / "pw.pdf"
