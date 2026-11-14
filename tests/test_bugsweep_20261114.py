@@ -68,6 +68,23 @@ def test_state_save_syncs_data_before_replacing_the_library(tmp_path, monkeypatc
     assert events == ["fsync", "replace"]
 
 
+def test_windows_text_encodings_are_read_correctly(tmp_path):
+    """ANSI-€/„“, UTF-16 („Unicode“ im alten Editor) und UTF-8-BOM erschienen als Zeichensalat."""
+    text = "Rechnung „Müller“ – 5 €\nZeile 2"
+    cases = {
+        "ansi.txt": text.encode("cp1252"),
+        "utf16.txt": text.encode("utf-16"),
+        "utf8bom.txt": text.encode("utf-8-sig"),
+        "utf8.txt": text.encode("utf-8"),
+    }
+    for name, data in cases.items():
+        (tmp_path / name).write_bytes(data)
+        assert app.read_text_with_fallback(str(tmp_path / name)) == text, name
+    # Nicht-Text bleibt lesbar ohne Absturz (latin-1 nimmt jedes Byte).
+    (tmp_path / "binary.txt").write_bytes(bytes(range(256)))
+    assert app.read_text_with_fallback(str(tmp_path / "binary.txt")) is not None
+
+
 def test_pdf_part_problem_names_the_reason(tmp_path):
     normal = tmp_path / "ok.pdf"
     protected = tmp_path / "pw.pdf"

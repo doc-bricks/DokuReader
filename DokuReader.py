@@ -124,8 +124,18 @@ except Exception:
 
 
 def read_text_with_fallback(path, max_chars=None):
-    """Liest eine Textdatei mit Encoding-Fallback: UTF-8 -> Latin-1 -> Hexdump."""
-    for enc in ["utf-8", "latin-1"]:
+    """Liest eine Textdatei: BOM (UTF-16/UTF-8) -> UTF-8 -> Windows-1252 -> Latin-1 -> Hexdump.
+
+    Windows-Textdateien sind oft ANSI (cp1252: €, „“, –) oder UTF-16 („Unicode“ im
+    alten Editor); mit nur UTF-8/Latin-1 wurden sie in Vorschau und Sammel-PDF zu Zeichensalat.
+    """
+    try:
+        with open(path, "rb") as f:
+            head = f.read(2)
+    except OSError:
+        return None
+    encodings = ["utf-16"] if head in (b"\xff\xfe", b"\xfe\xff") else ["utf-8-sig", "cp1252", "latin-1"]
+    for enc in encodings:
         try:
             with open(path, "r", encoding=enc) as f:
                 return f.read(max_chars) if max_chars is not None else f.read()
