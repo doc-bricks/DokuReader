@@ -2082,7 +2082,8 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
                 h = ih * scale
                 x = (width - w) / 2
                 y = (height - h) / 2
-                c.drawImage(img, x, y, w, h, preserveAspectRatio=True)
+                # mask="auto": Alphakanal beachten — transparente Bereiche wurden sonst schwarz.
+                c.drawImage(img, x, y, w, h, preserveAspectRatio=True, mask="auto")
                 c.showPage()
                 c.save()
                 return str(out)
@@ -2091,8 +2092,10 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         # Fallback: Pillow direkt nach PDF
         if PIL_AVAILABLE:
             try:
-                img = Image.open(path).convert("RGB")
-                img.save(out, "PDF", resolution=150.0)
+                img = Image.open(path).convert("RGBA")
+                background = Image.new("RGB", img.size, (255, 255, 255))
+                background.paste(img, mask=img.getchannel("A"))  # Transparenz auf Weiß statt Schwarz
+                background.save(out, "PDF", resolution=150.0)
                 return str(out)
             except (OSError, ValueError):
                 pass

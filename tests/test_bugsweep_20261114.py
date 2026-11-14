@@ -166,6 +166,23 @@ def test_desktop_path_uses_the_windows_known_folder(tmp_path, monkeypatch):
     assert app.desktop_path() in {app.Path.home() / "Desktop", app.Path.home()}
 
 
+def test_transparent_image_keeps_a_white_background_in_the_pdf(tmp_path):
+    """Transparente PNG-Bereiche (Logos, Screenshots) wurden im Sammel-PDF schwarz."""
+    import pytest
+
+    fitz = pytest.importorskip("fitz")
+    from PIL import Image
+
+    image = Image.new("RGBA", (200, 200), (0, 0, 0, 0))
+    image.paste((255, 0, 0, 255), (80, 80, 120, 120))
+    image.save(tmp_path / "logo.png")
+    out = app.App._image_to_pdf(object(), str(tmp_path / "logo.png"), tmp_path)
+    pixmap = fitz.open(out)[0].get_pixmap()
+    w, h = pixmap.width, pixmap.height
+    assert pixmap.pixel(w // 2, h // 2) == (255, 0, 0)
+    assert pixmap.pixel(w // 2 - int(w * 0.3), h // 2) == (255, 255, 255)
+
+
 def test_pdf_part_problem_names_the_reason(tmp_path):
     normal = tmp_path / "ok.pdf"
     protected = tmp_path / "pw.pdf"
