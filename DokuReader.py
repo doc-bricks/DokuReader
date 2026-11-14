@@ -489,6 +489,10 @@ class State:
                 descriptor = None  # Der Stream übernimmt den Dateideskriptor.
                 with stream as f:
                     f.write(serialized)
+                    # Wie Export und Sammel-PDF: Daten erst auf den Datenträger, dann
+                    # ersetzen — sonst droht nach Stromausfall eine leere Bibliothek.
+                    f.flush()
+                    os.fsync(f.fileno())
                 os.replace(temporary_path, destination)
                 return True
             except (OSError, TypeError, ValueError):

@@ -50,6 +50,24 @@ def test_protected_pdf_is_skipped_instead_of_failing_the_whole_collection(tmp_pa
     assert "Passwortgeschützt" in message
 
 
+def test_state_save_syncs_data_before_replacing_the_library(tmp_path, monkeypatch):
+    """Bibliothek wurde ohne fsync ersetzt: nach Stromausfall drohte eine leere/kaputte Datei.
+
+    Export, Sammel-PDF und LibreOffice-Ergebnis synchronisieren bereits vor dem Ersetzen.
+    """
+    import os
+
+    monkeypatch.setattr(app, "STATE_FILE", str(tmp_path / "state.json"))
+    events = []
+    real_fsync, real_replace = os.fsync, os.replace
+    monkeypatch.setattr(app.os, "fsync", lambda fd: (events.append("fsync"), real_fsync(fd))[1])
+    monkeypatch.setattr(app.os, "replace", lambda a, b: (events.append("replace"), real_replace(a, b))[1])
+    state = app.State()
+    state.topics = {"Bücher": [{"path": "C:/a.pdf", "read": True}]}
+    assert state.save() is True
+    assert events == ["fsync", "replace"]
+
+
 def test_pdf_part_problem_names_the_reason(tmp_path):
     normal = tmp_path / "ok.pdf"
     protected = tmp_path / "pw.pdf"
