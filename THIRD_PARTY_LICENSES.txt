@@ -1,7 +1,7 @@
 THIRD-PARTY SOFTWARE LICENSES & LEVEL 1 SBOM COMPANION
 ================================================================================
 Project: DokuReader (Local Document Library & PDF Organizer Desktop Application)
-Audited: 2026-10-03 against Level 1 SBOM and Runtime Invariants (Previous Audits: 2026-10-01, 2026-09-28, 2026-09-25, 2026-09-22, 2026-09-11)
+Audited: 2026-11-01 against Level 1 SBOM and Runtime Invariants (Audited: 2026-10-03 against Level 1 SBOM and Runtime Invariants; Previous Audits: 2026-10-01, 2026-09-28, 2026-09-25, 2026-09-22, 2026-09-11)
 License: GNU Affero General Public License v3.0 (AGPL-3.0) (see LICENSE and NOTICE)
 Repository: https://github.com/doc-bricks/DokuReader
 Parent Organization: doc-bricks (https://github.com/doc-bricks)
