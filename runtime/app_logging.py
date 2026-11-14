@@ -42,7 +42,26 @@ from .app_info import APP_SLUG
 
 DEFAULT_MAX_BYTES = 2 * 1024 * 1024      # 2 MB je Datei
 DEFAULT_BACKUP_COUNT = 3                 # -> hoechstens ~8 MB je Prozess
+LOG_RETENTION_DAYS = 30                  # alte app-<PID>.log-Dateien danach entfernen
 LOG_FORMAT = "%(asctime)s %(levelname)-8s %(name)s: %(message)s"
+
+
+def prune_old_logs(directory: Path, keep: Path, days: int = LOG_RETENTION_DAYS) -> None:
+    """Entfernt eigene Logs frueherer Prozesse, die aelter als `days` Tage sind.
+
+    Jeder Start schreibt eine eigene app-<PID>.log; die Rotation greift nur innerhalb
+    eines Prozesses. Ohne Aufraeumen wuerde die Zahl der Dateien unbegrenzt wachsen.
+    Fremde Dateien im Ordner bleiben unberuehrt.
+    """
+    import time
+
+    cutoff = time.time() - days * 86400
+    for path in directory.glob("app-*.log*"):
+        try:
+            if path != keep and path.is_file() and path.stat().st_mtime < cutoff:
+                path.unlink()
+        except OSError:
+            pass  # gesperrt oder schon weg: beim naechsten Start erneut versuchen
 
 
 def log_dir(app_slug: str = APP_SLUG) -> Path:
@@ -91,6 +110,7 @@ def setup_logging(level: int = logging.INFO,
     """
     target = log_file(app_slug)
     target.parent.mkdir(parents=True, exist_ok=True)
+    prune_old_logs(target.parent, keep=target)
 
     root = logging.getLogger()
     root.setLevel(level)

@@ -149,3 +149,17 @@ test("serializeLibrary mappt sizeBytes auf size_bytes zurück", () => {
   assert.equal(serialized.topics[0].documents[0].size_bytes, 100000);
   assert.equal(serialized.topics[0].documents[1].size_bytes, null);
 });
+
+// Bugsweep 2026-11-14: Dieselbe Datei kann (wie am Desktop) in mehreren Themen liegen; der
+// Gelesen-Status gilt je Thema. setRead änderte immer den ersten Treffer über alle Themen.
+test("setRead ändert nur den Eintrag im angegebenen Thema", () => {
+  const library = parseLibrary({
+    schema_version: SCHEMA,
+    topics: [
+      { name: "A", documents: [{ path: "C:/x.pdf", filename: "x.pdf", read: false }] },
+      { name: "B", documents: [{ path: "C:/x.pdf", filename: "x.pdf", read: false }] }
+    ]
+  });
+  assert.equal(setRead(library, "C:/x.pdf", true, "B"), true);
+  assert.deepEqual(library.topics.map(t => t.documents[0].read), [false, true]);
+});

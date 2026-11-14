@@ -17,7 +17,9 @@ def test_version_roles_and_release_surfaces_are_explicit() -> None:
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
     readme_de = (ROOT / "README_de.md").read_text(encoding="utf-8")
     status = (ROOT / "RELEASE_STATUS.md").read_text(encoding="utf-8")
-    plan = (ROOT / "PORTIERUNGSPLAN.md").read_text(encoding="utf-8")
+    # PORTIERUNGSPLAN.md ist intern (gitignored, Heimat OneDrive): nur prüfen, wo er vorliegt.
+    plan_path = ROOT / "PORTIERUNGSPLAN.md"
+    plan = plan_path.read_text(encoding="utf-8") if plan_path.is_file() else None
     build_script = (ROOT / "build_exe.bat").read_text(encoding="utf-8")
 
     assert 'version = "1.0.1.dev0"' in pyproject
@@ -31,6 +33,6 @@ def test_version_roles_and_release_surfaces_are_explicit() -> None:
         assert "kein" in surface.lower() or "no verified public release" in surface.lower()
     assert "Öffentliches Release" in status and "keines belegt" in status
     assert "signiertes MSIX" in status and "WACK" in status
-    assert "Releaseversion: keine" in plan
+    assert plan is None or "Releaseversion: keine" in plan
     assert "DOKUREADER_BUILD_ROOT" in build_script
     assert "C:\\_Local_DEV" not in build_script

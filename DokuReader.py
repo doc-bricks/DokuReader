@@ -78,11 +78,14 @@ except Exception:
     REPORTLAB_AVAILABLE = False
 
 try:
+    from pypdf import PdfReader as _PdfReader
     from pypdf import PdfWriter as _PdfWriter
 except Exception:
     try:
+        from PyPDF2 import PdfReader as _PdfReader
         from PyPDF2 import PdfWriter as _PdfWriter
     except Exception:
+        _PdfReader = None
         _PdfWriter = None
 
 # PDF-Vorschau optional
@@ -121,8 +124,18 @@ except Exception:
 
 
 def read_text_with_fallback(path, max_chars=None):
-    """Liest eine Textdatei mit Encoding-Fallback: UTF-8 -> Latin-1 -> Hexdump."""
-    for enc in ["utf-8", "latin-1"]:
+    """Liest eine Textdatei: BOM (UTF-16/UTF-8) -> UTF-8 -> Windows-1252 -> Latin-1 -> Hexdump.
+
+    Windows-Textdateien sind oft ANSI (cp1252: €, „“, –) oder UTF-16 („Unicode“ im
+    alten Editor); mit nur UTF-8/Latin-1 wurden sie in Vorschau und Sammel-PDF zu Zeichensalat.
+    """
+    try:
+        with open(path, "rb") as f:
+            head = f.read(2)
+    except OSError:
+        return None
+    encodings = ["utf-16"] if head in (b"\xff\xfe", b"\xfe\xff") else ["utf-8-sig", "cp1252", "latin-1"]
+    for enc in encodings:
         try:
             with open(path, "r", encoding=enc) as f:
                 return f.read(max_chars) if max_chars is not None else f.read()
@@ -195,7 +208,39 @@ def human_size(num_bytes: int) -> str:
     return f"{num_bytes:.1f} TB"
 
 
+def _known_desktop_folder() -> str | None:
+    """Echter Windows-Desktop (FOLDERID_Desktop) — auch bei OneDrive-Ordnersicherung."""
+    if platform.system() != "Windows":
+        return None
+    try:
+        import ctypes
+        import uuid
+        from ctypes import wintypes
+
+        class _Guid(ctypes.Structure):
+            _fields_ = [("Data1", wintypes.DWORD), ("Data2", wintypes.WORD),
+                        ("Data3", wintypes.WORD), ("Data4", ctypes.c_ubyte * 8)]
+
+        folder = uuid.UUID("{B4BFCC3A-DB2C-424C-B029-7FE99A87C641}")
+        guid = _Guid(folder.fields[0], folder.fields[1], folder.fields[2],
+                     (ctypes.c_ubyte * 8)(*folder.bytes[8:]))
+        path = ctypes.c_wchar_p()
+        if ctypes.windll.shell32.SHGetKnownFolderPath(ctypes.byref(guid), 0, None, ctypes.byref(path)) != 0:
+            return None
+        try:
+            return path.value
+        finally:
+            ctypes.windll.ole32.CoTaskMemFree(path)
+    except (OSError, AttributeError, ValueError):
+        return None
+
+
 def desktop_path() -> Path:
+    # Path.home()/"Desktop" ist mit OneDrive-Ordnersicherung (Windows-11-Standard) ein alter,
+    # unsichtbarer Ordner; der sichtbare Desktop liegt dann unter …\OneDrive\Desktop.
+    known = _known_desktop_folder()
+    if known and Path(known).is_dir():
+        return Path(known)
     p = Path.home() / "Desktop"
     return p if p.exists() else Path.home()
 
@@ -214,6 +259,28 @@ def collection_pdf_filename(topic: str, filter_mode: str) -> str:
         digest = hashlib.sha256(topic.encode("utf-8", errors="surrogatepass")).hexdigest()[:12]
         clean += "_" + digest
     return f"{clean}_{filter_mode}.pdf"
+
+
+def pdf_part_problem(path: str) -> str | None:
+    """Grund, warum eine Quell-PDF nicht ins Sammel-PDF kann, sonst None.
+
+    Eine einzige passwortgeschützte oder beschädigte PDF ließ sonst den ganzen
+    Sammel-PDF-Export scheitern, ohne zu sagen, welche Datei betroffen war.
+    """
+    if _PdfReader is None:
+        return None
+    if not os.path.isfile(path):
+        return "Datei fehlt"
+    try:
+        reader = _PdfReader(path)
+        if reader.is_encrypted and not reader.decrypt(""):
+            return "Passwortgeschützte PDF"
+        if not len(reader.pages):
+            return "PDF ohne Seiten"
+    except Exception:
+        # Die PDF-Backends haben eigene Fehlerklassen (u. a. für fehlende Passwörter).
+        return "PDF nicht lesbar (beschädigt oder Passwortgeschützt)"
+    return None
 
 
 def is_original_document(path: str | os.PathLike[str], original_paths: list[str]) -> bool:
@@ -464,6 +531,10 @@ class State:
                 descriptor = None  # Der Stream übernimmt den Dateideskriptor.
                 with stream as f:
                     f.write(serialized)
+                    # Wie Export und Sammel-PDF: Daten erst auf den Datenträger, dann
+                    # ersetzen — sonst droht nach Stromausfall eine leere Bibliothek.
+                    f.flush()
+                    os.fsync(f.fileno())
                 os.replace(temporary_path, destination)
                 return True
             except (OSError, TypeError, ValueError):
@@ -1323,8 +1394,18 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         return "break"
 
     def _select_topic(self, topic: str):
-        """Setzt das aktuelle Thema und lädt die zugehörigen Dokumente."""
+        """Setzt das aktuelle Thema, markiert es in der Liste und lädt die Dokumente.
+
+        Umbenennen/Löschen lesen die Listenauswahl: ohne Markierung blieben sie direkt
+        nach „Neues Thema“ oder nach dem Start ohne Wirkung.
+        """
         self.state_model.current_topic = topic
+        names = list(self.topic_list.get(0, tk.END))
+        if topic in names:
+            index = names.index(topic)
+            self.topic_list.selection_clear(0, tk.END)
+            self.topic_list.selection_set(index)
+            self.topic_list.see(index)
         self._reload_docs()
 
     def on_topic_select(self, _=None):
@@ -1667,7 +1748,9 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
                         pages = convert_from_path(path, first_page=1, last_page=1)
                         if pages:
                             img = pages[0]
-                    except (OSError, ValueError, RuntimeError):
+                    except Exception:
+                        # pdf2image hat eigene Fehlerklassen (z. B. PDFInfoNotInstalledError ohne
+                        # Poppler, unter Windows der Normalfall) — sonst liefe der PyMuPDF-Fallback nie.
                         img = None
                 if img is None and PYMUPDF_AVAILABLE:
                     try:
@@ -1830,7 +1913,11 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
                         if ext not in PDF_EXTS:
                             conversion_dir.mkdir()
                         if ext in PDF_EXTS:
-                            pdf_parts.append(src)
+                            problem = pdf_part_problem(src)
+                            if problem:
+                                skipped.append(f"{problem}: {src}")
+                            else:
+                                pdf_parts.append(src)
                         elif ext in TXT_EXTS:
                             pdfp = self._txt_to_pdf(src, conversion_dir)
                             if pdfp:
@@ -1958,17 +2045,32 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
             content = read_text_with_fallback(path)
             if content is None:
                 return None
+            # Umbruch nach gemessener Breite (die frühere Schätzung von 6 pt/Zeichen ließ breite
+            # Zeichen über den Seitenrand laufen) und Leerzeilen als Leerzeilen erhalten.
+            max_width = width - 2 * margin
+            rendered: list[str] = []
             for line in content.splitlines() or [""]:
+                line = line.expandtabs(4)
+                if not line:
+                    rendered.append("")
                 while line:
-                    max_chars = int((width - 2 * margin) / 6)  # Näherung
-                    part = line[:max_chars]
+                    fits, too_long = 1, len(line)
+                    while fits < too_long:
+                        middle = (fits + too_long + 1) // 2
+                        if c.stringWidth(line[:middle], "Helvetica", 11) <= max_width:
+                            fits = middle
+                        else:
+                            too_long = middle - 1
+                    rendered.append(line[:fits])
+                    line = line[fits:]
+            for part in rendered:
+                if part:
                     c.drawString(margin, y, part)
-                    y -= line_height
-                    line = line[len(part):]
-                    if y < margin:
-                        c.showPage()
-                        c.setFont("Helvetica", 11)
-                        y = height - margin
+                y -= line_height
+                if y < margin:
+                    c.showPage()
+                    c.setFont("Helvetica", 11)
+                    y = height - margin
             c.showPage()
             c.save()
             return str(out)
@@ -2005,7 +2107,8 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
                 h = ih * scale
                 x = (width - w) / 2
                 y = (height - h) / 2
-                c.drawImage(img, x, y, w, h, preserveAspectRatio=True)
+                # mask="auto": Alphakanal beachten — transparente Bereiche wurden sonst schwarz.
+                c.drawImage(img, x, y, w, h, preserveAspectRatio=True, mask="auto")
                 c.showPage()
                 c.save()
                 return str(out)
@@ -2014,8 +2117,10 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
         # Fallback: Pillow direkt nach PDF
         if PIL_AVAILABLE:
             try:
-                img = Image.open(path).convert("RGB")
-                img.save(out, "PDF", resolution=150.0)
+                img = Image.open(path).convert("RGBA")
+                background = Image.new("RGB", img.size, (255, 255, 255))
+                background.paste(img, mask=img.getchannel("A"))  # Transparenz auf Weiß statt Schwarz
+                background.save(out, "PDF", resolution=150.0)
                 return str(out)
             except (OSError, ValueError):
                 pass

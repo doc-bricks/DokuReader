@@ -170,7 +170,7 @@ function renderDocs() {
 
     // Klick und Enter/Space schalten den Gelesen-Status um
     const toggleRead = () => {
-      setRead(library, d.path, !d.read);
+      setRead(library, d.path, !d.read, d.topicName);
       renderDocs();
     };
     card.addEventListener("click", toggleRead);
