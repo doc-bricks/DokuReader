@@ -1,7 +1,7 @@
 const CACHE_PREFIX = "dokureader-companion-";
 const CACHE = "dokureader-companion-v7";
-// Wächter (tests/pwa_mobile_smoke.test.mjs): bei jeder Änderung an App-Dateien CACHE erhöhen und Hash erneuern.
-const ASSET_HASH = "a5378c1818b6";
+// Wächter (tests/pwa_mobile_smoke.test.mjs): Hash über alle ASSETS inkl. Manifest und Icons; bei jeder Änderung daran CACHE erhöhen und Hash erneuern.
+const ASSET_HASH = "56e0b95ca618";
 const ASSETS = [
   "./",
   "./index.html",

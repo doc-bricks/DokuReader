@@ -232,19 +232,32 @@ test("sample_library.json is valid dokureader-library-v1 schema and round-trips 
 // sich ändert, installieren Browser keinen neuen Worker und liefern dauerhaft die alte Fassung aus
 // (so erreichte die Manifest-Korrektur vom 2026-09-13 nie installierte PWAs). ASSET_HASH in sw.js
 // muss deshalb zum aktuellen Stand passen; bei Abweichung CACHE erhöhen und den Hash eintragen.
+// Die Dateiliste kommt aus ASSETS in sw.js selbst (inkl. Manifest und Icons; Vorlage: assistassets-ai/mediplaner
+// a0363a2): Eine eigene Liste hier veraltete still, so blieben die Icons ungeprüft.
 test("sw.js ASSET_HASH passt zu den ausgelieferten App-Dateien (CACHE erhöhen bei Änderung)", async () => {
   const { createHash } = await import("node:crypto");
+  const sw = readFileSync(path.join(ROOT, "sw.js"), "utf8");
+  const block = sw.match(/const ASSETS\s*=\s*\[([\s\S]*?)\];/);
+  assert.ok(block, "ASSETS fehlt in sw.js");
+  const assets = [...new Set([...block[1].matchAll(/['"]([^'"]+)['"]/g)]
+    .map((m) => m[1].replace(/^\.\//, ""))
+    .filter((rel) => rel !== ""))]; // "./" liefert index.html aus, das selbst gelistet ist
+  assert.ok(assets.includes("index.html"), "index.html fehlt in ASSETS");
+  const TEXT = /\.(html|js|mjs|css|webmanifest|json|svg|txt|xml)$/i;
   const hash = createHash("sha256");
-  for (const file of ["index.html", "app.js", "library.js", "style.css", "manifest.webmanifest"]) {
-    hash.update(file + "\n");
-    hash.update(readFileSync(path.join(ROOT, file), "utf8").replace(/\r\n/g, "\n"));
+  for (const rel of assets) {
+    assert.ok(existsSync(path.join(ROOT, rel)), `In ASSETS gelistet, aber nicht vorhanden: ${rel}`);
+    const content = TEXT.test(rel)
+      ? Buffer.from(readFileSync(path.join(ROOT, rel), "utf8").replace(/\r\n/g, "\n"), "utf-8")
+      : readFileSync(path.join(ROOT, rel));
+    hash.update(`${rel}\0`);
+    hash.update(content);
   }
   const expected = hash.digest("hex").slice(0, 12);
-  const sw = readFileSync(path.join(ROOT, "sw.js"), "utf8");
   const declared = sw.match(/const ASSET_HASH = "([0-9a-f]{12})";/)?.[1];
   assert.equal(
     declared,
     expected,
-    `App-Dateien geändert: CACHE in sw.js erhöhen und ASSET_HASH = "${expected}" eintragen.`
+    `Gecachte Dateien geändert: CACHE in sw.js erhöhen und ASSET_HASH = "${expected}" eintragen.`
   );
 });
