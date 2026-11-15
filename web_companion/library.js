@@ -41,10 +41,13 @@ export function filterDocuments(library, { topic = null, query = "", showMissing
 
 /**
  * Setzt den Gelesen-Status eines Dokuments anhand seines Pfads.
+ * Wie am Desktop gilt der Status je Thema: mit topicName nur in diesem Thema
+ * (dieselbe Datei kann in mehreren Themen liegen).
  * Gibt true zurück, wenn das Dokument gefunden und geändert wurde.
  */
-export function setRead(library, docPath, value) {
+export function setRead(library, docPath, value, topicName = null) {
   for (const topic of library.topics) {
+    if (topicName !== null && topic.name !== topicName) continue;
     for (const doc of topic.documents) {
       if (doc.path === docPath) {
         doc.read = Boolean(value);

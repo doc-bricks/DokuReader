@@ -88,13 +88,14 @@ test("service worker caches the full offline shell", async () => {
 
 test("service worker activation preserves caches outside the DokuReader namespace", async () => {
   const source = await read("sw.js");
+  const currentCache = source.match(/const CACHE = "([^"]+)";/)[1];
   const handlers = new Map();
   const deleted = [];
   const cacheApi = {
     keys: async () => [
       "other-app-v1",
       "dokureader-companion-v5",
-      "dokureader-companion-v6"
+      currentCache
     ],
     delete: async key => {
       deleted.push(key);
@@ -226,3 +227,24 @@ test("sample_library.json is valid dokureader-library-v1 schema and round-trips 
   assert.equal(roundtrip.totals.missing_documents, 1);
 });
 
+
+// Bugsweep 2026-11-14: Der Service Worker ist cache-first. Ändert sich eine App-Datei, ohne dass sw.js
+// sich ändert, installieren Browser keinen neuen Worker und liefern dauerhaft die alte Fassung aus
+// (so erreichte die Manifest-Korrektur vom 2026-09-13 nie installierte PWAs). ASSET_HASH in sw.js
+// muss deshalb zum aktuellen Stand passen; bei Abweichung CACHE erhöhen und den Hash eintragen.
+test("sw.js ASSET_HASH passt zu den ausgelieferten App-Dateien (CACHE erhöhen bei Änderung)", async () => {
+  const { createHash } = await import("node:crypto");
+  const hash = createHash("sha256");
+  for (const file of ["index.html", "app.js", "library.js", "style.css", "manifest.webmanifest"]) {
+    hash.update(file + "\n");
+    hash.update(readFileSync(path.join(ROOT, file), "utf8").replace(/\r\n/g, "\n"));
+  }
+  const expected = hash.digest("hex").slice(0, 12);
+  const sw = readFileSync(path.join(ROOT, "sw.js"), "utf8");
+  const declared = sw.match(/const ASSET_HASH = "([0-9a-f]{12})";/)?.[1];
+  assert.equal(
+    declared,
+    expected,
+    `App-Dateien geändert: CACHE in sw.js erhöhen und ASSET_HASH = "${expected}" eintragen.`
+  );
+});
