@@ -51,7 +51,8 @@ def test_readme_badges_and_links_parity() -> None:
     assert "RunAsInvoker-Non--Elevated-success" in readme_en
     assert "Third--Party%20Licenses-Audited-green" in readme_en
     assert (
-        "Audit-2026--10--03-informational" in readme_en
+        "Audit-2026--11--01-informational" in readme_en
+        or "Audit-2026--10--03-informational" in readme_en
         or "Audit-2026--10--01-informational" in readme_en
         or "Audit-2026--09--28-informational" in readme_en
         or "Audit-2026--09--25-informational" in readme_en
@@ -70,7 +71,8 @@ def test_readme_badges_and_links_parity() -> None:
     assert "RunAsInvoker-Unprivilegiert-success" in readme_de
     assert "Marketing%20Log-Aktiv-blue" in readme_de
     assert (
-        "Audit-2026--10--03-informational" in readme_de
+        "Audit-2026--11--01-informational" in readme_de
+        or "Audit-2026--10--03-informational" in readme_de
         or "Audit-2026--10--01-informational" in readme_de
         or "Audit-2026--09--28-informational" in readme_de
         or "Audit-2026--09--25-informational" in readme_de
@@ -626,12 +628,30 @@ def test_marketing_log_pfad_b_currency_20261003() -> None:
 
 
 def test_readme_badges_audit_recency_20261003() -> None:
-    '''Prüft die Badges für Audit-2026--10--03, Contributing Guidelines und Level 1 SBOM Text Companion.'''
+    '''Prüft die Badges für Audit, Contributing Guidelines und Level 1 SBOM Text Companion.'''
     readme_en = (ROOT / "README.md").read_text(encoding="utf-8")
     readme_de = (ROOT / "README_de.md").read_text(encoding="utf-8")
-    assert "Audit-2026--10--03-informational" in readme_en
+    assert (
+        "Audit-2026--11--01-informational" in readme_en
+        or "Audit-2026--10--03-informational" in readme_en
+    )
     assert "Level%201%20SBOM-Text%20Companion-blue" in readme_en
     assert "Contributing-Guidelines-blue" in readme_en
-    assert "Audit-2026--10--03-informational" in readme_de
+    assert (
+        "Audit-2026--11--01-informational" in readme_de
+        or "Audit-2026--10--03-informational" in readme_de
+    )
     assert "Level%201%20SBOM-Textbegleiter-blue" in readme_de
     assert "Mitwirken-Leitfaden-blue" in readme_de
+
+
+def test_readme_badges_audit_recency_20261101() -> None:
+    '''Prüft das aktuelle Audit-2026--11--01 Badge und die PWA-Sequenz-Parität in README.md und README_de.md.'''
+    readme_en = (ROOT / "README.md").read_text(encoding="utf-8")
+    readme_de = (ROOT / "README_de.md").read_text(encoding="utf-8")
+    assert "Audit-2026--11--01-informational" in readme_en
+    assert "Audit-2026--11--01-informational" in readme_de
+    assert "dokureader-library-v1.json" in readme_en
+    assert "dokureader-library-v1.json" in readme_de
+    assert "web_companion" in readme_en
+    assert "web_companion" in readme_de

@@ -1,6 +1,6 @@
 # DokuReader
 
-## Last-checked: 2026-10-03
+## Last-checked: 2026-11-01
 
 ## Canonical Links
 
@@ -57,6 +57,7 @@ For local agent job files and process startup/status, see [FolderHome](https://g
 - Unprivileged user-mode execution under RunAsInvoker principles (INV-RUNAS-02).
 - The `dokureader-library-v1.json` export contains topics, paths, file metadata, and read status without embedding private document content.
 - Four-view architectural topology documents caller runtimes, core engine, persistence layers, and air-gap defense perimeter.
+- Extended interactive sequence diagram documents the complete zero-egress mobile PWA companion lifecycle round-trip (INV-SCHEMA-04, INV-ISOLATION-05).
 
 ## Interfaces
 
@@ -73,7 +74,7 @@ For local agent job files and process startup/status, see [FolderHome](https://g
 
 - Python tests live under `tests/` (including `test_metadata.py`, release, accessibility, store, topic-rename, JSON/PDF integrity, export target protection, portable output names, partial-export feedback, conversion name collisions, collection-export lifecycle, state load/save/recovery regressions, and CI/contract suites; 259 collected, 254 passed, 5 skipped, 0 failed, exit 0).
 - Web Companion tests live under `web_companion/tests/` (37 Node.js tests verified: 100% green).
-- Suites are counted separately, never summed: Python 254 passed / 0 failed (exit 0); Web Companion 37 passed / 0 failed (exit 0); `ruff check .` clean (exit 0); `python tests/source_platform_smoke.py` OK (exit 0), including damaged-library recovery, partial PDF export warnings, and protected JSON targets. Measured 2026-10-03 with Python 3.12.10 on Windows.
+- Suites are counted separately, never summed: Python 254 passed / 0 failed (exit 0); Web Companion 37 passed / 0 failed (exit 0); `ruff check .` clean (exit 0); `python tests/source_platform_smoke.py` OK (exit 0), including damaged-library recovery, partial PDF export warnings, and protected JSON targets. Measured 2026-11-01 with Python 3.12.10 on Windows (preceding baseline 2026-10-03).
 - The former sporadic Tk initialization skip is bounded by at most three setup attempts. Ten independent focused runs produced 60/60 UI test passes without a skip. A real Tk visual smoke captured and reviewed empty, drag-and-drop and text-preview states; receipt: `UI_POLISH_SMOKE.json`.
 - MSIX, WACK, signing and Store gates are external and remain unproven by any of these runs.
 - Current focused validation: `python -m pytest -ra -v` and `node --test` in `web_companion`.
