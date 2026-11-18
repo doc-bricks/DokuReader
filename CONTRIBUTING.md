@@ -2,27 +2,27 @@
 
 ## Deutsch
 
-Vielen Dank für Ihr Interesse, zu diesem Projekt beizutragen.
+Vielen Dank für dein Interesse, zu diesem Projekt beizutragen.
 
-### Wie Sie beitragen können
+### Wie du beitragen kannst
 
-1. Melden Sie Bugs über GitHub Issues mit nachvollziehbaren Schritten.
-2. Schlagen Sie Features über GitHub Issues vor.
-3. Reichen Sie Code- oder Dokumentationsänderungen per Pull Request ein.
+1. Melde Bugs über GitHub Issues mit nachvollziehbaren Schritten.
+2. Schlage Features über GitHub Issues vor.
+3. Reiche Code- oder Dokumentationsänderungen per Pull Request ein.
 
-Bitte veröffentlichen Sie keine Secrets, privaten Dokumente oder Sicherheitslücken in öffentlichen Issues. Für Sicherheitsmeldungen gilt `SECURITY.md`.
+Bitte veröffentliche keine Secrets, privaten Dokumente oder Sicherheitslücken in öffentlichen Issues. Für Sicherheitsmeldungen gilt `SECURITY.md`.
 
 ### Pull Requests
 
-1. Forken Sie das Repository.
-2. Erstellen Sie einen Feature-Branch: `git checkout -b feature/mein-feature`.
-3. Testen Sie Ihre Änderung lokal.
-4. Committen Sie Ihre Änderung: `git commit -m "Beschreibung der Änderung"`.
-5. Pushen Sie den Branch und erstellen Sie einen Pull Request.
+1. Forke das Repository.
+2. Erstelle einen Feature-Branch: `git checkout -b feature/mein-feature`.
+3. Teste deine Änderung lokal.
+4. Committe deine Änderung: `git commit -m "Beschreibung der Änderung"`.
+5. Pushe den Branch und erstelle einen Pull Request.
 
 ### Lizenz- und Rechtehinweise
 
-Pull Requests werden unter der Projektlizenz eingereicht, sofern im konkreten Beitrag nichts anderes vereinbart ist. Bitte reichen Sie nur Code, Dokumentation oder Assets ein, die Sie unter dieser Lizenz beisteuern dürfen.
+Pull Requests werden unter der Projektlizenz eingereicht, sofern im konkreten Beitrag nichts anderes vereinbart ist. Bitte reiche nur Code, Dokumentation oder Assets ein, die du unter dieser Lizenz beisteuern darfst.
 
 ### Code-Richtlinien
 
@@ -56,8 +56,8 @@ Beiträge müssen alle 10 Kern-Invarianten des Projekts respektieren:
 - `INV-LOCAL-01` (100% Local-First & Zero Egress): Keine Hintergrund-Netzwerkverbindungen, Telemetrie oder externe API-Aufrufe.
 - `INV-RUNAS-02` (Unprivilegierter Modus): Standard-Benutzerrechte (`RunAsInvoker`), keine Admin-Rechte erforderlich.
 - `INV-INPLACE-03` (Originale unverändert): Dokumente verbleiben an Ort und Stelle; keine Dateimanipulation im Dateisystem.
-- `INV-SCHEMA-04` (Deterministisches Schema): Bibliotheks-Exporte folgen strikt der `dokureader-library-v1` Spezifikation.
-- `INV-ISOLATION-05` (Zustands- & Cache-Isolation): Lokaler Zustand in `~/.dokubibliothek_state.json`; isolierter PWA-Cache.
+- `INV-SCHEMA-04` (Deterministisches Schema): Bibliotheks-Exporte und Lesestatus-Reimporte folgen strikt der `dokureader-library-v1` Spezifikation.
+- `INV-ISOLATION-05` (Zustands- & Cache-Isolation): Lokaler Zustand in `~/.dokubibliothek_state.json`; isolierter PWA-Cache und lokaler `localStorage`-Zwischenspeicher.
 - `INV-SANDBOX-06` (Sichere Subprozesse): Optionale externe Tools (LibreOffice, Poppler) laufen mit Timeouts.
 - `INV-PARITY-07` (Plattform-Parität): Vollständige Unterstützung für Windows, macOS und Linux.
 - `INV-A11Y-08` (Barrierefreiheit): Tastaturbedienbarkeit und semantische Rollen für alle Steuerelemente.
@@ -66,9 +66,9 @@ Beiträge müssen alle 10 Kern-Invarianten des Projekts respektieren:
 
 ### Plan D Lokales Setup & Versions-Disziplin
 
-- **Kanonischer Arbeitsort:** Lokaler Git-Klon unter `C:\_Local_DEV\repos\REL-PUB_DokuReader-tasksolver-1084-1085`.
-- **OneDrive-Spiegel:** `C:\Users\lukas\OneDrive\.TOPICS\.SOFTWARE\DOCS\REL-PUB_DokuReader` dient als gitloser Spiegel.
-- **Versions-Freeze (T-20260920-167562623):** Die Versionsnummer (`1.0.1-dev` / `1.0.1.dev0`) bleibt für laufende Hygiene- und Marketing-Läufe strikt eingefroren. Alle Neuerungen werden unter `## [Unreleased]` im `CHANGELOG.md` erfasst.
+- **Kanonischer Arbeitsort:** Lokaler Git-Klon außerhalb synchronisierter Cloud-Ordner (`<LOCAL_DEV_REPOS>/DokuReader`).
+- **Cloud-Spiegel (Plan D):** Optionaler `.git`-loser Multi-Device-Spiegel ohne direkte Git-Operationen.
+- **Versions-Freeze (T-20260920-167562623):** Die Versionsnummer (`1.0.1-dev` / `1.0.1.dev0`) bleibt für laufende Hygiene- und Pflege-Läufe strikt eingefroren. Alle Neuerungen werden unter `## [Unreleased]` im `CHANGELOG.md` erfasst.
 
 ### Erste Schritte
 
@@ -137,8 +137,8 @@ Contributions must preserve all 10 architectural and runtime invariants:
 - `INV-LOCAL-01` (100% Local-First & Zero Egress): No outbound network requests, analytics, or external telemetry.
 - `INV-RUNAS-02` (Unprivileged User Mode): Executes purely under `RunAsInvoker` without administrative elevation.
 - `INV-INPLACE-03` (In-Place File Safety): Original documents are strictly read-only; originals never moved or altered.
-- `INV-SCHEMA-04` (Deterministic Schema): Export payloads adhere to the versioned `dokureader-library-v1` JSON specification.
-- `INV-ISOLATION-05` (State & Cache Isolation): Isolated user state in `~/.dokubibliothek_state.json`; scoped PWA cache.
+- `INV-SCHEMA-04` (Deterministic Schema): Export and status-reconcile payloads adhere to the versioned `dokureader-library-v1` JSON specification.
+- `INV-ISOLATION-05` (State & Cache Isolation): Isolated user state in `~/.dokubibliothek_state.json`; scoped PWA cache and `localStorage`.
 - `INV-SANDBOX-06` (Safe Subprocesses): Bounded execution with strict timeout limits for optional tools.
 - `INV-PARITY-07` (Tri-Platform Support): Parity across Windows, macOS, and Linux host environments.
 - `INV-A11Y-08` (Accessibility): Full keyboard navigation and semantic roles across the UI.
@@ -147,8 +147,8 @@ Contributions must preserve all 10 architectural and runtime invariants:
 
 ### Plan D Setup & Version Freeze Discipline
 
-- **Canonical Repository:** Local Git clone at `C:\_Local_DEV\repos\REL-PUB_DokuReader-tasksolver-1084-1085`.
-- **OneDrive Mirror:** `C:\Users\lukas\OneDrive\.TOPICS\.SOFTWARE\DOCS\REL-PUB_DokuReader` serves as gitless multi-device mirror.
+- **Canonical Repository:** Local Git clone outside cloud-synced folders (`<LOCAL_DEV_REPOS>/DokuReader`).
+- **Cloud Mirror (Plan D):** Optional gitless multi-device projection without direct Git operations.
 - **Version Freeze (T-20260920-167562623):** Version numbers (`1.0.1-dev` / `1.0.1.dev0`) remain strictly frozen during routine maintenance. All enhancements are tracked under `## [Unreleased]` in `CHANGELOG.md`.
 
 ### Getting Started

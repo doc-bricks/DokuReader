@@ -1,11 +1,22 @@
 /**
- * library.js — DokuReader Web Companion core logic
- * Parses and queries dokureader-library-v1.json payloads.
+ * library.js — DokuReader Web Companion core logic & scoped offline persistence
+ * Parses, queries, serializes, and locally caches dokureader-library-v1.json payloads.
  */
 
 export const SCHEMA = "dokureader-library-v1";
 
+export const STORAGE_KEYS = Object.freeze({
+  library: "dokureader_companion_library_v1",
+  topic: "dokureader_companion_topic_v1",
+  lang: "dokureader_companion_lang_v1"
+});
+
+export const MAX_PERSISTED_BYTES = 4 * 1024 * 1024; // 4 MiB scoped localStorage ceiling (INV-ISOLATION-05)
+
 export function parseLibrary(json) {
+  if (!json || typeof json !== "object" || Array.isArray(json)) {
+    throw new Error("Ungültiges Bibliotheksformat");
+  }
   if (json.schema_version !== SCHEMA) {
     throw new Error(`Unbekanntes Schema: ${json.schema_version}`);
   }
@@ -70,6 +81,7 @@ export function serializeLibrary(library) {
     current_topic: library.currentTopic || null,
     topics: library.topics.map(t => ({
       name: t.name,
+      document_count: t.documents.length,
       documents: t.documents.map(d => ({
         path: d.path,
         filename: d.filename,
@@ -88,6 +100,92 @@ export function serializeLibrary(library) {
       )
     }
   };
+}
+
+/**
+ * Persistiert die aktuell geladene Bibliothek + Themenauswahl im lokalen Browser-Storage
+ * (INV-ISOLATION-05, kein Netzwerk-Egress). Fängt Quota- und Zugriffsausnahmen sicher ab.
+ */
+export function saveLibrarySnapshot(storage, library, activeTopic = null) {
+  if (!storage || !library) {
+    return { saved: false, reason: "unavailable" };
+  }
+  try {
+    const payload = serializeLibrary(library);
+    const serialized = JSON.stringify(payload);
+    const byteLength = new TextEncoder().encode(serialized).length;
+    if (byteLength > MAX_PERSISTED_BYTES) {
+      return { saved: false, reason: "quota" };
+    }
+    storage.setItem(STORAGE_KEYS.library, serialized);
+    storage.setItem(
+      STORAGE_KEYS.topic,
+      JSON.stringify({ activeTopic: activeTopic === null ? null : String(activeTopic) })
+    );
+    return { saved: true, bytes: byteLength };
+  } catch {
+    return { saved: false, reason: "quota" };
+  }
+}
+
+/**
+ * Stellt eine zuvor lokal gespeicherte Bibliothek beim Offline-Neustart wieder her.
+ * Beschädigte oder schemafremde Einträge werden automatisch bereinigt (Self-Healing).
+ */
+export function loadLibrarySnapshot(storage) {
+  if (!storage) {
+    return null;
+  }
+  let rawText = null;
+  try {
+    rawText = storage.getItem(STORAGE_KEYS.library);
+  } catch {
+    return null;
+  }
+  if (!rawText) {
+    return null;
+  }
+  try {
+    const byteLength = new TextEncoder().encode(rawText).length;
+    if (byteLength > MAX_PERSISTED_BYTES) {
+      throw new Error("Persisted library exceeds size ceiling");
+    }
+    const parsedJson = JSON.parse(rawText);
+    const library = parseLibrary(parsedJson);
+    let resolvedTopic = library.currentTopic || (library.topics[0]?.name ?? null);
+    try {
+      const rawTopic = storage.getItem(STORAGE_KEYS.topic);
+      if (rawTopic) {
+        const topicState = JSON.parse(rawTopic);
+        if (topicState && topicState.activeTopic === null) {
+          resolvedTopic = null;
+        } else if (
+          topicState &&
+          typeof topicState.activeTopic === "string" &&
+          library.topics.some(t => t.name === topicState.activeTopic)
+        ) {
+          resolvedTopic = topicState.activeTopic;
+        }
+      }
+    } catch {
+      // Topic-Zusatzzustand ist optional; Fallback auf currentTopic greift.
+    }
+    return { library, activeTopic: resolvedTopic, error: null };
+  } catch {
+    clearLibrarySnapshot(storage);
+    return { library: null, activeTopic: null, error: "corrupt" };
+  }
+}
+
+export function clearLibrarySnapshot(storage) {
+  if (!storage) return false;
+  try {
+    storage.removeItem(STORAGE_KEYS.library);
+    storage.removeItem(STORAGE_KEYS.topic);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 export function buildDemoLibrary() {

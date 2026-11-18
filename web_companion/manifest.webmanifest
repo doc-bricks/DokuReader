@@ -1,7 +1,7 @@
 {
   "name": "DokuReader Companion",
   "short_name": "DokuReader",
-  "description": "Read-only-Ansicht der DokuReader-Bibliothek auf Mobilger\u00e4ten und im Browser.",
+  "description": "Offline-f\u00e4hige Begleitansicht und Lesestatus-Pflege f\u00fcr die lokale DokuReader-Bibliothek.",
   "id": "./",
   "scope": "./",
   "start_url": "./",

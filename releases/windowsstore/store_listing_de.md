@@ -1,5 +1,5 @@
 Kurzbeschreibung:
-Lokale Dokumentenbibliothek mit Vorschau, Lesestatus, Sammel-PDF und JSON-Export.
+Lokale Dokumentenbibliothek mit Vorschau, Lesestatus, Sammel-PDF und Companion-JSON-Abgleich.
 
 Beschreibung:
 DokuReader ist eine lokale Desktop-App für persönliche Dokumentenbibliotheken, Forschungsablagen und PDF-Sammlungen. Die Anwendung organisiert Dokumente nach Themen, zeigt Vorschauen für Text, Bilder und PDFs an und speichert nur Verweise sowie Lesestatus. Die Originaldateien bleiben unverändert an ihrem Speicherort.
@@ -7,16 +7,16 @@ DokuReader ist eine lokale Desktop-App für persönliche Dokumentenbibliotheken,
 Funktionen im Überblick:
 - Themenbasierte Dokumentenbibliothek für Forschung, Verwaltung oder persönliche Unterlagen
 - Lesestatus (gelesen / ungelesen) direkt in der Bibliotheksansicht umschalten
-- Integrierte Vorschau für Textdateien, Bilder und PDFs
+- Integrierte Vorschau für Textdateien, Bilder, PDFs sowie DOCX und ODT
 - Sammel-PDF-Export für alle Dokumente, nur gelesene oder noch ungelesene Dokumente
-- JSON-Export im standardisierten Schema (dokureader-library-v1.json) für Begleit-Workflows
+- Bidirektionaler JSON-Statusabgleich (dokureader-library-v1.json) für Offline-Web/PWA-Begleitworkflows
 - Öffnen von Originaldateien per Doppelklick in der System-Standardanwendung
-- Schnelle Suche und Filterung nach Dokumentnamen und Themen
+- Schnelle Suche und Sortierung nach Dokumentnamen, Typ und Größe
 
 Datenschutz und Offline-Betrieb:
 - 100 % lokal: keine Cloud-Pflicht, kein Kontozwang und keine Datenübertragung an Dritte
 - Datenschutzfreundlich: Bibliotheks-Metadaten speichern lediglich Pfad und Lesestatus
-- Schlank und reaktionsschnell: Native Desktop-Oberfläche ohne ressourcenhungrige Hintergrunddienste
+- Schlank und reaktionsschnell: Unprivilegierte Desktop-Oberfläche ohne Hintergrunddienste
 
 Lizenz:
 DokuReader ist freie Open-Source-Software unter der GNU Affero General Public License v3 (AGPL-3.0).
