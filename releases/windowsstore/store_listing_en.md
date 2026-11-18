@@ -1,5 +1,5 @@
 Short Description:
-Local document library with previews, read tracking, bundle PDF export, and JSON export.
+Local document library with previews, read tracking, bundle PDF export, and JSON status sync.
 
 Description:
 DokuReader is a local desktop application for personal document libraries, research folders, and PDF collections. It organizes files by topic, previews text, image, and PDF content, and stores only references plus read status. Original files stay untouched in their existing locations.
@@ -7,16 +7,16 @@ DokuReader is a local desktop application for personal document libraries, resea
 Key Features:
 - Topic-based library for research, administration, or personal records
 - Read/unread tracking directly inside the library view
-- Built-in preview for text files, images, and PDFs
+- Built-in preview for text files, images, PDFs, DOCX, and ODT
 - Combined bundle PDF export for all, read, or unread documents
-- Standardized JSON export (dokureader-library-v1.json) for companion workflows
+- Bidirectional JSON status sync (dokureader-library-v1.json) for offline Web/PWA companion workflows
 - Open original files with a double-click in your system's default application
-- Fast search and filtering across document names and topics
+- Fast search and sorting across document names, types, and sizes
 
 Privacy and Offline Operation:
 - 100% local: no cloud requirement, no mandatory account, zero data egress
 - Privacy-friendly: library metadata only records paths and read flags
-- Lightweight and fast: native desktop interface with no background services
+- Lightweight and fast: unprivileged desktop interface with no background services
 
 License:
 DokuReader is free and open-source software licensed under the GNU Affero General Public License v3 (AGPL-3.0).

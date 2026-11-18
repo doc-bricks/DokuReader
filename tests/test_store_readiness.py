@@ -138,3 +138,58 @@ def test_store_readiness_blocks_failed_wack_summary(tmp_path):
     results = _by_name(module.run_checks(tmp_path))
 
     assert results["WACK JSON summary"].status == "BLOCKER"
+
+
+def test_real_repository_tier2_languages_listings_manifest_and_path_hygiene_pass():
+    module = _load_module()
+    results = _by_name(module.run_checks(PROJECT_ROOT))
+
+    assert results["Store metadata"].status == "OK"
+    assert results["Store Tier-2 languages"].status == "OK"
+    assert results["Store Tier-2 listings"].status == "OK"
+    assert results["MSIX AppxManifest template"].status == "OK"
+    assert results["Packager path hygiene"].status == "OK"
+
+    # Only external binary build artifacts (Windows EXE, MSIX package) may be BLOCKER in clean Git clone
+    blockers = {name for name, item in results.items() if item.status == "BLOCKER"}
+    assert blockers.issubset({"Windows EXE", "MSIX package", "WACK JSON summary"})
+
+
+def test_store_readiness_detects_non_portable_paths_and_missing_tier2_locale(tmp_path):
+    module = _load_module()
+    _create_store_ready_fixture(tmp_path)
+
+    pkg = json.loads((tmp_path / "store_package.json").read_text(encoding="utf-8"))
+    pkg["languages"] = ["de-DE", "en-US"]  # missing es-ES, zh-CN, ja-JP, ru-RU
+    (tmp_path / "store_package.json").write_text(json.dumps(pkg), encoding="utf-8")
+
+    (tmp_path / "releases" / "windowsstore" / "store_settings.json").write_text(
+        json.dumps(
+            {
+                "publisher": "CN=52596601-BAB4-4F3F-B182-E8F3F273B202",
+                "pfx_password": "",
+                "pfx_path": "C:/_Local_DEV/repos/WinStorePackager/dev_cert.pfx",
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    results = _by_name(module.run_checks(tmp_path))
+    assert results["Store Tier-2 languages"].status == "BLOCKER"
+    assert results["Packager path hygiene"].status == "BLOCKER"
+
+
+def test_store_readiness_blocks_invalid_manifest_logo_paths(tmp_path):
+    module = _load_module()
+    _create_store_ready_fixture(tmp_path)
+
+    bad_manifest = (PROJECT_ROOT / "releases" / "windowsstore" / "AppxManifest.xml").read_text(
+        encoding="utf-8"
+    ).replace(r"icons\StoreLogo.png", r"Assets\StoreLogo.png")
+    (tmp_path / "releases" / "windowsstore" / "AppxManifest.xml").write_text(
+        bad_manifest, encoding="utf-8"
+    )
+
+    results = _by_name(module.run_checks(tmp_path))
+    assert results["MSIX AppxManifest template"].status == "BLOCKER"
+    assert "Properties/Logo" in results["MSIX AppxManifest template"].detail

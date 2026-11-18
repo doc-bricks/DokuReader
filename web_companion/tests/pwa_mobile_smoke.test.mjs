@@ -69,6 +69,7 @@ test("service worker caches the full offline shell", async () => {
     "./index.html",
     "./style.css",
     "./app.js",
+    "./i18n.js",
     "./library.js",
     "./manifest.webmanifest",
     "./icons/dokureader-companion-180.png",

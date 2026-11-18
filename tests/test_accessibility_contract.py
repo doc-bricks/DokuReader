@@ -47,6 +47,7 @@ def test_ui_source_contains_state_and_keyboard_contract() -> None:
         '"preview_state"',
         '"preview_text"',
         '"collection_export"',
+        '"library_import"',
         '"library_export"',
     ):
         assert key in source

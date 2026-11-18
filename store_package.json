@@ -4,7 +4,7 @@
   "publisher_display": "Geiger",
   "identity_name": "Geiger.DokuReader",
   "version": "1.0.1.0",
-  "description": "Lokale Dokumentenbibliothek mit Vorschau, Lesestatus, Sammel-PDF und Companion-JSON-Export.",
+  "description": "Lokale Dokumentenbibliothek mit Vorschau, Lesestatus, Sammel-PDF und Companion-JSON-Abgleich.",
   "executable": "DokuReader.exe",
   "execution_alias": "dokureader.exe",
   "capabilities": "runFullTrust",
@@ -13,9 +13,93 @@
   "license": "AGPL-3.0-or-later",
   "languages": [
     "de-DE",
-    "en-US"
+    "en-US",
+    "es-ES",
+    "zh-CN",
+    "ja-JP",
+    "ru-RU"
   ],
-  "privacy_url": "https://github.com/doc-bricks/DokuReader/blob/master/README.md#privacy-and-local-data",
+  "listings": {
+    "de-DE": {
+      "short_description": "Lokale Dokumentenbibliothek mit Vorschau, Lesestatus, Sammel-PDF und Companion-JSON-Abgleich.",
+      "keywords": [
+        "Dokumente",
+        "PDF",
+        "Vorschau",
+        "Bibliothek",
+        "Leseliste",
+        "Sammel-PDF",
+        "Datenschutz"
+      ],
+      "listing_file": "releases/windowsstore/store_listing_de.md"
+    },
+    "en-US": {
+      "short_description": "Local document library with previews, read tracking, bundle PDF export, and JSON status sync.",
+      "keywords": [
+        "documents",
+        "PDF",
+        "preview",
+        "library",
+        "reading list",
+        "bundle PDF",
+        "privacy"
+      ],
+      "listing_file": "releases/windowsstore/store_listing_en.md"
+    },
+    "es-ES": {
+      "short_description": "Biblioteca local de documentos con vista previa, estado de lectura, PDF combinado y JSON.",
+      "keywords": [
+        "documentos",
+        "PDF",
+        "vista previa",
+        "biblioteca",
+        "lectura",
+        "combinar PDF",
+        "privacidad"
+      ],
+      "listing_file": "releases/windowsstore/store_listing_es.md"
+    },
+    "zh-CN": {
+      "short_description": "本地文档库：支持主题分类、文档预览、阅读状态同步、合并导出 PDF 与离线 JSON 协作。",
+      "keywords": [
+        "文档管理",
+        "PDF",
+        "文档预览",
+        "本地文献库",
+        "阅读清单",
+        "合并PDF",
+        "隐私保护"
+      ],
+      "listing_file": "releases/windowsstore/store_listing_zh.md"
+    },
+    "ja-JP": {
+      "short_description": "プレビュー・既読管理・一括PDF出力・JSON状態同期を備えたローカル完結型ドキュメント管理アプリ。",
+      "keywords": [
+        "ドキュメント管理",
+        "PDF",
+        "プレビュー",
+        "ライブラリ",
+        "読書リスト",
+        "結合PDF",
+        "プライバシー"
+      ],
+      "listing_file": "releases/windowsstore/store_listing_ja.md"
+    },
+    "ru-RU": {
+      "short_description": "Локальная библиотека документов с предпросмотром, статусом чтения, сборным PDF и JSON-обменом.",
+      "keywords": [
+        "документы",
+        "PDF",
+        "предпросмотр",
+        "библиотека",
+        "список чтения",
+        "сборный PDF",
+        "приватность"
+      ],
+      "listing_file": "releases/windowsstore/store_listing_ru.md"
+    }
+  },
+  "privacy_url": "https://github.com/doc-bricks/DokuReader/blob/master/PRIVACY_POLICY.md",
   "support_url": "https://github.com/doc-bricks/DokuReader/issues",
   "store_id": "TBD"
 }

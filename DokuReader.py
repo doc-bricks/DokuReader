@@ -152,6 +152,7 @@ APP_NAME = "Dokumentenbibliothek"
 APP_VERSION = "1.0.1-dev"
 STATE_FILE = str(Path.home() / ".dokubibliothek_state.json")
 LIBRARY_EXPORT_SCHEMA = "dokureader-library-v1"
+MAX_LIBRARY_IMPORT_BYTES = 16 * 1024 * 1024
 
 SUPPORTED_EXTS = {
     ".txt", ".doc", ".docx", ".pdf", ".odt", ".rtf",
@@ -418,6 +419,140 @@ def write_library_export(path: str | os.PathLike[str], payload: dict) -> None:
                 pass
 
 
+def _is_explicit_absolute_path(path: str) -> bool:
+    """Erkennt echte vollqualifizierte Pfade plattformübergreifend ohne Laufwerks-CWD-Auflösung."""
+    if len(path) >= 3 and path[0].isalpha() and path[1] == ":" and path[2] in ("/", "\\"):
+        return True
+    if path.startswith(("\\\\", "//")):
+        return True
+    if os.name == "nt":
+        # Unter Windows ist '/foo.pdf' laufwerksrelativ zum CWD und kein vollqualifizierter Pfad.
+        return False
+    return os.path.isabs(path)
+
+
+def _paths_match_in_topic(existing_path: str, incoming_path: str) -> bool:
+    """Vergleicht Dokumentpfade innerhalb desselben Themas exakt oder über kanonische Aliasse."""
+    if existing_path == incoming_path:
+        return True
+    if not (_is_explicit_absolute_path(existing_path) and _is_explicit_absolute_path(incoming_path)):
+        return False
+    norm_existing = os.path.normcase(os.path.normpath(existing_path))
+    norm_incoming = os.path.normcase(os.path.normpath(incoming_path))
+    if norm_existing == norm_incoming:
+        return True
+    if os.path.isabs(existing_path) and os.path.isabs(incoming_path):
+        try:
+            if os.path.normcase(os.path.realpath(existing_path)) == os.path.normcase(
+                os.path.realpath(incoming_path)
+            ):
+                return True
+            if os.path.samefile(existing_path, incoming_path):
+                return True
+        except (OSError, ValueError):
+            pass
+    return False
+
+
+def validate_library_export_payload(payload: object) -> list[tuple[str, str, bool]]:
+    """Prüft ein `dokureader-library-v1`-Objekt strikt vor jeder Statusübernahme."""
+    if not isinstance(payload, dict):
+        raise ValueError("Ungültiges Bibliotheksformat: JSON-Wurzel muss ein Objekt sein.")
+    schema = payload.get("schema_version")
+    if schema != LIBRARY_EXPORT_SCHEMA:
+        raise ValueError(
+            f"Unbekanntes Schema: {schema!r} (erwartet: {LIBRARY_EXPORT_SCHEMA})."
+        )
+    current_topic = payload.get("current_topic")
+    if current_topic is not None and not isinstance(current_topic, str):
+        raise ValueError("Ungültiges Feld 'current_topic': String oder null erwartet.")
+    topics = payload.get("topics")
+    if not isinstance(topics, list):
+        raise ValueError("Ungültiges Feld 'topics': Liste erwartet.")
+
+    records: list[tuple[str, str, bool]] = []
+    for topic_entry in topics:
+        if not isinstance(topic_entry, dict):
+            raise ValueError("Ungültiger Themeneintrag im JSON-Import.")
+        topic_name = topic_entry.get("name")
+        docs = topic_entry.get("documents")
+        if not isinstance(topic_name, str) or not topic_name or not isinstance(docs, list):
+            raise ValueError("Jedes Thema benötigt 'name' (String) und 'documents' (Liste).")
+        for doc_entry in docs:
+            if not isinstance(doc_entry, dict):
+                raise ValueError("Ungültiger Dokumenteintrag im JSON-Import.")
+            doc_path = doc_entry.get("path")
+            doc_read = doc_entry.get("read")
+            if not isinstance(doc_path, str) or not doc_path or not isinstance(doc_read, bool):
+                raise ValueError(
+                    "Jedes Dokument im JSON-Import benötigt 'path' (String) und 'read' (Boolean)."
+                )
+            records.append((topic_name, doc_path, doc_read))
+    return records
+
+
+def read_library_export(path: str | os.PathLike[str]) -> dict:
+    """Liest und validiert eine `dokureader-library-v1.json`-Datei mit Größenlimit."""
+    with open(path, "rb") as handle:
+        raw = handle.read(MAX_LIBRARY_IMPORT_BYTES + 1)
+    if len(raw) > MAX_LIBRARY_IMPORT_BYTES:
+        raise ValueError(
+            f"JSON-Importdatei überschreitet das Größenlimit ({human_size(MAX_LIBRARY_IMPORT_BYTES)})."
+        )
+    try:
+        decoded = raw.decode("utf-8-sig")
+    except UnicodeDecodeError as exc:
+        raise ValueError("JSON-Importdatei ist kein gültiges UTF-8.") from exc
+    try:
+        payload = json.loads(decoded)
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"Ungültiges JSON: {exc.msg} (Zeile {exc.lineno}).") from exc
+    except RecursionError as exc:
+        raise ValueError("JSON-Importdatei ist unzulässig tief verschachtelt.") from exc
+    validate_library_export_payload(payload)
+    return payload
+
+
+def reconcile_library_export_payload(
+    topics: dict[str, list[dict]], payload: dict
+) -> dict[str, int]:
+    """Gleicht den `read`-Status vorhandener Bibliothekseinträge gegen einen v1-Export ab."""
+    records = validate_library_export_payload(payload)
+    matched = 0
+    updated = 0
+    unchanged = 0
+    unmatched = 0
+
+    for topic_name, incoming_path, incoming_read in records:
+        local_docs = topics.get(topic_name)
+        if not local_docs:
+            unmatched += 1
+            continue
+        target_docs = [
+            doc for doc in local_docs if _paths_match_in_topic(str(doc.get("path", "")), incoming_path)
+        ]
+        if not target_docs:
+            unmatched += 1
+            continue
+        matched += 1
+        changed_any = False
+        for doc in target_docs:
+            if bool(doc.get("read", False)) != incoming_read:
+                doc["read"] = incoming_read
+                changed_any = True
+        if changed_any:
+            updated += 1
+        else:
+            unchanged += 1
+
+    return {
+        "matched": matched,
+        "updated": updated,
+        "unchanged": unchanged,
+        "unmatched": unmatched,
+    }
+
+
 class State:
     """
     Verwaltet den Anwendungszustand (Themen, Dokumente, Gelesen-Status).
@@ -679,6 +814,24 @@ class State:
             self.topics.pop(topic, None)
             if self.current_topic == topic:
                 self.current_topic = None
+
+    def reconcile_from_export(self, payload: dict) -> dict[str, int]:
+        """Übernimmt Gelesen-Markierungen aus einem `dokureader-library-v1`-Payload thread-sicher.
+
+        Es werden ausschließlich `read`-Flags bereits vorhandener `(Thema, Pfad)`-Einträge
+        aktualisiert; weder werden fremde Pfade angelegt noch lokale Einträge oder Dateien gelöscht.
+        """
+        validate_library_export_payload(payload)
+        with self._lock:
+            summary = reconcile_library_export_payload(self.topics, payload)
+            incoming_topic = payload.get("current_topic")
+            if (
+                self.current_topic is None
+                and isinstance(incoming_topic, str)
+                and incoming_topic in self.topics
+            ):
+                self.current_topic = incoming_topic
+            return summary
 
 
 def _post_ui(window, callback):
@@ -1253,17 +1406,33 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
             "library_export_description",
             self.library_export_desc_label,
             name="Bibliothek JSON Beschreibung",
-            description="Erklärender Text zum Metadatenexport",
+            description="Erklärender Text zum Metadatenexport und Statusabgleich",
             role="description",
             focusable=False,
         )
+        library_json_actions = ttk.Frame(library_export_frame, style="Toolbar.TFrame")
+        library_json_actions.pack(fill=tk.X, padx=8, pady=(0, 5))
+        self.library_import_button = ttk.Button(
+            library_json_actions,
+            text="Status importieren…",
+            command=self.import_library_json,
+        )
+        self.library_import_button.pack(side=tk.LEFT)
+        self._register_accessibility(
+            "library_import",
+            self.library_import_button,
+            name="Lesestatus aus JSON importieren",
+            description="Übernimmt Gelesen-Markierungen aus einer dokureader-library-v1-Datei für vorhandene Einträge",
+            role="button",
+            focusable=True,
+        )
         self.library_export_button = ttk.Button(
-            library_export_frame,
+            library_json_actions,
             text="JSON-Export…",
             command=self.export_library_json,
             style="Accent.TButton",
         )
-        self.library_export_button.pack(anchor="e", padx=8, pady=(0, 5))
+        self.library_export_button.pack(side=tk.RIGHT)
         self._register_accessibility(
             "library_export",
             self.library_export_button,
@@ -2016,10 +2185,41 @@ class App(tk.Tk if not TKDND_AVAILABLE else tkdnd.Tk):
                 current_topic=self.state_model.current_topic,
             )
             write_library_export(out_path, payload)
-        except (OSError, ValueError, TypeError) as exc:
+        except (OSError, ValueError, TypeError, RecursionError) as exc:
             messagebox.showerror("Fehler", f"JSON-Export fehlgeschlagen:\n{exc}")
             return
         messagebox.showinfo("Erfolg", f"Bibliothek exportiert:\n{out_path}")
+
+    def import_library_json(self):
+        """Importiert geänderte Gelesen-Markierungen aus einer `dokureader-library-v1.json`-Datei."""
+        in_path = filedialog.askopenfilename(
+            title="Lesestatus aus JSON importieren",
+            initialdir=str(desktop_path()),
+            filetypes=[("JSON-Dateien", "*.json"), ("Alle Dateien", "*.*")],
+        )
+        if not in_path:
+            return
+        try:
+            payload = read_library_export(in_path)
+            summary = self.state_model.reconcile_from_export(payload)
+        except (OSError, ValueError, TypeError) as exc:
+            messagebox.showerror("Fehler", f"JSON-Statusimport fehlgeschlagen:\n{exc}", parent=self)
+            return
+        self._reload_topics()
+        if self.state_model.current_topic:
+            self._select_topic(self.state_model.current_topic)
+        else:
+            self._reload_docs()
+        saved = _save_library_state(self)
+        if saved:
+            messagebox.showinfo(
+                "Status importiert",
+                "Lesestatus aus Companion-JSON abgeglichen:\n"
+                f"• Geändert: {summary['updated']}\n"
+                f"• Unverändert: {summary['unchanged']}\n"
+                f"• Übersprungen (nicht in Bibliothek): {summary['unmatched']}",
+                parent=self,
+            )
 
     # Konvertierungen
     def _txt_to_pdf(self, path: str, tmpdir: Path) -> str | None:

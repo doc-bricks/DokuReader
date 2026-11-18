@@ -194,6 +194,31 @@ def main() -> None:
                 export_success.assert_called_once()
                 _assert(export_error.call_count == 3,
                         "JSON-Export hat nicht beide geschützten Ziele sichtbar abgewiesen.")
+
+            # Companion-Roundtrip im Source-Smoke: Lesestatus extern im JSON ändern und reimportieren
+            import json as _json
+
+            companion_payload = _json.loads(json_export.read_text(encoding="utf-8"))
+            for _topic_item in companion_payload["topics"]:
+                if _topic_item["name"] == "Ärzte":
+                    for _doc_item in _topic_item["documents"]:
+                        if _doc_item["path"] == str(pdf_path):
+                            _doc_item["read"] = True
+            companion_roundtrip = tmpdir / "companion_roundtrip.json"
+            companion_roundtrip.write_text(
+                _json.dumps(companion_payload, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+            with mock.patch.object(
+                DokuReader.filedialog, "askopenfilename", return_value=str(companion_roundtrip)
+            ), mock.patch.object(DokuReader.messagebox, "showinfo") as import_info:
+                app.import_library_json()
+                import_info.assert_called_once()
+            reconciled_docs = {d["path"]: d["read"] for d in app.state_model.list_docs("Ärzte")}
+            _assert(
+                reconciled_docs.get(str(pdf_path)) is True,
+                "JSON-Statusreimport hat den geänderten Gelesen-Status nicht übernommen.",
+            )
         finally:
             app.destroy()
             DokuReader.STATE_FILE = original_state_file

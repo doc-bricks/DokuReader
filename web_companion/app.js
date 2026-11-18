@@ -1,7 +1,20 @@
-import { parseLibrary, filterDocuments, buildDemoLibrary, setRead, serializeLibrary } from "./library.js";
+import {
+  parseLibrary,
+  filterDocuments,
+  buildDemoLibrary,
+  setRead,
+  serializeLibrary,
+  STORAGE_KEYS,
+  saveLibrarySnapshot,
+  loadLibrarySnapshot,
+  clearLibrarySnapshot
+} from "./library.js";
+import { SUPPORTED_LANGUAGES, normalizeLanguage, getDateLocale, t } from "./i18n.js";
 
 let library = null;
 let activeTopic = null;
+let currentLang = "de";
+let lastStatus = null;
 
 const topicList = document.getElementById("topic-list");
 const docList = document.getElementById("doc-list");
@@ -10,8 +23,101 @@ const showMissingChk = document.getElementById("show-missing");
 const statusBar = document.getElementById("status-bar");
 const dropZone = document.getElementById("drop-zone");
 const importBtn = document.getElementById("import-btn");
+const demoBtn = document.getElementById("demo-btn");
 const exportBtn = document.getElementById("export-btn");
+const clearBtn = document.getElementById("clear-btn");
+const langSelect = document.getElementById("lang-select");
 const fileInput = document.getElementById("file-input");
+
+function getSafeStorage() {
+  try {
+    return typeof window !== "undefined" && window.localStorage ? window.localStorage : null;
+  } catch {
+    return null;
+  }
+}
+
+function resolveInitialLanguage() {
+  const params = new URLSearchParams(location.search);
+  const queryLang = params.get("lang");
+  if (queryLang && SUPPORTED_LANGUAGES.includes(normalizeLanguage(queryLang, ""))) {
+    return normalizeLanguage(queryLang, "de");
+  }
+  const storage = getSafeStorage();
+  if (storage) {
+    try {
+      const saved = storage.getItem(STORAGE_KEYS.lang);
+      if (saved) return normalizeLanguage(saved, "de");
+    } catch {
+      // Storage gesperrt -> Browser-Sprache nutzen.
+    }
+  }
+  return normalizeLanguage(navigator.language || "de", "de");
+}
+
+function applyStaticTranslations() {
+  document.documentElement.lang = currentLang;
+  document.title = t("app_title", currentLang);
+  if (langSelect) {
+    langSelect.value = currentLang;
+    langSelect.setAttribute("aria-label", t("lang_label", currentLang));
+  }
+  for (const el of document.querySelectorAll("[data-i18n]")) {
+    const key = el.getAttribute("data-i18n");
+    if (key) el.textContent = t(key, currentLang);
+  }
+  searchInput.placeholder = t("search_placeholder", currentLang);
+  searchInput.setAttribute("aria-label", t("search_aria", currentLang));
+}
+
+function setStatusKey(key, params = {}, isError = false) {
+  lastStatus = { key, params, isError };
+  statusBar.textContent = t(key, currentLang, params);
+  statusBar.className = "status-bar" + (isError ? " error" : "");
+}
+
+function updateActionVisibility() {
+  const hasLibrary = Boolean(library);
+  exportBtn.hidden = !hasLibrary;
+  if (clearBtn) clearBtn.hidden = !hasLibrary;
+}
+
+function persistState() {
+  const storage = getSafeStorage();
+  if (!storage || !library) return { saved: true };
+  const result = saveLibrarySnapshot(storage, library, activeTopic);
+  if (result.saved === false && result.reason === "quota") {
+    const { topicCount, docCount } = countTotals(library);
+    setStatusKey("status_storage_quota", { topicCount, docCount });
+  }
+  return result;
+}
+
+function countTotals(lib) {
+  const topicCount = lib.totals?.topic_count ?? lib.topics.length;
+  const docCount =
+    lib.totals?.document_count ??
+    lib.topics.reduce((sum, topic) => sum + topic.documents.length, 0);
+  return { topicCount, docCount };
+}
+
+// --- Language switcher ---
+
+if (langSelect) {
+  langSelect.addEventListener("change", () => {
+    currentLang = normalizeLanguage(langSelect.value, "de");
+    const storage = getSafeStorage();
+    if (storage) {
+      try { storage.setItem(STORAGE_KEYS.lang, currentLang); } catch { /* ignore */ }
+    }
+    applyStaticTranslations();
+    renderTopics();
+    renderDocs();
+    if (lastStatus) {
+      setStatusKey(lastStatus.key, lastStatus.params, lastStatus.isError);
+    }
+  });
+}
 
 // --- Import ---
 
@@ -19,19 +125,19 @@ function loadLibrary(json) {
   try {
     library = parseLibrary(json);
     activeTopic = library.currentTopic || (library.topics[0]?.name ?? null);
+    const persisted = persistState();
     renderTopics();
     renderDocs();
-    exportBtn.hidden = false;
-    const total = library.totals;
-    setStatus(`${total.topic_count ?? library.topics.length} Themen · ${total.document_count ?? 0} Dokumente geladen`);
+    updateActionVisibility();
+    const { topicCount, docCount } = countTotals(library);
+    if (persisted.saved === false && persisted.reason === "quota") {
+      setStatusKey("status_storage_quota", { topicCount, docCount });
+    } else {
+      setStatusKey("status_loaded", { topicCount, docCount });
+    }
   } catch (e) {
-    setStatus("Fehler: " + e.message, true);
+    setStatusKey("status_error_prefix", { message: e.message }, true);
   }
-}
-
-function setStatus(msg, isError = false) {
-  statusBar.textContent = msg;
-  statusBar.className = "status-bar" + (isError ? " error" : "");
 }
 
 importBtn.addEventListener("click", () => fileInput.click());
@@ -41,9 +147,9 @@ fileInput.addEventListener("change", e => {
   if (!file) return;
   const reader = new FileReader();
   reader.onload = ev => {
-    try { loadLibrary(JSON.parse(ev.target.result)); } catch { setStatus("Ungültige JSON-Datei.", true); }
+    try { loadLibrary(JSON.parse(ev.target.result)); } catch { setStatusKey("status_invalid_json", {}, true); }
   };
-  reader.onerror = () => setStatus("Datei konnte nicht gelesen werden.", true);
+  reader.onerror = () => setStatusKey("status_read_error", {}, true);
   reader.readAsText(file, "utf-8");
   e.target.value = "";
 });
@@ -57,23 +163,38 @@ dropZone.addEventListener("drop", e => {
   if (!file) return;
   const reader = new FileReader();
   reader.onload = ev => {
-    try { loadLibrary(JSON.parse(ev.target.result)); } catch { setStatus("Ungültige JSON-Datei.", true); }
+    try { loadLibrary(JSON.parse(ev.target.result)); } catch { setStatusKey("status_invalid_json", {}, true); }
   };
-  reader.onerror = () => setStatus("Datei konnte nicht gelesen werden.", true);
+  reader.onerror = () => setStatusKey("status_read_error", {}, true);
   reader.readAsText(file, "utf-8");
 });
 
-// Demo — buildDemoLibrary() liefert bereits geparste Library; loadLibrary() würde parseLibrary()
-// nochmals aufrufen und wegen fehlender schema_version werfen.
-document.getElementById("demo-btn").addEventListener("click", () => {
+// Demo — buildDemoLibrary() liefert bereits eine geparste Library; parseLibrary()
+// darf darauf nicht erneut aufgerufen werden.
+demoBtn.addEventListener("click", () => {
   library = buildDemoLibrary();
   activeTopic = library.currentTopic || (library.topics[0]?.name ?? null);
+  persistState();
   renderTopics();
   renderDocs();
-  exportBtn.hidden = false;
-  const total = library.totals;
-  setStatus(`${total.topic_count ?? library.topics.length} Themen · ${total.document_count ?? 0} Dokumente geladen`);
+  updateActionVisibility();
+  const { topicCount, docCount } = countTotals(library);
+  setStatusKey("status_loaded", { topicCount, docCount });
 });
+
+// --- Clear persisted local data ---
+
+if (clearBtn) {
+  clearBtn.addEventListener("click", () => {
+    clearLibrarySnapshot(getSafeStorage());
+    library = null;
+    activeTopic = null;
+    topicList.replaceChildren();
+    updateActionVisibility();
+    renderDocs();
+    setStatusKey("status_cleared");
+  });
+}
 
 // --- Export ---
 
@@ -87,13 +208,16 @@ exportBtn.addEventListener("click", () => {
   a.download = "dokureader-library-v1.json";
   a.click();
   URL.revokeObjectURL(url);
-  setStatus("Bibliothek mit aktuellem Lesestatus exportiert.");
+  setStatusKey("status_exported");
 });
 
 // --- Render ---
 
 function renderTopics() {
-  if (!library) return;
+  if (!library) {
+    topicList.replaceChildren();
+    return;
+  }
   topicList.replaceChildren();
 
   const addTopic = (label, topic) => {
@@ -104,15 +228,21 @@ function renderTopics() {
     button.className = "topic-item" + (isActive ? " active" : "");
     button.textContent = label;
     if (isActive) button.setAttribute("aria-current", "true");
-    button.addEventListener("click", () => { activeTopic = topic; renderTopics(); renderDocs(); });
+    button.addEventListener("click", () => {
+      activeTopic = topic;
+      if (topic !== null) library.currentTopic = topic;
+      persistState();
+      renderTopics();
+      renderDocs();
+    });
     item.appendChild(button);
     topicList.appendChild(item);
   };
 
-  addTopic("Alle Themen", null);
+  addTopic(t("all_topics", currentLang), null);
 
-  for (const t of library.topics) {
-    addTopic(`${t.name} (${t.documents.length})`, t.name);
+  for (const topic of library.topics) {
+    addTopic(`${topic.name} (${topic.documents.length})`, topic.name);
   }
 }
 
@@ -124,13 +254,16 @@ function emptyMsg(text) {
 }
 
 function renderDocs() {
-  if (!library) { docList.replaceChildren(emptyMsg("Noch keine Bibliothek geladen.")); return; }
+  if (!library) {
+    docList.replaceChildren(emptyMsg(t("empty_no_library", currentLang)));
+    return;
+  }
   const q = searchInput.value;
   const showMissing = showMissingChk.checked;
   const docs = filterDocuments(library, { topic: activeTopic, query: q, showMissing });
 
   if (docs.length === 0) {
-    docList.replaceChildren(emptyMsg("Keine Dokumente gefunden."));
+    docList.replaceChildren(emptyMsg(t("empty_no_results", currentLang)));
     return;
   }
 
@@ -140,7 +273,11 @@ function renderDocs() {
     card.className = "doc-card" + (d.missing ? " missing" : "") + (d.read ? " read" : "");
     card.setAttribute("role", "button");
     card.setAttribute("tabindex", "0");
-    card.setAttribute("aria-label", `${d.filename} — ${d.read ? "Gelesen" : "Ungelesen"}, Klicken zum Umschalten`);
+    const stateText = t(d.read ? "state_read" : "state_unread", currentLang);
+    card.setAttribute(
+      "aria-label",
+      t("card_aria_toggle", currentLang, { filename: d.filename, state: stateText })
+    );
 
     const badge = document.createElement("span");
     badge.className = "ext-badge";
@@ -158,19 +295,20 @@ function renderDocs() {
     if (activeTopic === null) parts.push(d.topicName);
     if (d.sizeBytes !== null) parts.push(formatSize(d.sizeBytes));
     if (d.mtime) parts.push(formatDate(d.mtime));
-    if (d.missing) parts.push("⚠ Datei fehlt");
+    if (d.missing) parts.push(t("missing_flag", currentLang));
     meta.textContent = parts.join(" · ");
 
     const readBadge = document.createElement("span");
     readBadge.className = "read-badge";
-    readBadge.textContent = d.read ? "✓ Gelesen" : "Ungelesen";
+    readBadge.textContent = t(d.read ? "badge_read" : "badge_unread", currentLang);
 
     info.append(name, meta);
     card.append(badge, info, readBadge);
 
-    // Klick und Enter/Space schalten den Gelesen-Status um
+    // Klick und Enter/Space schalten den Gelesen-Status um und sichern ihn offline
     const toggleRead = () => {
       setRead(library, d.path, !d.read, d.topicName);
+      persistState();
       renderDocs();
     };
     card.addEventListener("click", toggleRead);
@@ -192,7 +330,7 @@ function formatSize(bytes) {
 }
 
 function formatDate(iso) {
-  try { return new Date(iso).toLocaleDateString("de-DE"); } catch { return ""; }
+  try { return new Date(iso).toLocaleDateString(getDateLocale(currentLang)); } catch { return ""; }
 }
 
 // --- Service Worker ---
@@ -201,15 +339,34 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("sw.js").catch(() => {});
 }
 
-// Demo on load if ?demo=1
+// --- Bootstrapping (Language + Offline State Restoration) ---
+
+currentLang = resolveInitialLanguage();
+applyStaticTranslations();
+
 if (new URLSearchParams(location.search).get("demo") === "1") {
   library = buildDemoLibrary();
   activeTopic = library.currentTopic || (library.topics[0]?.name ?? null);
   renderTopics();
   renderDocs();
-  exportBtn.hidden = false;
-  const total = library.totals;
-  setStatus(`${total.topic_count ?? library.topics.length} Themen · ${total.document_count ?? 0} Dokumente geladen`);
+  updateActionVisibility();
+  const { topicCount, docCount } = countTotals(library);
+  setStatusKey("status_loaded", { topicCount, docCount });
 } else {
-  renderDocs();
+  const restored = loadLibrarySnapshot(getSafeStorage());
+  if (restored && restored.library) {
+    library = restored.library;
+    activeTopic = restored.activeTopic;
+    renderTopics();
+    renderDocs();
+    updateActionVisibility();
+    const { topicCount, docCount } = countTotals(library);
+    setStatusKey("status_restored", { topicCount, docCount });
+  } else {
+    updateActionVisibility();
+    renderDocs();
+    if (restored && restored.error === "corrupt") {
+      setStatusKey("status_corrupt_cleared", {}, true);
+    }
+  }
 }

@@ -6,10 +6,10 @@
   "version": "1.0.1.0",
   "exe_name": "DokuReader.exe",
   "msix_name": "DokuReader.msix",
-  "output_dir": "C:/_Local_DEV/repos/DokuReader/releases/windowsstore",
-  "makeappx_path": "C:/Program Files (x86)/Windows Kits/10/bin/10.0.26100.0/x64/makeappx.exe",
-  "signtool_path": "C:/Program Files (x86)/Windows Kits/10/bin/10.0.26100.0/x64/signtool.exe",
-  "pfx_path": "C:/_Local_DEV/repos/WinStorePackager/dev_cert.pfx",
+  "output_dir": ".",
+  "makeappx_path": "",
+  "signtool_path": "",
+  "pfx_path": "",
   "pfx_password": "",
   "timestamp_url": "http://timestamp.digicert.com",
   "license_files": [
@@ -17,10 +17,18 @@
     "../../THIRD_PARTY_LICENSES.txt"
   ],
   "enable_i18n": true,
+  "languages": [
+    "de-DE",
+    "en-US",
+    "es-ES",
+    "zh-CN",
+    "ja-JP",
+    "ru-RU"
+  ],
   "capabilities": "runFullTrust",
-  "privacy_url": "https://github.com/doc-bricks/DokuReader/blob/master/README.md#privacy-and-local-data",
+  "privacy_url": "https://github.com/doc-bricks/DokuReader/blob/master/PRIVACY_POLICY.md",
   "support_url": "https://github.com/doc-bricks/DokuReader/issues",
   "category": "Productivity",
   "age_rating": "3+",
-  "description": "Lokale Dokumentenbibliothek mit Vorschau, Lesestatus, Sammel-PDF und Companion-JSON-Export."
+  "description": "Lokale Dokumentenbibliothek mit Vorschau, Lesestatus, Sammel-PDF und Companion-JSON-Abgleich."
 }

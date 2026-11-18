@@ -207,6 +207,7 @@ class SearchUiAccessibilityTests(unittest.TestCase):
                     self.app.delete_topic_button,
                     self.app.save_library_button,
                     self.app.collection_export_button,
+                    self.app.library_import_button,
                     self.app.library_export_button,
                 ):
                     self.assertTrue(button.winfo_ismapped(), button.cget("text"))
