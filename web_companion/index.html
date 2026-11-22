@@ -15,24 +15,33 @@
 </head>
 <body>
   <header>
-    <h1>DokuReader Companion</h1>
+    <h1 id="app-title" data-i18n="app_title">DokuReader Companion</h1>
     <div class="header-actions">
-      <button id="import-btn">JSON importieren</button>
-      <button id="demo-btn">Demo laden</button>
-      <button id="export-btn" hidden>Status exportieren</button>
+      <select id="lang-select" aria-label="Sprache auswählen">
+        <option value="de">Deutsch</option>
+        <option value="en">English</option>
+        <option value="es">Español</option>
+        <option value="zh">简体中文</option>
+        <option value="ja">日本語</option>
+        <option value="ru">Русский</option>
+      </select>
+      <button id="import-btn" type="button" data-i18n="import_btn">JSON importieren</button>
+      <button id="demo-btn" type="button" data-i18n="demo_btn">Demo laden</button>
+      <button id="export-btn" type="button" hidden data-i18n="export_btn">Status exportieren</button>
+      <button id="clear-btn" type="button" hidden data-i18n="clear_btn">Lokale Daten löschen</button>
       <input type="file" id="file-input" accept=".json" hidden>
     </div>
   </header>
 
   <button id="drop-zone" type="button" aria-describedby="drop-zone-help">
-    <span id="drop-zone-help">dokureader-library-v1.json hierher ziehen oder zum Auswählen aktivieren</span>
+    <span id="drop-zone-help" data-i18n="drop_zone_help">dokureader-library-v1.json hierher ziehen oder zum Auswählen aktivieren</span>
   </button>
 
   <div id="status-bar" class="status-bar" role="status" aria-live="polite" aria-atomic="true"></div>
 
   <div id="main-layout">
     <aside id="sidebar">
-      <h2>Themen</h2>
+      <h2 id="topics-heading" data-i18n="topics_heading">Themen</h2>
       <ul id="topic-list" role="list"></ul>
     </aside>
 
@@ -41,7 +50,7 @@
         <input id="search" type="search" placeholder="Dokument suchen…" aria-label="Dokument suchen">
         <label class="checkbox-label">
           <input type="checkbox" id="show-missing" checked>
-          Fehlende anzeigen
+          <span id="show-missing-text" data-i18n="show_missing">Fehlende anzeigen</span>
         </label>
       </div>
       <div id="doc-list" aria-live="polite">

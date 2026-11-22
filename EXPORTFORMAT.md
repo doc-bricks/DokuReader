@@ -1,12 +1,12 @@
 # EXPORTFORMAT - DokuReader
 
-Stand: 2026-05-30
+Stand: 2026-11-18
 
 ## Zweck
 
-`dokureader-library-v1.json` ist das stabile Austauschformat für die lokale Bibliothek von DokuReader. Der Export ist für Web/PWA-Companions, Backups der Themenstruktur und spätere Status-Synchronisation gedacht.
+`dokureader-library-v1.json` ist das stabile Austauschformat für die lokale Bibliothek von DokuReader. Der Export dient Web/PWA-Companions (`web_companion/`), Backups der Themenstruktur und dem bidirektionalen Lesestatus-Abgleich zwischen Desktop und Companion (`INV-SCHEMA-04`).
 
-Der Standardexport enthält bewusst **keine Dokumentinhalte** und kopiert keine Dateien. Exportiert werden nur Themen, Dokumentpfade und Metadaten, die sich ohne Eingriff in die Originaldateien aus dem lokalen Zustand ableiten lassen.
+Der Standardexport enthält bewusst **keine Dokumentinhalte** und kopiert keine Dateien. Exportiert werden ausschließlich Themen, Dokumentpfade und Metadaten, die sich ohne Eingriff in die Originaldateien (`INV-INPLACE-03`) aus dem lokalen Zustand ableiten lassen.
 
 ## Stabilitätsregeln
 
@@ -22,9 +22,9 @@ Der Standardexport enthält bewusst **keine Dokumentinhalte** und kopiert keine 
 |---|---|---|
 | `schema_version` | String | Formatkennung, aktuell `dokureader-library-v1` |
 | `exported_at` | String | UTC-Zeitstempel des Exports im ISO-8601-Format |
-| `app_name` | String | Anzeigename der Desktop-App |
-| `app_version` | String | App- oder Build-Stand der exportierenden Version |
-| `current_topic` | String oder `null` | Im Desktop zuletzt aktives Thema |
+| `app_name` | String (optional beim Reimport) | Anzeigename der exportierenden App |
+| `app_version` | String (optional beim Reimport) | App- oder Build-Stand der exportierenden Version |
+| `current_topic` | String oder `null` | Zuletzt aktives Thema |
 | `topics` | Array | Exportierte Themen |
 | `totals` | Objekt | Summen über alle Themen |
 
@@ -35,7 +35,7 @@ Jeder Eintrag in `topics` hat dieses Schema:
 | Feld | Typ | Bedeutung |
 |---|---|---|
 | `name` | String | Themenname |
-| `document_count` | Integer | Anzahl der exportierten Dokumenteinträge |
+| `document_count` | Integer (optional beim Reimport) | Anzahl der exportierten Dokumenteinträge |
 | `documents` | Array | Dokumente des Themas |
 
 ## Dokumente
@@ -47,10 +47,10 @@ Jeder Eintrag in `documents` hat dieses Schema:
 | `path` | String | Originalpfad der Datei auf dem Desktop-System |
 | `filename` | String | Dateiname ohne Pfad |
 | `extension` | String | Dateiendung inklusive Punkt, z. B. `.pdf` |
-| `read` | Boolean | Gelesen-Status aus DokuReader |
+| `read` | Boolean | Gelesen-Status aus DokuReader bzw. Companion |
 | `size_bytes` | Integer oder `null` | Dateigröße in Bytes, `null` wenn Datei fehlt |
 | `mtime` | String oder `null` | Änderungszeit der Datei in UTC-ISO-8601, `null` wenn Datei fehlt |
-| `missing` | Boolean | `true`, wenn der Pfad aktuell nicht mehr auf eine lesbare Datei zeigt |
+| `missing` | Boolean | `true`, wenn der Pfad beim Export nicht auf eine lesbare Datei zeigte |
 
 ## Summen
 
@@ -105,14 +105,19 @@ Jeder Eintrag in `documents` hat dieses Schema:
 }
 ```
 
-## Desktop-Verhalten
+## Desktop-Verhalten (Export & Lesestatus-Reimport)
 
-- Die GUI exportiert immer die gesamte Bibliothek, nicht nur das aktuell sichtbare Thema
-- Das aktuell gewählte Thema wird zusätzlich als `current_topic` mitgegeben
-- Der Export nutzt UTF-8 und schreibt echte Umlaute
-- Dokumentinhalte, Vorschaubilder, PDFs und Binärdateien werden nicht eingebettet
+### 1. Export (`JSON-Export…`)
+- Die GUI exportiert immer die gesamte Bibliothek, nicht nur das aktuell sichtbare Thema.
+- Das aktuell gewählte Thema wird zusätzlich als `current_topic` mitgegeben.
+- Der Export schreibt atomar (`.tmp` + `fsync` + `os.replace`) in UTF-8 mit echten Umlauten und verweigert das Überschreiben geschützter Originaldokumente sowie der internen Bibliotheksdatei.
+- Dokumentinhalte, Vorschaubilder, PDFs und Binärdateien werden nicht eingebettet.
 
-## Folgearbeit
-
-- Rückexport für Lesestatus aus einem Companion-Format definieren
-- Optionales Bundle-Format separat planen, falls mobile Offline-Pakete wirklich gebraucht werden
+### 2. Lesestatus-Reimport (`Status importieren…`)
+- Über `Status importieren…` (`read_library_export` + `State.reconcile_from_export`) liest die Desktop-App eine im Web/PWA-Companion aktualisierte `dokureader-library-v1.json`-Datei (Größenwächter max. 16 MiB, strikte Schema- und Typprüfung).
+- Abgeglichen wird ausschließlich das boolesche Feld `read` für bereits in der lokalen Desktop-Bibliothek vorhandene `(Thema, Pfad)`-Einträge (exakter Pfad oder kanonischer absoluter Pfad-Alias innerhalb desselben Themas).
+- **Sicherheitsinvarianten beim Reimport:**
+  - Fremde Themen oder unbekannte Dateipfade aus der Importdatei werden niemals automatisch in die lokale Bibliothek eingefügt (`unmatched` wird gezählt und übersprungen).
+  - Lokale Themen oder Dokumente, die im älteren Companion-Export fehlen, bleiben vollständig erhalten.
+  - Originaldateien im Dateisystem werden zu keinem Zeitpunkt verändert, verschoben oder gelöscht (`INV-INPLACE-03`).
+  - Die aktualisierte Bibliothek wird atomar in `.dokubibliothek_state.json` gespeichert.

@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import xml.etree.ElementTree as ET
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Iterable
@@ -30,12 +31,26 @@ STORE_SCREENSHOTS = (
 )
 WACK_REPORT_PREFIX = "wack_"
 
+TIER2_STORE_LANGUAGES = (
+    "de-DE",
+    "en-US",
+    "es-ES",
+    "zh-CN",
+    "ja-JP",
+    "ru-RU",
+)
+
 REQUIRED_DOCS = (
     "STORE_LISTING.md",
     "PRIVACY_POLICY.md",
     "SUPPORT.md",
     "LICENSE",
     "THIRD_PARTY_LICENSES.txt",
+)
+
+FORBIDDEN_LOCAL_PATH_RE = re.compile(
+    r"(?:[A-Za-z]:[\\/](?:Users|_Local_DEV)[\\/]|/Users/|/home/)",
+    re.IGNORECASE,
 )
 
 
@@ -95,7 +110,170 @@ def check_store_package(root: Path) -> list[CheckResult]:
         else:
             results.append(_result(f"{key}", "BLOCKER", "must be a public https URL", path, root))
 
+    if "languages" in data:
+        langs = data.get("languages")
+        if not isinstance(langs, list) or not all(isinstance(item, str) and item.strip() for item in langs):
+            results.append(_result("Store Tier-2 languages", "BLOCKER", "languages must be a non-empty list of BCP-47 tags", path, root))
+        else:
+            missing_langs = [lang for lang in TIER2_STORE_LANGUAGES if lang not in langs]
+            if missing_langs:
+                results.append(
+                    _result(
+                        "Store Tier-2 languages",
+                        "BLOCKER",
+                        f"missing Tier-2 languages: {', '.join(missing_langs)}",
+                        path,
+                        root,
+                    )
+                )
+            else:
+                results.append(
+                    _result(
+                        "Store Tier-2 languages",
+                        "OK",
+                        f"{len(langs)} locales ({', '.join(langs)})",
+                        path,
+                        root,
+                    )
+                )
+
+    if "listings" in data:
+        listings = data.get("listings")
+        if not isinstance(listings, dict):
+            results.append(_result("Store Tier-2 listings", "BLOCKER", "listings must be an object keyed by locale", path, root))
+        else:
+            expected_locales = data.get("languages") if isinstance(data.get("languages"), list) else list(TIER2_STORE_LANGUAGES)
+            problems: list[str] = []
+            for locale in expected_locales:
+                entry = listings.get(locale)
+                if not isinstance(entry, dict):
+                    problems.append(f"{locale}: missing listing object")
+                    continue
+                short_desc = str(entry.get("short_description", "")).strip()
+                if not (1 <= len(short_desc) <= 100):
+                    problems.append(f"{locale}: short_description length {len(short_desc)} (must be 1..100)")
+                keywords = entry.get("keywords")
+                if not isinstance(keywords, list) or not (1 <= len(keywords) <= 7):
+                    problems.append(f"{locale}: keywords must contain 1..7 entries")
+                else:
+                    for kw in keywords:
+                        kw_text = str(kw).strip()
+                        if not (1 <= len(kw_text) <= 30):
+                            problems.append(f"{locale}: keyword {kw_text!r} exceeds 30 chars or is empty")
+                listing_rel = str(entry.get("listing_file", "")).strip()
+                if not listing_rel:
+                    problems.append(f"{locale}: missing listing_file")
+                else:
+                    listing_path = root / listing_rel
+                    if not listing_path.is_file() or listing_path.stat().st_size == 0:
+                        problems.append(f"{locale}: listing_file missing or empty ({listing_rel})")
+            if problems:
+                results.append(_result("Store Tier-2 listings", "BLOCKER", "; ".join(problems), path, root))
+            else:
+                results.append(
+                    _result(
+                        "Store Tier-2 listings",
+                        "OK",
+                        f"verified {len(expected_locales)} localized listings (short_description <=100, <=7 keywords <=30 chars)",
+                        path,
+                        root,
+                    )
+                )
+
     return results
+
+
+def check_appx_manifest(root: Path) -> list[CheckResult]:
+    manifest_path = root / "releases" / "windowsstore" / "AppxManifest.xml"
+    if not manifest_path.exists():
+        return []
+
+    pkg_data, pkg_err = _read_json(root / "store_package.json")
+    try:
+        xml_root = ET.parse(manifest_path).getroot()
+    except ET.ParseError as exc:
+        return [_result("MSIX AppxManifest template", "BLOCKER", f"invalid XML: {exc}", manifest_path, root)]
+
+    def _local(tag: str) -> str:
+        return tag.rsplit("}", 1)[-1]
+
+    identity = next((el for el in xml_root.iter() if _local(el.tag) == "Identity"), None)
+    if identity is None:
+        return [_result("MSIX AppxManifest template", "BLOCKER", "missing <Identity> element", manifest_path, root)]
+
+    problems: list[str] = []
+    if not pkg_err:
+        for xml_attr, json_key in (
+            ("Name", "identity_name"),
+            ("Publisher", "publisher"),
+            ("Version", "version"),
+        ):
+            expected = str(pkg_data.get(json_key, "")).strip()
+            actual = str(identity.attrib.get(xml_attr, "")).strip()
+            if expected and actual != expected:
+                problems.append(f"Identity {xml_attr}={actual!r} != {expected!r}")
+
+    arch = identity.attrib.get("ProcessorArchitecture", "")
+    if arch not in {"x64", "arm64", "neutral"}:
+        problems.append(f"unexpected ProcessorArchitecture={arch!r}")
+
+    caps = [
+        el.attrib.get("Name", "")
+        for el in xml_root.iter()
+        if _local(el.tag) == "Capability"
+    ]
+    if "runFullTrust" not in caps:
+        problems.append("missing runFullTrust capability")
+
+    manifest_langs = [
+        el.attrib.get("Language", "")
+        for el in xml_root.iter()
+        if _local(el.tag) == "Resource" and el.attrib.get("Language")
+    ]
+    expected_langs = (
+        [str(x) for x in pkg_data.get("languages", [])]
+        if not pkg_err and isinstance(pkg_data.get("languages"), list)
+        else []
+    )
+    missing_res = [lang for lang in expected_langs if lang not in manifest_langs]
+    if missing_res:
+        problems.append(f"missing <Resource Language>: {', '.join(missing_res)}")
+
+    app_el = next((el for el in xml_root.iter() if _local(el.tag) == "Application"), None)
+    expected_exe = str(pkg_data.get("executable", "DokuReader.exe")).strip() if not pkg_err else "DokuReader.exe"
+    if app_el is None or app_el.attrib.get("Executable", "").strip() != expected_exe:
+        problems.append(f"Application Executable must be {expected_exe!r}")
+
+    logo_el = next((el for el in xml_root.iter() if _local(el.tag) == "Logo"), None)
+    visual_el = next((el for el in xml_root.iter() if _local(el.tag) == "VisualElements"), None)
+    default_tile_el = next((el for el in xml_root.iter() if _local(el.tag) == "DefaultTile"), None)
+
+    expected_logos = {
+        "Properties/Logo": (logo_el.text.strip() if logo_el is not None and logo_el.text else "", "StoreLogo.png"),
+        "Square150x150Logo": (visual_el.attrib.get("Square150x150Logo", "") if visual_el is not None else "", "Square150x150Logo.png"),
+        "Square44x44Logo": (visual_el.attrib.get("Square44x44Logo", "") if visual_el is not None else "", "Square44x44Logo.png"),
+        "Wide310x150Logo": (default_tile_el.attrib.get("Wide310x150Logo", "") if default_tile_el is not None else "", "Wide310x150Logo.png"),
+        "Square310x310Logo": (default_tile_el.attrib.get("Square310x310Logo", "") if default_tile_el is not None else "", "Square310x310Logo.png"),
+    }
+    for label, (declared_ref, asset_filename) in expected_logos.items():
+        norm_ref = declared_ref.replace("/", "\\")
+        valid_staging_refs = {f"icons\\{asset_filename}", f"store_assets\\{asset_filename}"}
+        if norm_ref not in valid_staging_refs:
+            problems.append(f"{label}={declared_ref!r} must use icons\\{asset_filename} or store_assets\\{asset_filename}")
+        elif not (root / "store_assets" / asset_filename).is_file():
+            problems.append(f"{label} source PNG missing: store_assets/{asset_filename}")
+
+    if problems:
+        return [_result("MSIX AppxManifest template", "BLOCKER", "; ".join(problems), manifest_path, root)]
+    return [
+        _result(
+            "MSIX AppxManifest template",
+            "OK",
+            f"Identity {identity.attrib.get('Name')} {identity.attrib.get('Version')} ({arch}, {len(manifest_langs)} languages)",
+            manifest_path,
+            root,
+        )
+    ]
 
 
 def check_packager_settings(root: Path) -> list[CheckResult]:
@@ -118,6 +296,24 @@ def check_packager_settings(root: Path) -> list[CheckResult]:
         results.append(_result("Signing password", "BLOCKER", "pfx_password must not be stored in project files", path, root))
     else:
         results.append(_result("Signing password", "OK", "no signing password stored", path, root))
+
+    leaked_keys = [
+        key
+        for key in ("output_dir", "pfx_path", "makeappx_path", "signtool_path")
+        if FORBIDDEN_LOCAL_PATH_RE.search(str(data.get(key, "")))
+    ]
+    if leaked_keys:
+        results.append(
+            _result(
+                "Packager path hygiene",
+                "BLOCKER",
+                f"non-portable developer paths in {', '.join(leaked_keys)}",
+                path,
+                root,
+            )
+        )
+    else:
+        results.append(_result("Packager path hygiene", "OK", "no machine-specific user/worktree paths", path, root))
 
     return results
 
@@ -178,6 +374,7 @@ def _first_existing(paths: Iterable[Path]) -> Path | None:
 def check_build_artifacts(root: Path) -> list[CheckResult]:
     exe_candidates = (
         root / "dist" / "DokuReader.exe",
+        root / "dist" / "DokuReader" / "DokuReader.exe",
         root / "releases" / "v1.0.0" / "DokuReader-1.0.0-win64.exe",
     )
     msix_candidates = (
@@ -294,6 +491,7 @@ def run_checks(root: Path = PROJECT_ROOT) -> list[CheckResult]:
     root = root.resolve()
     results: list[CheckResult] = []
     results.extend(check_store_package(root))
+    results.extend(check_appx_manifest(root))
     results.extend(check_packager_settings(root))
     results.extend(check_required_docs(root))
     results.extend(check_store_assets(root))
