@@ -5,6 +5,14 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+- **Pfad B Discoverability, Interactive Lifecycle Sequence Parity, Level-1-SBOM-Re-Audit & Vertragstest-Erweiterung (2026-11-01)**:
+  - Interaktives Sequenzdiagramm in Sektion 6 von `README.md` und `README_de.md` um den vollständigen Offline-Lebenszyklus des mobilen PWA-Companions (`web_companion/`) erweitert (Zero-Egress JSON-Export, Offline-Review auf Mobilgeräten, Status-Toggle und Re-Import unter `INV-SCHEMA-04`, `INV-LOCAL-01` und `INV-ISOLATION-05`).
+  - Shields.io Badges in `README.md` und `README_de.md` synchronisiert: Audit `2026-11-01`, 254 Pytest Tests, 37 Web Companion Tests (100% grün).
+  - Level 1 SBOM Text-Begleitdatei `THIRD_PARTY_LICENSES.txt` und `THIRD_PARTY_LICENSES.md` re-auditiert auf Stand 2026-11-01 mit Invarianten-Bestätigungsblock (`INV-LOCAL-01` bis `INV-SLA-10`), `RunAsInvoker` Non-Elevation (`INV-RUNAS-02`), Zero-Egress Air-Gap und § 521 BGB Gefälligkeitsrecht.
+  - `llms.txt` RAG-Kontextindex aktualisiert auf Last-checked: 2026-11-01 mit aktualisierten Messwerten und Companion-Lebenszyklus-Dokumentation.
+  - Vertragstestsuite `tests/test_metadata.py` um Tests für Audit-Aktualität 2026-11-01 und bilaterale PWA-Sequenz-Parität erweitert (`test_readme_badges_audit_recency_20261101`).
+  - Versionsnummer `1.0.1-dev` (`1.0.1.dev0` / Store: `1.0.1.0`) gemäß T-20260920-167562623 strikt unverändert beibehalten.
+
 - **Pfad B Discoverability, Four-View ASCII Architecture Topology, Level-1-SBOM-Text-Begleitdatei & Vertragstest-Erweiterung (2026-10-03)**:
   - Standardisierte ASCII Vier-Sichten-Architekturprojektion (`[VIEW 1]` bis `[VIEW 4]` bzw. `[SICHT 1]` bis `[SICHT 4]`) in `README.md` und `README_de.md` Sektion 3 integriert unter Erhalt aller 18 Schnellnavigationspunkte (`sec-01` bis `sec-18`) und Verankerung aller 10 Governance-Invarianten (`INV-LOCAL-01` bis `INV-SLA-10`).
   - Shields.io Badges synchronisiert: Audit `2026-10-03`, Contributing Guidelines (`Contributing: Welcome` / `Mitwirken: Leitfaden`), Level 1 SBOM Text Companion (`Level 1 SBOM: Text Companion` / `Textbegleiter`), Attributions und 164 Pytest Tests (100% grün).

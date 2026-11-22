@@ -24,7 +24,7 @@
 [![Dachorganisation: open-bricks](https://img.shields.io/badge/Dachorganisation-open--bricks-blue)](https://github.com/open-bricks)
 [![Level 1 SBOM: Text](https://img.shields.io/badge/Level%201%20SBOM-Textbegleiter-blue)](THIRD_PARTY_LICENSES.txt)
 [![Mitwirken: Willkommen](https://img.shields.io/badge/Mitwirken-Leitfaden-blue)](CONTRIBUTING.md)
-[![Audit: 2026--10--03](https://img.shields.io/badge/Audit-2026--10--03-informational)](#qualitäts-gates--automatisierte-testsuiten)
+[![Audit: 2026--11--01](https://img.shields.io/badge/Audit-2026--11--01-informational)](#qualitäts-gates--automatisierte-testsuiten)
 [![Attribution: NOTICE](https://img.shields.io/badge/Attribution-NOTICE-blue)](NOTICE)
 
 > [!NOTE]
@@ -298,6 +298,14 @@ sequenceDiagram
     UI->>Output: Bündel generieren (Gefiltert nach Status)
     Output->>Disk: dokureader-library-v1.json oder Merged PDF schreiben
     Note over UI,Disk: 100% Offline / Local-First — Zero Network Egress (INV-LOCAL-01)
+
+    opt Mobiler PWA-Begleiter-Kreislauf (web_companion)
+        User->>Disk: dokureader-library-v1.json in mobilen Browser laden
+        Disk-->>User: Gekapselter lokaler PWA-Cache (INV-ISOLATION-05)
+        User->>UI: Abgeglichene dokureader-library-v1.json importieren
+        UI->>State: Lesestatus abgleichen (INV-SCHEMA-04)
+        State-->>UI: In Desktop-Übersicht widerspiegeln
+    end
 ```
 
 ---
